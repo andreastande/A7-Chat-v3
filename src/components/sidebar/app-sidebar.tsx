@@ -1,10 +1,11 @@
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu } from "@/components/ui/sidebar"
-import AppSidebarHeader from "./app-sidebar-header"
-import ChatItem from "./items/chat-item"
-import FilesItem from "./items/files-item"
-import GalleryItem from "./items/gallery-item"
-import HistoryItem from "./items/history-item"
-import ProjectsItem from "./items/projects-item"
+import { AppSidebarFooter } from "./app-sidebar-footer"
+import { AppSidebarHeader } from "./app-sidebar-header"
+import { ChatItem } from "./items/chat-item"
+import { FilesItem } from "./items/files-item"
+import { HistoryItem } from "./items/history-item"
+import { ImagesItem } from "./items/images-item"
+import { ProjectsItem } from "./items/projects-item"
 
 export function AppSidebar() {
   return (
@@ -15,7 +16,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <ChatItem />
-              <GalleryItem />
+              <ImagesItem />
               <FilesItem />
               <ProjectsItem />
               <HistoryItem />
@@ -23,6 +24,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <AppSidebarFooter />
     </Sidebar>
   )
 }
