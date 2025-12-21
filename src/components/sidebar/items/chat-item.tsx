@@ -2,7 +2,8 @@
 
 import { MessageCircle } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { useHotkeys } from "react-hotkeys-hook"
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 
 function NewChatShortcut() {
@@ -17,6 +18,9 @@ function NewChatShortcut() {
 
 export function ChatItem() {
   const pathname = usePathname()
+  const router = useRouter()
+
+  useHotkeys("shift+mod+o", () => router.push("/"), { preventDefault: true })
 
   return (
     <SidebarMenuItem>
@@ -24,7 +28,7 @@ export function ChatItem() {
         tooltip={
           <div className="flex items-center gap-2">
             Chat
-            <kbd className="space-x-0.5 text-muted-foreground text-xs *:font-sans">
+            <kbd className="*:kbd space-x-0.5">
               <NewChatShortcut />
             </kbd>
           </div>
@@ -35,7 +39,7 @@ export function ChatItem() {
         <Link href="/">
           <MessageCircle />
           Chat
-          <kbd className="absolute top-2 right-2 hidden space-x-0.5 text-muted-foreground text-xs *:font-sans group-data-[state=expanded]:group-[:hover,:focus-visible]/menu-button:flex">
+          <kbd className="*:kbd invisible ml-auto space-x-0.5 group-data-[state=expanded]:group-[:hover,:focus-visible]/menu-button:visible">
             <NewChatShortcut />
           </kbd>
         </Link>

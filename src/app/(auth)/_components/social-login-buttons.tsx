@@ -11,11 +11,7 @@ const providers = [
   { name: "github", icon: SiGithub },
 ] as const
 
-interface SocialLoginButtonsProps {
-  lastMethod?: string | null
-}
-
-export function SocialLoginButtons({ lastMethod }: SocialLoginButtonsProps) {
+export function SocialLoginButtons({ lastMethod }: { lastMethod?: string | null }) {
   return (
     <Field className="grid grid-cols-2 gap-6">
       {providers.map(({ name, icon: Icon }) => (

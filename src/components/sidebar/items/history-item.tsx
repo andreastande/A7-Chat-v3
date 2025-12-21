@@ -14,15 +14,6 @@ import {
 } from "@/components/ui/sidebar"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
-function HistoryShortcut() {
-  return (
-    <>
-      <kbd>⌘</kbd>
-      <kbd>K</kbd>
-    </>
-  )
-}
-
 export function HistoryItem() {
   const session = useSession()
 
@@ -33,8 +24,9 @@ export function HistoryItem() {
           <SidebarMenuButton>
             <History />
             History
-            <kbd className="absolute top-2 right-2 hidden space-x-0.5 text-muted-foreground text-xs *:font-sans group-data-[state=expanded]:group-[:hover,:focus-visible]/menu-button:flex">
-              <HistoryShortcut />
+            <kbd className="*:kbd invisible absolute top-2 right-2 flex space-x-0.5 group-data-[state=expanded]:group-[:hover,:focus-visible]/menu-button:visible">
+              <kbd>⌘</kbd>
+              <kbd>K</kbd>
             </kbd>
           </SidebarMenuButton>
           <CollapsibleTrigger asChild>

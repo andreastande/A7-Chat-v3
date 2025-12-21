@@ -14,7 +14,7 @@ export function AppSidebarHeader() {
         content={
           <div className="flex items-center gap-2">
             {open ? "Close sidebar" : "Open sidebar"}
-            <kbd className="text-muted-foreground *:font-sans">
+            <kbd className="*:kbd">
               <kbd>⌘</kbd>
               <kbd>B</kbd>
             </kbd>
@@ -23,9 +23,13 @@ export function AppSidebarHeader() {
         side="right"
         asChild
       >
-        <Button variant="ghost" size="icon-sm" onClick={toggleSidebar}>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={toggleSidebar}
+          aria-label={open ? "Close sidebar" : "Open sidebar"}
+        >
           <PanelLeft />
-          <span className="sr-only">Toggle sidebar</span>
         </Button>
       </WithTooltip>
     </SidebarHeader>

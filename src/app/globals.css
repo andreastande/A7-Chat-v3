@@ -124,11 +124,27 @@ body {
   }
 }
 
+/* https://ui.shadcn.com/docs/components/button#cursor */
 @layer base {
   button:not([disabled]),
   [role="button"]:not([disabled]) {
     cursor: pointer;
   }
+}
+
+/* Maintains hover state on dropdown triggers when expanded */
+@utility trigger-active {
+  &[aria-expanded="true"] {
+    @apply bg-accent text-accent-foreground;
+
+    @variant dark {
+      @apply bg-accent/50;
+    }
+  }
+}
+
+@utility kbd {
+  @apply text-muted-foreground text-xs font-sans;
 }
 
 /* https://stackoverflow.com/a/79481043/19894206 */

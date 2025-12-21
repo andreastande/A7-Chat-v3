@@ -1,5 +1,5 @@
 import { AppSidebar } from "@/components/sidebar/app-sidebar"
-import { ChatHeader } from "../../_components/chat-header"
+import { ExistingChatHeader } from "../../_components/chat-header"
 
 export default async function Page({ params }: PageProps<"/chat/[id]">) {
   const { id: chatId } = await params
@@ -7,10 +7,10 @@ export default async function Page({ params }: PageProps<"/chat/[id]">) {
   return (
     <>
       <AppSidebar />
-      <div className="flex w-full flex-col">
-        <ChatHeader />
+      <div className="@container flex w-full flex-col">
+        <ExistingChatHeader chatId={chatId} />
         <main className="flex flex-1 items-center justify-center">
-          <p>{chatId}</p>
+          <p>Test</p>
         </main>
       </div>
     </>

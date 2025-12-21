@@ -71,7 +71,7 @@ export function AppSidebarFooter() {
                   Learn more
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
-                  <DropdownMenuSubContent className="min-w-50 max-w-xs">
+                  <DropdownMenuSubContent>
                     {[
                       { href: "https://github.com/andreastande/A7-Chat-v3", icon: SiGithub, label: "GitHub" },
                       { href: "/privacy-policy", icon: HatGlasses, label: "Privacy policy", separator: true },
@@ -79,13 +79,11 @@ export function AppSidebarFooter() {
                     ].map(({ href, icon: Icon, label, separator }) => (
                       <div key={href}>
                         {separator && <DropdownMenuSeparator />}
-                        <DropdownMenuItem className="group/item justify-between" asChild>
+                        <DropdownMenuItem className="group/item" asChild>
                           <Link href={href} target="_blank">
-                            <div className="flex items-center gap-2">
-                              <Icon />
-                              {label}
-                            </div>
-                            <ExternalLink className="hidden group-[:hover,:focus-visible]/item:flex" />
+                            <Icon />
+                            <span className="mr-4">{label}</span>
+                            <ExternalLink className="invisible ml-auto group-[:hover,:focus-visible]/item:visible" />
                           </Link>
                         </DropdownMenuItem>
                       </div>
