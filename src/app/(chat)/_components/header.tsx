@@ -1,5 +1,6 @@
 "use client"
 
+import { useMessageCount } from "@ai-sdk-tools/store"
 import { ChevronDown, MessageCircleDashed, Share } from "lucide-react"
 import Link from "next/link"
 import { useSession } from "@/components/providers/session-provider"
@@ -7,16 +8,20 @@ import { Button } from "@/components/ui/button"
 import { WithTooltip } from "@/components/ui/tooltip"
 
 function GuestHeader() {
+  const messageCount = useMessageCount()
+
   return (
     <div className="sticky top-0 z-10 flex justify-center p-2">
-      <div className="flex gap-2">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/about">About</Link>
-        </Button>
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/features">Features</Link>
-        </Button>
-      </div>
+      {messageCount === 0 && (
+        <div className="flex gap-2">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/about">About</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/features">Features</Link>
+          </Button>
+        </div>
+      )}
       <div className="absolute right-4 flex gap-2">
         <Button size="sm" asChild>
           <Link href="/login">Log in</Link>
@@ -29,13 +34,7 @@ function GuestHeader() {
   )
 }
 
-export function NewChatHeader() {
-  const session = useSession()
-
-  if (!session) {
-    return <GuestHeader />
-  }
-
+function EmptyChatHeader() {
   return (
     <div className="sticky top-0 z-10 flex justify-end p-2">
       <WithTooltip content="Turn on temporary chat" side="left" asChild>
@@ -47,12 +46,12 @@ export function NewChatHeader() {
   )
 }
 
-export function ExistingChatHeader({ chatId }: { chatId: string }) {
+function ChatHeader() {
   return (
     // Show bg when title overlaps: 768 (conversation, w-3xl) + 2×(242+8) (title+padding) = 1268px
     <div className="sticky top-0 z-10 flex justify-between @max-[1268]:bg-background p-2">
       <Button variant="ghost" size="sm">
-        <span className="w-full max-w-50 truncate">A Tale of Fortune and Disaster ({chatId})</span>
+        <span className="w-full max-w-50 truncate">A Tale of Fortune and Disaster in Paris</span>
         <ChevronDown />
       </Button>
       <Button variant="ghost" size="sm">
@@ -61,4 +60,19 @@ export function ExistingChatHeader({ chatId }: { chatId: string }) {
       </Button>
     </div>
   )
+}
+
+export function Header() {
+  const session = useSession()
+  const messageCount = useMessageCount()
+
+  if (!session) {
+    return <GuestHeader />
+  }
+
+  if (messageCount === 0) {
+    return <EmptyChatHeader />
+  }
+
+  return <ChatHeader />
 }

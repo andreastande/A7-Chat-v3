@@ -1,17 +1,35 @@
 "use client"
 
-import { ArrowUp, ChevronDown } from "lucide-react"
-import { useRef } from "react"
+import { useChatActions, useChatStatus } from "@ai-sdk-tools/store"
+import { ArrowUp, ChevronDown, Square } from "lucide-react"
+import { useRef, useState } from "react"
 import TextareaAutosize from "react-textarea-autosize"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import ChatInputActions from "./chat-input-actions"
 
-export function ChatInput({ className }: { className?: string }) {
+interface ChatInputProps {
+  className?: string
+  sendMessage: (msg: string) => void
+}
+
+export function ChatInput({ className, sendMessage }: ChatInputProps) {
+  const [input, setInput] = useState("")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  function sendMessage() {
-    console.log("funker!")
+  const status = useChatStatus()
+  const { stop } = useChatActions()
+
+  const canSend = status === "ready" && input.trim()
+  const canStop = status === "submitted" || status === "streaming"
+
+  function handleSubmit() {
+    if (canSend) {
+      sendMessage(input.trim())
+      setInput("")
+    } else if (canStop) {
+      stop()
+    }
   }
 
   return (
@@ -22,7 +40,7 @@ export function ChatInput({ className }: { className?: string }) {
         // Should shadcn-button default to type=button?
         const submitter = (e.nativeEvent as SubmitEvent).submitter
         if (submitter?.hasAttribute("data-submit")) {
-          sendMessage()
+          handleSubmit()
         }
       }}
       onClick={(e) => {
@@ -31,10 +49,15 @@ export function ChatInput({ className }: { className?: string }) {
           textareaRef.current?.focus()
         }
       }}
-      className={cn("cursor-text rounded-xl border border-input p-3 shadow-xs dark:bg-input/30", className)}
+      className={cn(
+        "cursor-text rounded-xl border border-input bg-background p-3 shadow-xs dark:bg-[#141416]",
+        className,
+      )}
     >
       <TextareaAutosize
         ref={textareaRef}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
         autoFocus
         placeholder="Ask anything"
         minRows={2}
@@ -43,7 +66,7 @@ export function ChatInput({ className }: { className?: string }) {
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault()
-            sendMessage()
+            handleSubmit()
           }
         }}
       />
@@ -55,8 +78,8 @@ export function ChatInput({ className }: { className?: string }) {
             <ChevronDown className="text-muted-foreground" />
           </Button>
         </div>
-        <Button data-submit size="icon-sm">
-          <ArrowUp />
+        <Button data-submit size="icon-sm" disabled={!(canSend || canStop)}>
+          {canStop ? <Square /> : <ArrowUp />}
         </Button>
       </div>
     </form>

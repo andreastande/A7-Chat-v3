@@ -1,6 +1,12 @@
 import { Globe, Paperclip, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { WithTooltip } from "@/components/ui/tooltip"
 
 export default function ChatInputActions() {
@@ -22,6 +28,7 @@ export default function ChatInputActions() {
             <kbd>U</kbd>
           </kbd>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem>
           <Globe />
           Web search

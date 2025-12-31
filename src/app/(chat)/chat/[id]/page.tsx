@@ -1,17 +1,24 @@
+import { Provider as ChatProvider } from "@ai-sdk-tools/store"
 import { AppSidebar } from "@/components/sidebar/app-sidebar"
-import { ExistingChatHeader } from "../../_components/chat-header"
+import { getMessages } from "@/dal/chat"
+import { Chat } from "../../_components/chat"
+import { Header } from "../../_components/header"
 
 export default async function Page({ params }: PageProps<"/chat/[id]">) {
   const { id: chatId } = await params
+
+  const initialMessages = await getMessages(chatId)
 
   return (
     <>
       <AppSidebar />
       <div className="@container flex w-full flex-col">
-        <ExistingChatHeader chatId={chatId} />
-        <main className="flex flex-1 items-center justify-center">
-          <p>Test</p>
-        </main>
+        <ChatProvider initialMessages={initialMessages}>
+          <Header />
+          <main className="flex flex-1 justify-center">
+            <Chat chatId={chatId} initialMessages={initialMessages} />
+          </main>
+        </ChatProvider>
       </div>
     </>
   )

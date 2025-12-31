@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Effect } from "effect"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Controller, useForm } from "react-hook-form"
@@ -40,16 +39,11 @@ export default function Page() {
   })
 
   async function onSubmit(data: z.infer<typeof signupSchema>) {
-    await Effect.promise(() => signUpEmail(data)).pipe(
-      Effect.flatMap(({ error, data }) =>
-        error ? Effect.fail(error.message ?? "Unable to create account. Please try again.") : Effect.succeed(data),
-      ),
-      Effect.match({
-        onFailure: (message) => form.setError("root.serverError", { message }),
-        onSuccess: () => router.push("/"),
-      }),
-      Effect.runPromise,
-    )
+    const { error } = await signUpEmail(data)
+    if (error) {
+      return form.setError("root.serverError", { message: error.message ?? "Unable to create account" })
+    }
+    router.push("/")
   }
 
   return (

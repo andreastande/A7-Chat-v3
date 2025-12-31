@@ -1,16 +1,19 @@
+import { Provider as ChatProvider } from "@ai-sdk-tools/store"
 import { AppSidebar } from "@/components/sidebar/app-sidebar"
-import { NewChatHeader } from "./_components/chat-header"
-import { NewChat } from "./_components/new-chat"
+import { Chat } from "./_components/chat"
+import { Header } from "./_components/header"
 
 export default function Home() {
   return (
     <>
       <AppSidebar />
-      <div className="flex w-full flex-col">
-        <NewChatHeader />
-        <main className="flex flex-1 justify-center">
-          <NewChat />
-        </main>
+      <div className="@container flex w-full flex-col">
+        <ChatProvider>
+          <Header />
+          <main className="flex flex-1 justify-center">
+            <Chat />
+          </main>
+        </ChatProvider>
       </div>
     </>
   )

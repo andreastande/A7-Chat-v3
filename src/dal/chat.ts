@@ -1,0 +1,160 @@
+"server-only"
+
+import type { UIMessage } from "ai"
+import { and, eq } from "drizzle-orm"
+import { db } from "@/db"
+import { chat, message } from "@/db/schemas/chat"
+import { requireAuth } from "./auth"
+
+// =============================================================================
+// Queries
+// =============================================================================
+
+/**
+ * Get all chats for the current user, ordered by most recent.
+ */
+export async function getChats() {
+  const user = await requireAuth()
+
+  return db.query.chat.findMany({
+    where: eq(chat.userId, user.id),
+    orderBy: (chat, { desc }) => desc(chat.updatedAt),
+    columns: { id: true, title: true, updatedAt: true },
+  })
+}
+
+/**
+ * Get a specific chat by ID.
+ * Returns null if not found or not owned by user.
+ */
+export async function getChat(chatId: string) {
+  const user = await requireAuth()
+
+  const result = await db.query.chat.findFirst({
+    where: and(eq(chat.id, chatId), eq(chat.userId, user.id)),
+  })
+
+  return result ?? null
+}
+
+/**
+ * Get all messages for a chat, ordered chronologically.
+ * Verifies user owns the chat before returning messages.
+ */
+export async function getMessages(chatId: string): Promise<UIMessage[]> {
+  const user = await requireAuth()
+
+  const result = await db.query.chat.findFirst({
+    where: and(eq(chat.id, chatId), eq(chat.userId, user.id)),
+    with: {
+      messages: {
+        orderBy: (messages, { asc }) => asc(messages.createdAt),
+        columns: { id: true, role: true, parts: true },
+      },
+    },
+  })
+
+  return result?.messages ?? []
+}
+
+// =============================================================================
+// Mutations
+// =============================================================================
+
+/**
+ * Create a new chat for the current user.
+ */
+export async function createChat({ id, title }: { id: string; title?: string }) {
+  const user = await requireAuth()
+
+  await db.insert(chat).values({
+    id: id,
+    userId: user.id,
+    title: title ?? "New Chat",
+  })
+}
+
+/**
+ * Insert a message into a chat.
+ * Verifies user owns the chat before inserting.
+ */
+export async function insertMessage({
+  id,
+  chatId,
+  role,
+  parts,
+}: {
+  id: string
+  chatId: string
+  role: UIMessage["role"]
+  parts: UIMessage["parts"]
+}) {
+  const user = await requireAuth()
+
+  // Verify ownership
+  const [chatRecord] = await db
+    .select({ id: chat.id })
+    .from(chat)
+    .where(and(eq(chat.id, chatId), eq(chat.userId, user.id)))
+    .limit(1)
+
+  if (!chatRecord) {
+    throw new Error("Chat not found")
+  }
+
+  await db.insert(message).values({
+    id,
+    chatId,
+    role,
+    parts,
+  })
+}
+
+/**
+ * Insert multiple messages into a chat (batch insert).
+ * Useful for saving both user message and AI response together.
+ */
+export async function insertMessages(
+  chatId: string,
+  messages: Array<{
+    id: string
+    role: UIMessage["role"]
+    parts: UIMessage["parts"]
+  }>,
+) {
+  const user = await requireAuth()
+
+  // Verify ownership
+  const [chatRecord] = await db
+    .select({ id: chat.id })
+    .from(chat)
+    .where(and(eq(chat.id, chatId), eq(chat.userId, user.id)))
+    .limit(1)
+
+  if (!chatRecord) {
+    throw new Error("Chat not found")
+  }
+
+  await db.insert(message).values(messages.map((m) => ({ ...m, chatId })))
+}
+
+/**
+ * Update chat title.
+ */
+export async function updateChatTitle(chatId: string, title: string) {
+  const user = await requireAuth()
+
+  await db
+    .update(chat)
+    .set({ title })
+    .where(and(eq(chat.id, chatId), eq(chat.userId, user.id)))
+}
+
+/**
+ * Delete a chat and all its messages (cascade).
+ */
+export async function deleteChat(chatId: string) {
+  const user = await requireAuth()
+
+  await db.delete(chat).where(and(eq(chat.id, chatId), eq(chat.userId, user.id)))
+}
