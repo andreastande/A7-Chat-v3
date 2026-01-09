@@ -3,7 +3,7 @@
 import type { UIMessage } from "ai"
 import { and, eq } from "drizzle-orm"
 import { db } from "@/db"
-import { chat, message } from "@/db/schemas/chat"
+import { type Chat, chat, message } from "@/db/schemas/chat"
 import { requireAuth } from "./auth"
 
 // =============================================================================
@@ -13,13 +13,13 @@ import { requireAuth } from "./auth"
 /**
  * Get all chats for the current user, ordered by most recent.
  */
-export async function getChats() {
+export async function getChats(): Promise<Chat[]> {
   const user = await requireAuth()
 
   return db.query.chat.findMany({
     where: eq(chat.userId, user.id),
     orderBy: (chat, { desc }) => desc(chat.updatedAt),
-    columns: { id: true, title: true, updatedAt: true },
+    columns: { userId: false },
   })
 }
 
@@ -27,11 +27,12 @@ export async function getChats() {
  * Get a specific chat by ID.
  * Returns null if not found or not owned by user.
  */
-export async function getChat(chatId: string) {
+export async function getChat(chatId: string): Promise<Chat | null> {
   const user = await requireAuth()
 
   const result = await db.query.chat.findFirst({
     where: and(eq(chat.id, chatId), eq(chat.userId, user.id)),
+    columns: { userId: false },
   })
 
   return result ?? null
@@ -64,13 +65,12 @@ export async function getMessages(chatId: string): Promise<UIMessage[]> {
 /**
  * Create a new chat for the current user.
  */
-export async function createChat({ id, title }: { id: string; title?: string }) {
+export async function createChat(chatId: string) {
   const user = await requireAuth()
 
   await db.insert(chat).values({
-    id: id,
+    id: chatId,
     userId: user.id,
-    title: title ?? "New Chat",
   })
 }
 
@@ -147,6 +147,18 @@ export async function updateChatTitle(chatId: string, title: string) {
   await db
     .update(chat)
     .set({ title })
+    .where(and(eq(chat.id, chatId), eq(chat.userId, user.id)))
+}
+
+/**
+ * Touch a chat to update its updatedAt timestamp.
+ */
+export async function touchChat(chatId: string) {
+  const user = await requireAuth()
+
+  await db
+    .update(chat)
+    .set({ updatedAt: new Date() })
     .where(and(eq(chat.id, chatId), eq(chat.userId, user.id)))
 }
 

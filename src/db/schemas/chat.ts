@@ -9,7 +9,7 @@ export const chat = pgTable(
     userId: text()
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    title: text().notNull().default("New Chat"),
+    title: text().notNull().default("Untitled"),
     createdAt: timestamp().defaultNow().notNull(),
     updatedAt: timestamp()
       .defaultNow()
@@ -39,8 +39,5 @@ export const message = pgTable(
   ],
 )
 
-export type Chat = typeof chat.$inferSelect
-export type ChatInsert = typeof chat.$inferInsert
-
+export type Chat = Omit<typeof chat.$inferSelect, "userId">
 export type Message = typeof message.$inferSelect
-export type MessageInsert = typeof message.$inferInsert

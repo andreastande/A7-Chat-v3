@@ -2,6 +2,7 @@
 
 import { ChevronRight, History } from "lucide-react"
 import Link from "next/link"
+import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
 import { useSession } from "@/components/providers/session-provider"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
@@ -13,14 +14,18 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { useChatId } from "@/hooks/use-chat-id"
+import { cn } from "@/lib/utils"
 
 export function HistoryItem() {
   const session = useSession()
+  const chats = useChatHistoryStore((state) => state.chats)
+  const chatId = useChatId()
 
   return (
     <SidebarMenuItem>
       {session ? (
-        <Collapsible>
+        <Collapsible defaultOpen>
           <SidebarMenuButton>
             <History />
             History
@@ -39,11 +44,15 @@ export function HistoryItem() {
           </CollapsibleTrigger>
           <CollapsibleContent className="overflow-hidden transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
             <SidebarMenuSub>
-              <SidebarMenuSubItem>
-                <SidebarMenuSubButton asChild>
-                  <Link href="#">Test</Link>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
+              {chats.slice(0, 10).map((chat) => (
+                <SidebarMenuSubItem key={chat.id}>
+                  <SidebarMenuSubButton asChild isActive={chatId === chat.id}>
+                    <Link href={`/chat/${chat.id}`}>
+                      <span className={cn(chat.title === "Untitled" && "text-muted-foreground")}>{chat.title}</span>
+                    </Link>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              ))}
             </SidebarMenuSub>
           </CollapsibleContent>
         </Collapsible>

@@ -18,7 +18,7 @@ export function PasswordInput({ className, ...props }: Omit<ComponentProps<"inpu
           variant="ghost"
           onClick={() => setIsRevealed((v) => !v)}
           aria-label={isRevealed ? "Hide password" : "Show password"}
-          className="-translate-y-1/2 absolute top-1/2 right-2 size-7"
+          className="absolute top-1/2 right-2 size-7 -translate-y-1/2"
         >
           {isRevealed ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
         </Button>

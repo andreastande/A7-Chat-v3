@@ -1,11 +1,15 @@
 import { Provider as ChatProvider } from "@ai-sdk-tools/store"
+import { notFound } from "next/navigation"
 import { AppSidebar } from "@/components/sidebar/app-sidebar"
-import { getMessages } from "@/dal/chat"
+import { getChat, getMessages } from "@/dal/chat"
 import { Chat } from "../../_components/chat"
 import { Header } from "../../_components/header"
 
 export default async function Page({ params }: PageProps<"/chat/[id]">) {
   const { id: chatId } = await params
+
+  const chat = await getChat(chatId).catch(() => null)
+  if (!chat) return notFound()
 
   const initialMessages = await getMessages(chatId)
 

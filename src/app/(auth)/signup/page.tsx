@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Controller, useForm } from "react-hook-form"
 import z from "zod"
 import { Button } from "@/components/ui/button"
@@ -27,8 +26,6 @@ const signupSchema = z.object({
 })
 
 export default function Page() {
-  const router = useRouter()
-
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -43,7 +40,7 @@ export default function Page() {
     if (error) {
       return form.setError("root.serverError", { message: error.message ?? "Unable to create account" })
     }
-    router.push("/")
+    window.location.href = "/"
   }
 
   return (
