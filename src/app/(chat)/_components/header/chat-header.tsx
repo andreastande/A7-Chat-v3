@@ -2,6 +2,8 @@
 
 import { ChevronDown, Folder, Pencil, Pin, Share, Trash2 } from "lucide-react"
 import { useState } from "react"
+import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog"
+import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
@@ -14,8 +16,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useChatId } from "@/hooks/use-chat-id"
 import { cn } from "@/lib/utils"
-import { DeleteChatDialog } from "./dialogs/delete-chat-dialog"
-import { RenameChatDialog } from "./dialogs/rename-chat-dialog"
 
 export function ChatHeader() {
   const chatId = useChatId()
@@ -28,9 +28,9 @@ export function ChatHeader() {
   function renderDialog() {
     switch (openDialog) {
       case "rename":
-        return <RenameChatDialog />
+        return <RenameChatDialog chatId={chatId} />
       case "delete":
-        return <DeleteChatDialog />
+        return <DeleteChatDialog chatId={chatId} />
       default:
         return null
     }
@@ -54,7 +54,7 @@ export function ChatHeader() {
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="start">
+          <DropdownMenuContent align="start" className="w-44">
             <DialogTrigger asChild>
               <DropdownMenuItem onSelect={() => setOpenDialog("rename")}>
                 <Pencil />

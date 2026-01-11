@@ -11,10 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { useChatId } from "@/hooks/use-chat-id"
 
-export function DeleteChatDialog() {
-  const chatId = useChatId()
+export function DeleteChatDialog({ chatId }: { chatId: string }) {
   const router = useRouter()
   const removeChat = useChatHistoryStore((s) => s.removeChat)
 

@@ -146,7 +146,7 @@ export async function updateChatTitle(chatId: string, title: string) {
 
   await db
     .update(chat)
-    .set({ title })
+    .set({ title, updatedAt: chat.updatedAt })
     .where(and(eq(chat.id, chatId), eq(chat.userId, user.id)))
 }
 
