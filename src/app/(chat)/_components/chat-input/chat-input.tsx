@@ -1,12 +1,13 @@
 "use client"
 
 import { useChatActions, useChatStatus } from "@ai-sdk-tools/store"
-import { ArrowUp, ChevronDown, Square } from "lucide-react"
+import { ArrowUp, Square } from "lucide-react"
 import { useRef, useState } from "react"
 import TextareaAutosize from "react-textarea-autosize"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import ChatInputActions from "./chat-input-actions"
+import { ChatInputActions } from "./chat-input-actions"
+import { ModelPicker } from "./model-picker"
 
 interface ChatInputProps {
   className?: string
@@ -44,8 +45,8 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
         }
       }}
       onClick={(e) => {
-        const target = e.target as HTMLElement
-        if (!target.closest("button") && !target.closest("[data-slot=tooltip-content]")) {
+        const excludedSlots = ["tooltip-content", "popover-content"]
+        if (!excludedSlots.some((slot) => (e.target as HTMLElement).closest(`[data-slot="${slot}"]`))) {
           textareaRef.current?.focus()
         }
       }}
@@ -73,10 +74,7 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
       <div className="mt-2 flex justify-between">
         <div className="flex items-center gap-2">
           <ChatInputActions />
-          <Button variant="ghost" size="sm">
-            GPT 5.2
-            <ChevronDown className="text-muted-foreground" />
-          </Button>
+          <ModelPicker />
         </div>
         <Button data-submit size="icon-sm" disabled={!(canSend || canStop)}>
           {canStop ? <Square /> : <ArrowUp />}

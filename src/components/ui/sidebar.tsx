@@ -215,7 +215,7 @@ function Sidebar({
       data-slot="sidebar"
       onClick={(e) => {
         const excludedSlots = ["sidebar-group", "sidebar-footer", "sidebar-header", "dropdown-menu-content", "dropdown-menu-sub-content", "tooltip-content", "dialog-content", "hover-card-content"]
-        if (!excludedSlots.some(slot => (e.target as HTMLElement).closest(`[data-slot="${slot}"]`))) toggleSidebar()
+        if (!excludedSlots.some((slot) => (e.target as HTMLElement).closest(`[data-slot="${slot}"]`))) toggleSidebar()
       }}
     >
       {/* This is what handles the sidebar gap on desktop */}

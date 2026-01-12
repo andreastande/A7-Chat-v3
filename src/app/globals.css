@@ -145,6 +145,20 @@
   @apply text-muted-foreground text-xs font-sans;
 }
 
+@utility sticky-shadow {
+  &::after {
+    @apply content-[''] absolute inset-x-0 top-full h-4 bg-linear-to-b from-background to-transparent pointer-events-none;
+  }
+}
+
+@utility scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* https://stackoverflow.com/a/79481043/19894206 */
 @theme {
   --animate-collapsible-down: collapsible-down 0.1s ease-out;

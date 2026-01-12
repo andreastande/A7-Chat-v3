@@ -46,10 +46,7 @@ export function AppSidebarFooter() {
                       <AvatarImage src={session.user.image ?? undefined} alt={session.user.name} />
                       <AvatarFallback className="rounded-md">{initials}</AvatarFallback>
                     </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">{session.user.name}</span>
-                      <span className="truncate text-xs">{session.user.email}</span>
-                    </div>
+                    <span className="flex-1 truncate text-left font-medium text-sm">{session.user.name}</span>
                     <ChevronsUpDown className="ml-auto hidden size-4 group-[:hover,:focus-visible,[data-state=open]]/menu-button:flex" />
                   </>
                 ) : (

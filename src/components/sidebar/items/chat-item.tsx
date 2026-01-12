@@ -20,7 +20,7 @@ export function ChatItem() {
   const pathname = usePathname()
   const router = useRouter()
 
-  useHotkeys("shift+mod+o", () => router.push("/"), { preventDefault: true })
+  useHotkeys("shift+mod+o", () => router.push("/"), { preventDefault: true, enableOnFormTags: true })
 
   return (
     <SidebarMenuItem>

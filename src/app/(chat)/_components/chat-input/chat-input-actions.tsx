@@ -1,3 +1,5 @@
+"use client"
+
 import { Globe, Paperclip, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { WithTooltip } from "@/components/ui/tooltip"
 
-export default function ChatInputActions() {
+export function ChatInputActions() {
   return (
     <DropdownMenu>
       <WithTooltip content="Add files and more" side="bottom" asChild>

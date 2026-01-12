@@ -1,3 +1,5 @@
+"use client"
+
 import { Badge } from "@/components/ui/badge"
 
 export function LastUsedBadge({ show }: { show: boolean }) {

@@ -1,3 +1,5 @@
+"use client"
+
 import { useChatStatus } from "@ai-sdk-tools/store"
 import type { UIMessage } from "ai"
 import { Streamdown } from "streamdown"

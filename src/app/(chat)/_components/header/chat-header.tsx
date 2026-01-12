@@ -38,7 +38,7 @@ export function ChatHeader() {
 
   return (
     // Show bg when title overlaps: 768 (conversation, w-3xl) + 2×(242+8) (title+padding) = 1268px
-    <div className="sticky top-0 z-10 flex justify-between @max-[1268]:bg-background p-2">
+    <div className="@max-[1268px]:sticky-shadow sticky top-0 z-10 flex justify-between @max-[1268px]:bg-background p-2">
       <Dialog onOpenChange={(open) => open === false && setOpenDialog(null)}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
