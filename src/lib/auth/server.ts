@@ -4,6 +4,7 @@ import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { nextCookies } from "better-auth/next-js"
 import { lastLoginMethod } from "better-auth/plugins"
+import { initializeDefaultFavorites } from "@/dal/chat"
 import { db } from "@/db"
 import * as schema from "@/db/schemas/auth"
 import env from "~/env.config"
@@ -30,6 +31,15 @@ export const auth = betterAuth({
     cookieCache: {
       enabled: true,
       maxAge: 5 * 60,
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await initializeDefaultFavorites(user.id)
+        },
+      },
     },
   },
   plugins: [nextCookies(), lastLoginMethod()],

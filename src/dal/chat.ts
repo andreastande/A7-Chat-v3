@@ -207,3 +207,13 @@ export async function removeFavoriteModel(modelId: string) {
 
   await db.delete(favoriteModel).where(and(eq(favoriteModel.userId, user.id), eq(favoriteModel.modelId, modelId)))
 }
+
+const DEFAULT_FAVORITE_MODELS = ["openai/gpt-5.2"]
+
+/**
+ * Initialize default favorite models for a new user.
+ * Called from auth hook on signup - no auth check needed.
+ */
+export async function initializeDefaultFavorites(userId: string) {
+  await db.insert(favoriteModel).values(DEFAULT_FAVORITE_MODELS.map((modelId) => ({ userId, modelId })))
+}
