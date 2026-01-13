@@ -7,7 +7,6 @@ type FavoriteModelsState = {
 }
 
 type FavoriteModelsActions = {
-  isFavorite: (modelId: string) => boolean
   toggleFavorite: (modelId: string) => void
 }
 
@@ -17,8 +16,6 @@ export function createFavoriteModelsStore(initialFavorites: string[]) {
   return createStore<FavoriteModelsStore>((set, get) => ({
     favorites: initialFavorites,
 
-    isFavorite: (modelId) => get().favorites.includes(modelId),
-
     toggleFavorite: async (modelId) => {
       const previousFavorites = get().favorites
       const isCurrentlyFavorite = previousFavorites.includes(modelId)
@@ -27,7 +24,7 @@ export function createFavoriteModelsStore(initialFavorites: string[]) {
       set({
         favorites: isCurrentlyFavorite
           ? previousFavorites.filter((id) => id !== modelId)
-          : [modelId, ...previousFavorites],
+          : [...previousFavorites, modelId],
       })
 
       // Persist via server action

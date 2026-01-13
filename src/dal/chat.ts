@@ -183,7 +183,7 @@ export async function getFavoriteModels() {
 
   const results = await db.query.favoriteModel.findMany({
     where: eq(favoriteModel.userId, user.id),
-    orderBy: (favoriteModel, { desc }) => desc(favoriteModel.createdAt),
+    orderBy: (favoriteModel, { asc }) => asc(favoriteModel.createdAt),
     columns: { modelId: true },
   })
 

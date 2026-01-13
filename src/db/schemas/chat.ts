@@ -10,7 +10,7 @@ export const chat = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     title: text().notNull().default("Untitled"),
-    model: text().notNull().default("openai/gpt-5.2"),
+    model: text().notNull().default("openai/gpt-5.2"), // remove default?
     createdAt: timestamp().defaultNow().notNull(),
     updatedAt: timestamp()
       .defaultNow()

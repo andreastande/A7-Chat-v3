@@ -86,7 +86,8 @@ Uses `envin` for type-safe env vars (`env.config.ts`):
 - `~/*`: Maps to project root
 
 ### Important Notes
-- React Compiler is enabled in Next.js config
+- React Compiler is enabled in Next.js config - don't use useMemo/useCallback for memoization.
+- Prefer regular function declarations over arrow functions (but use arrow functions for inline callbacks).
 - Biome excludes `src/components/ui` (shadcn components)
 - pnpm workspace ignores `sharp` and `unrs-resolver` built deps
 - Database uses `prepare: false` for transaction pool mode compatibility
