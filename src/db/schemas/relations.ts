@@ -1,11 +1,12 @@
 import { relations } from "drizzle-orm"
 import { account, session, user } from "./auth"
-import { chat, message } from "./chat"
+import { chat, favoriteModel, message } from "./chat"
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   chats: many(chat),
+  favoriteModels: many(favoriteModel),
 }))
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -34,5 +35,12 @@ export const messageRelations = relations(message, ({ one }) => ({
   chat: one(chat, {
     fields: [message.chatId],
     references: [chat.id],
+  }),
+}))
+
+export const favoriteModelRelations = relations(favoriteModel, ({ one }) => ({
+  user: one(user, {
+    fields: [favoriteModel.userId],
+    references: [user.id],
   }),
 }))

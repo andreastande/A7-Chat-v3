@@ -3,7 +3,7 @@
 import type { UIMessage } from "ai"
 import { and, eq } from "drizzle-orm"
 import { db } from "@/db"
-import { type Chat, chat, message } from "@/db/schemas/chat"
+import { type Chat, chat, favoriteModel, message } from "@/db/schemas/chat"
 import { requireAuth } from "./auth"
 
 // =============================================================================
@@ -169,4 +169,41 @@ export async function deleteChat(chatId: string) {
   const user = await requireAuth()
 
   await db.delete(chat).where(and(eq(chat.id, chatId), eq(chat.userId, user.id)))
+}
+
+// =============================================================================
+// Favorite Models
+// =============================================================================
+
+/**
+ * Get all favorite model IDs for the current user.
+ */
+export async function getFavoriteModels() {
+  const user = await requireAuth()
+
+  const results = await db.query.favoriteModel.findMany({
+    where: eq(favoriteModel.userId, user.id),
+    orderBy: (favoriteModel, { desc }) => desc(favoriteModel.createdAt),
+    columns: { modelId: true },
+  })
+
+  return results.map((r) => r.modelId)
+}
+
+/**
+ * Add a model to the user's favorites.
+ */
+export async function addFavoriteModel(modelId: string) {
+  const user = await requireAuth()
+
+  await db.insert(favoriteModel).values({ userId: user.id, modelId }).onConflictDoNothing()
+}
+
+/**
+ * Remove a model from the user's favorites.
+ */
+export async function removeFavoriteModel(modelId: string) {
+  const user = await requireAuth()
+
+  await db.delete(favoriteModel).where(and(eq(favoriteModel.userId, user.id), eq(favoriteModel.modelId, modelId)))
 }

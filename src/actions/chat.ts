@@ -3,8 +3,10 @@
 import { generateText } from "ai"
 import { z } from "zod"
 import {
+  addFavoriteModel as addFavoriteModelDAL,
   createChat as createChatDAL,
   deleteChat as deleteChatDAL,
+  removeFavoriteModel as removeFavoriteModelDAL,
   touchChat as touchChatDAL,
   updateChatTitle as updateChatTitleDAL,
 } from "@/dal/chat"
@@ -45,10 +47,24 @@ export const generateChatTitle = authActionClient
     const { text: title } = await generateText({
       model: "openai/gpt-oss-120b",
       system: `
-        You are a helpful assistant that writes concise, topic-specific chat titles 
+        You are a helpful assistant that writes concise, topic-specific chat titles
         based on the user's first message. Limit to 2-5 words.
       `,
       prompt: text,
     })
     return title
+  })
+
+export const addFavoriteModel = authActionClient
+  .metadata({ errorMessage: "Failed to add favorite model" })
+  .inputSchema(z.object({ modelId: z.string() }))
+  .action(async ({ parsedInput: { modelId } }) => {
+    await addFavoriteModelDAL(modelId)
+  })
+
+export const removeFavoriteModel = authActionClient
+  .metadata({ errorMessage: "Failed to remove favorite model" })
+  .inputSchema(z.object({ modelId: z.string() }))
+  .action(async ({ parsedInput: { modelId } }) => {
+    await removeFavoriteModelDAL(modelId)
   })

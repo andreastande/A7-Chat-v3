@@ -1,5 +1,5 @@
 import type { UIMessage } from "ai"
-import { index, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core"
+import { index, jsonb, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core"
 import { user } from "./auth"
 
 export const chat = pgTable(
@@ -10,6 +10,7 @@ export const chat = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     title: text().notNull().default("Untitled"),
+    model: text().notNull().default("openai/gpt-5.2"),
     createdAt: timestamp().defaultNow().notNull(),
     updatedAt: timestamp()
       .defaultNow()
@@ -36,6 +37,21 @@ export const message = pgTable(
   (table) => [
     index("message_chatId_idx").on(table.chatId),
     index("message_chatId_createdAt_idx").on(table.chatId, table.createdAt),
+  ],
+)
+
+export const favoriteModel = pgTable(
+  "favorite_model",
+  {
+    userId: text()
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    modelId: text().notNull(),
+    createdAt: timestamp().defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.modelId] }),
+    index("favorite_model_userId_idx").on(table.userId),
   ],
 )
 

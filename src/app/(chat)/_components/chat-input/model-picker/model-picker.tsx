@@ -4,6 +4,7 @@ import { ChevronDown, Star } from "lucide-react"
 import { useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { useModels } from "@/app/(chat)/_hooks/use-models"
+import { useFavoriteModelsStore } from "@/components/providers/favorite-models-provider"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
@@ -14,12 +15,15 @@ import { SearchBar } from "./search-bar"
 
 export function ModelPicker() {
   const { models, providers, providerDisplayNames } = useModels()
+  const favorites = useFavoriteModelsStore((s) => s.favorites)
 
   const [input, setInput] = useState("")
   const [open, setOpen] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState<"favorites" | (string & {})>("favorites")
 
   useHotkeys("mod+slash, mod+7", () => setOpen((prev) => !prev), { preventDefault: true, enableOnFormTags: true })
+
+  console.log(favorites)
 
   return (
     <Popover
@@ -80,7 +84,9 @@ export function ModelPicker() {
               ?.filter((m) =>
                 input.trim()
                   ? m.name.toLowerCase().includes(input.trim().toLowerCase())
-                  : m.owned_by === selectedFilter,
+                  : selectedFilter === "favorites"
+                    ? favorites.includes(m.id)
+                    : m.owned_by === selectedFilter,
               )
               .map((m) => (
                 <Button

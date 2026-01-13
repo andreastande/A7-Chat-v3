@@ -13,7 +13,12 @@ import { useScrollOnSubmit } from "../_hooks/use-scroll-on-submit"
 import { ChatInput } from "./chat-input"
 import { Message } from "./message"
 
-export function Chat({ chatId, initialMessages = [] }: { chatId?: string; initialMessages?: UIMessage[] }) {
+interface ChatProps {
+  chatId?: string
+  initialMessages?: UIMessage[]
+}
+
+export function Chat({ chatId, initialMessages = [] }: ChatProps) {
   const { addChat, touchChat, renameChat } = useChatHistoryStore(
     useShallow((s) => ({ addChat: s.addChat, touchChat: s.touchChat, renameChat: s.renameChat })),
   )
