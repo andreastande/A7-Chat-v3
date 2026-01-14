@@ -163,6 +163,18 @@ export async function touchChat(chatId: string) {
 }
 
 /**
+ * Update chat model.
+ */
+export async function updateChatModel(chatId: string, modelId: string) {
+  const user = await requireAuth()
+
+  await db
+    .update(chat)
+    .set({ modelId, updatedAt: chat.updatedAt })
+    .where(and(eq(chat.id, chatId), eq(chat.userId, user.id)))
+}
+
+/**
  * Delete a chat and all its messages (cascade).
  */
 export async function deleteChat(chatId: string) {

@@ -4,7 +4,8 @@ import { usePathname } from "next/navigation"
 
 export function useChatId() {
   const pathname = usePathname()
-  const chatId = pathname.split("/")[2]
+  const segments = pathname.split("/")
+  const chatId = segments[1] === "chat" ? segments[2] : undefined
 
   return chatId
 }

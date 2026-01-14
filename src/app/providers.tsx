@@ -1,7 +1,6 @@
 import { cookies, headers } from "next/headers"
 import type { ReactNode } from "react"
 import { ChatHistoryProvider } from "@/components/providers/chat-history-provider"
-import { QueryProvider } from "@/components/providers/query-provider"
 import { SessionProvider } from "@/components/providers/session-provider"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { SidebarProvider } from "@/components/ui/sidebar"
@@ -19,11 +18,9 @@ export async function Providers({ children }: { children: ReactNode }) {
   return (
     <SessionProvider session={session}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-        <QueryProvider>
-          <ChatHistoryProvider initialChats={chats}>
-            <SidebarProvider defaultOpen={defaultOpen}>{children}</SidebarProvider>
-          </ChatHistoryProvider>
-        </QueryProvider>
+        <ChatHistoryProvider initialChats={chats}>
+          <SidebarProvider defaultOpen={defaultOpen}>{children}</SidebarProvider>
+        </ChatHistoryProvider>
       </ThemeProvider>
     </SessionProvider>
   )

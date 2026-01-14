@@ -24,23 +24,25 @@ export function HistoryItemHoverCard({ children }: { children: ReactNode }) {
         className="w-56 p-2"
       >
         <p className="mb-2 px-3 font-bold text-sm">History</p>
-        <div className="space-y-1">
+        <ul className="space-y-1">
           {chats.slice(0, 10).map((c) => (
-            <Button key={c.id} asChild variant="ghost" size="sm">
-              <Link
-                href={`/chat/${c.id}`}
-                onClick={() => setOpen(false)}
-                className={cn(
-                  "w-full justify-start",
-                  c.title === "Untitled" && "text-muted-foreground",
-                  c.id === chatID && "bg-accent text-accent-foreground dark:bg-accent/50",
-                )}
-              >
-                <span className="truncate">{c.title}</span>
-              </Link>
-            </Button>
+            <li key={c.id}>
+              <Button asChild variant="ghost" size="sm">
+                <Link
+                  href={`/chat/${c.id}`}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "w-full justify-start",
+                    c.title === "Untitled" && "text-muted-foreground",
+                    c.id === chatID && "bg-accent text-accent-foreground dark:bg-accent/50",
+                  )}
+                >
+                  <span className="truncate">{c.title}</span>
+                </Link>
+              </Button>
+            </li>
           ))}
-        </div>
+        </ul>
       </HoverCardContent>
     </HoverCard>
   )

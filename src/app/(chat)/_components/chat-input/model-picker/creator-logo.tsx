@@ -1,7 +1,8 @@
 import { Anthropic, DeepSeek, Gemini, Meta, Minimax, Moonshot, OpenAI, Qwen, XAI, ZAI } from "@lobehub/icons"
 import type { ComponentProps } from "react"
+import type { Creator } from "@/lib/models"
 
-const providerLogos: Record<string, React.FC<ComponentProps<"svg">>> = {
+const creatorLogos: Record<Creator, React.FC<ComponentProps<"svg">>> = {
   openai: OpenAI,
   anthropic: Anthropic,
   google: Gemini,
@@ -14,7 +15,7 @@ const providerLogos: Record<string, React.FC<ComponentProps<"svg">>> = {
   minimax: Minimax,
 }
 
-export function ProviderLogo({ provider, className }: { provider: string; className?: string }) {
-  const Icon = providerLogos[provider] ?? providerLogos.openai
+export function CreatorLogo({ creator, className }: { creator: Creator; className?: string }) {
+  const Icon = creatorLogos[creator] ?? creatorLogos.openai
   return <Icon className={className} />
 }

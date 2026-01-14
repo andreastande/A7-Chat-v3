@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { FavoriteModelsProvider } from "@/components/providers/favorite-models-provider"
+import { FavoriteModelsProvider } from "@/app/(chat)/_components/providers/favorite-models-provider"
 import { AppSidebar } from "@/components/sidebar/app-sidebar"
 import { getFavoriteModels } from "@/dal/chat"
 

@@ -10,7 +10,9 @@ type ChatHistoryStoreApi = ReturnType<typeof createChatHistoryStore>
 const ChatHistoryContext = createContext<ChatHistoryStoreApi | null>(null)
 
 export function ChatHistoryProvider({ children, initialChats }: { children: ReactNode; initialChats: Chat[] }) {
-  const [store] = useState(() => createChatHistoryStore(initialChats))
+  const [store] = useState(() =>
+    createChatHistoryStore(initialChats.map(({ id, title, updatedAt }) => ({ id, title, updatedAt }))),
+  )
   return <ChatHistoryContext.Provider value={store}>{children}</ChatHistoryContext.Provider>
 }
 

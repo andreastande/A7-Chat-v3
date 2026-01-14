@@ -3,8 +3,10 @@ import { createStore } from "zustand"
 import { createChat, deleteChat, touchChat, updateChatTitle } from "@/actions/chat"
 import type { Chat } from "@/db/schemas/chat"
 
+type ChatListItem = Pick<Chat, "id" | "title" | "updatedAt">
+
 type ChatHistoryState = {
-  chats: Chat[]
+  chats: ChatListItem[]
 }
 
 type ChatHistoryActions = {
@@ -16,12 +18,12 @@ type ChatHistoryActions = {
 
 export type ChatHistoryStore = ChatHistoryState & ChatHistoryActions
 
-export function createChatHistoryStore(initialChats: Chat[]) {
+export function createChatHistoryStore(initialChats: ChatListItem[]) {
   return createStore<ChatHistoryStore>((set, get) => {
     /** Persists via server action, rolls back to previousChats on error */
     async function persistOrRollback(
       serverAction: () => Promise<{ serverError?: string }>,
-      previousChats: Chat[],
+      previousChats: ChatListItem[],
     ): Promise<boolean> {
       const { serverError } = await serverAction()
       if (serverError) {
@@ -37,11 +39,10 @@ export function createChatHistoryStore(initialChats: Chat[]) {
 
       addChat: async (id) => {
         const previousChats = get().chats
-        const newChat: Chat = {
+        const newChat: ChatListItem = {
           id,
           title: "Untitled",
           updatedAt: new Date(),
-          createdAt: new Date(),
         }
         set((state) => ({ chats: [newChat, ...state.chats] }))
 

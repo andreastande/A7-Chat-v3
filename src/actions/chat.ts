@@ -8,6 +8,7 @@ import {
   deleteChat as deleteChatDAL,
   removeFavoriteModel as removeFavoriteModelDAL,
   touchChat as touchChatDAL,
+  updateChatModel as updateChatModelDAL,
   updateChatTitle as updateChatTitleDAL,
 } from "@/dal/chat"
 import { authActionClient } from "@/lib/safe-action"
@@ -24,6 +25,13 @@ export const updateChatTitle = authActionClient
   .inputSchema(z.object({ chatId: z.string(), title: z.string() }))
   .action(async ({ parsedInput: { chatId, title } }) => {
     await updateChatTitleDAL(chatId, title)
+  })
+
+export const updateChatModel = authActionClient
+  .metadata({ errorMessage: "Failed to update chat model" })
+  .inputSchema(z.object({ chatId: z.string(), modelId: z.string() }))
+  .action(async ({ parsedInput: { chatId, modelId } }) => {
+    await updateChatModelDAL(chatId, modelId)
   })
 
 export const deleteChat = authActionClient

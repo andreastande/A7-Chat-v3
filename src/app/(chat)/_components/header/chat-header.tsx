@@ -25,7 +25,7 @@ export function ChatHeader() {
   const chat = chats.find((c) => c.id === chatId)
   const title = chat?.title ?? "Untitled"
 
-  function renderDialog() {
+  function renderDialog(chatId: string) {
     switch (openDialog) {
       case "rename":
         return <RenameChatDialog chatId={chatId} />
@@ -79,7 +79,8 @@ export function ChatHeader() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {renderDialog()}
+        {/** biome-ignore lint/style/noNonNullAssertion: chatId is guaranteed to exist */}
+        {renderDialog(chatId!)}
       </Dialog>
 
       <Button variant="ghost" size="sm">

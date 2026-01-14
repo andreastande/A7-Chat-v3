@@ -12,6 +12,7 @@ import { useScrollOnMount } from "../_hooks/use-scroll-on-mount"
 import { useScrollOnSubmit } from "../_hooks/use-scroll-on-submit"
 import { ChatInput } from "./chat-input"
 import { Message } from "./message"
+import { useSelectedModelStore } from "./providers/selected-model-provider"
 
 interface ChatProps {
   chatId?: string
@@ -19,6 +20,7 @@ interface ChatProps {
 }
 
 export function Chat({ chatId, initialMessages = [] }: ChatProps) {
+  const selectedModelId = useSelectedModelStore((s) => s.modelId)
   const { addChat, touchChat, renameChat } = useChatHistoryStore(
     useShallow((s) => ({ addChat: s.addChat, touchChat: s.touchChat, renameChat: s.renameChat })),
   )
@@ -49,7 +51,7 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
       navigateToChat()
     }
 
-    sendMessage({ text })
+    sendMessage({ text }, { body: { modelId: selectedModelId } })
 
     if (isNewChat) {
       const { data: title, serverError } = await generateChatTitle({ text })

@@ -1,4 +1,3 @@
-import { toast } from "sonner"
 import { createStore } from "zustand"
 import { addFavoriteModel, removeFavoriteModel } from "@/actions/chat"
 
@@ -16,25 +15,15 @@ export function createFavoriteModelsStore(initialFavorites: string[]) {
   return createStore<FavoriteModelsStore>((set, get) => ({
     favorites: initialFavorites,
 
-    toggleFavorite: async (modelId) => {
-      const previousFavorites = get().favorites
-      const isCurrentlyFavorite = previousFavorites.includes(modelId)
-
-      // Optimistic update
+    toggleFavorite: (modelId) => {
+      const isCurrentlyFavorite = get().favorites.includes(modelId)
       set({
-        favorites: isCurrentlyFavorite
-          ? previousFavorites.filter((id) => id !== modelId)
-          : [...previousFavorites, modelId],
+        favorites: isCurrentlyFavorite ? get().favorites.filter((id) => id !== modelId) : [...get().favorites, modelId],
       })
-
-      // Persist via server action
-      const { serverError } = isCurrentlyFavorite
-        ? await removeFavoriteModel({ modelId })
-        : await addFavoriteModel({ modelId })
-
-      if (serverError) {
-        toast.error(serverError)
-        set({ favorites: previousFavorites })
+      if (isCurrentlyFavorite) {
+        removeFavoriteModel({ modelId })
+      } else {
+        addFavoriteModel({ modelId })
       }
     },
   }))
