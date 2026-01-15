@@ -49,7 +49,7 @@ export function ModelPicker() {
         >
           <CreatorLogo creator={selectedModelId.split("/")[0] as Creator} className="size-3" />
           {allModels.find((m) => m.id === selectedModelId)?.name}
-          <ChevronDown className="text-muted-foreground" />
+          <ChevronDown className="ml-1.5 text-muted-foreground" />
         </Button>
       </PopoverTrigger>
 

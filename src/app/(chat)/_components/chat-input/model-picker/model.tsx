@@ -56,7 +56,7 @@ export function Model({ model, showCreatorLogo, closeModelPicker }: ModelProps) 
             toggleFavorite(model.id)
           }
         }}
-        className="ml-auto rounded-md p-1.5 opacity-0 outline-none transition-colors hover:bg-accent focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/50 group-[:hover,:focus-visible]/button:opacity-100 dark:hover:bg-accent/50"
+        className="ml-auto rounded-md p-1.5 opacity-0 transition-colors outline-none group-[:hover,:focus-visible]/button:opacity-100 hover:bg-accent focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/50 dark:hover:bg-accent/50"
       >
         <Star className={cn("size-3 text-muted-foreground", isFavorited && "fill-yellow-400 text-yellow-400")} />
       </div>

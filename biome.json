@@ -26,12 +26,6 @@
           "fix": "safe",
           "level": "warn"
         }
-      },
-      "nursery": {
-        "useSortedClasses": {
-          "fix": "safe",
-          "level": "info"
-        }
       }
     },
     "domains": {

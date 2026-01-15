@@ -25,7 +25,7 @@ export function ChatInputActions() {
         <DropdownMenuItem className="group/item">
           <Paperclip />
           <span className="mr-4">Add files or photos</span>
-          <kbd className="*:kbd invisible ml-auto space-x-0.5 group-[:hover,:focus-visible]/item:visible">
+          <kbd className="invisible ml-auto space-x-0.5 *:kbd group-[:hover,:focus-visible]/item:visible">
             <kbd>⌘</kbd>
             <kbd>U</kbd>
           </kbd>

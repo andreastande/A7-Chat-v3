@@ -28,7 +28,7 @@ export function ChatItem() {
         tooltip={
           <div className="flex items-center gap-2">
             Chat
-            <kbd className="*:kbd space-x-0.5">
+            <kbd className="space-x-0.5 *:kbd">
               <NewChatShortcut />
             </kbd>
           </div>
@@ -39,7 +39,7 @@ export function ChatItem() {
         <Link href="/">
           <MessageCircle />
           Chat
-          <kbd className="*:kbd invisible ml-auto space-x-0.5 group-data-[state=expanded]:group-[:hover,:focus-visible]/menu-button:visible">
+          <kbd className="invisible ml-auto space-x-0.5 *:kbd group-data-[state=expanded]:group-[:hover,:focus-visible]/menu-button:visible">
             <NewChatShortcut />
           </kbd>
         </Link>

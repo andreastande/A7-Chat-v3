@@ -118,7 +118,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background font-sans text-foreground;
   }
 }
 
@@ -142,12 +142,12 @@
 }
 
 @utility kbd {
-  @apply text-muted-foreground text-xs font-sans;
+  @apply font-sans text-xs text-muted-foreground;
 }
 
 @utility sticky-shadow {
   &::after {
-    @apply content-[''] absolute inset-x-0 top-full h-4 bg-linear-to-b from-background to-transparent pointer-events-none;
+    @apply pointer-events-none absolute inset-x-0 top-full h-4 bg-linear-to-b from-background to-transparent content-[''];
   }
 }
 

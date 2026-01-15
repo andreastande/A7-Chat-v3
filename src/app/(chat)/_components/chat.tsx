@@ -51,7 +51,7 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
       navigateToChat()
     }
 
-    sendMessage({ text }, { body: { modelId: selectedModelId } })
+    sendMessage({ text }, { body: { modelId: selectedModelId } }) // oxlint-disable-line
 
     if (isNewChat) {
       const { data: title, serverError } = await generateChatTitle({ text })

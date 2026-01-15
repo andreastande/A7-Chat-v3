@@ -30,7 +30,7 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
       sendMessage(input.trim())
       setInput("")
     } else if (canStop) {
-      stop()
+      stop() // oxlint-disable-line
     }
   }
 

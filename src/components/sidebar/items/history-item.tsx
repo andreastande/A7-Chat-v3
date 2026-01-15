@@ -54,7 +54,7 @@ export function HistoryItem() {
             <SidebarMenuButton>
               <History />
               History
-              <kbd className="*:kbd invisible absolute top-2 right-2 flex space-x-0.5 group-data-[state=expanded]:group-[:hover,:focus-visible]/menu-button:visible">
+              <kbd className="invisible absolute top-2 right-2 flex space-x-0.5 *:kbd group-data-[state=expanded]:group-[:hover,:focus-visible]/menu-button:visible">
                 <kbd>⌘</kbd>
                 <kbd>K</kbd>
               </kbd>
@@ -124,6 +124,13 @@ export function HistoryItem() {
                   </Dialog>
                 </SidebarMenuSubItem>
               ))}
+              <SidebarMenuSubItem>
+                <SidebarMenuSubButton asChild className="w-full bg-transparent! text-[13px] text-muted-foreground">
+                  <button type="button">
+                    <span>See all</span>
+                  </button>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
             </SidebarMenuSub>
           </CollapsibleContent>
         </Collapsible>

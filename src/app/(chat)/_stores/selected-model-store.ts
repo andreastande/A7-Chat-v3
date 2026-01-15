@@ -16,7 +16,7 @@ export function createSelectedModelStore(initialModelId: string) {
     modelId: initialModelId,
     setModelId: ({ chatId, modelId }) => {
       set({ modelId })
-      if (chatId) updateChatModel({ chatId, modelId })
+      if (chatId) updateChatModel({ chatId, modelId }) // oxlint-disable-line
       // biome-ignore lint/suspicious/noDocumentCookie: non-sensitive
       document.cookie = `selectedModelId=${modelId}; path=/; max-age=${60 * 60 * 24 * 30}`
     },

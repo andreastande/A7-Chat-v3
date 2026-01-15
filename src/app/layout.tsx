@@ -1,8 +1,8 @@
+import "./globals.css"
 import type { Metadata } from "next"
 import { Geist } from "next/font/google"
-import { Providers } from "./providers"
-import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
+import { Providers } from "./providers"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

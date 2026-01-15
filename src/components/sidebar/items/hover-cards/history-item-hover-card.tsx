@@ -23,7 +23,7 @@ export function HistoryItemHoverCard({ children }: { children: ReactNode }) {
         hidden={state !== "collapsed" || isMobile}
         className="w-56 p-2"
       >
-        <p className="mb-2 px-3 font-bold text-sm">History</p>
+        <p className="mb-2 px-3 text-sm font-bold">History</p>
         <ul className="space-y-1">
           {chats.slice(0, 10).map((c) => (
             <li key={c.id}>
@@ -42,6 +42,16 @@ export function HistoryItemHoverCard({ children }: { children: ReactNode }) {
               </Button>
             </li>
           ))}
+          <li>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setOpen(false)}
+              className="w-full justify-start bg-transparent! text-[13px] text-muted-foreground"
+            >
+              See all
+            </Button>
+          </li>
         </ul>
       </HoverCardContent>
     </HoverCard>

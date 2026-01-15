@@ -220,7 +220,13 @@ export async function removeFavoriteModel(modelId: string) {
   await db.delete(favoriteModel).where(and(eq(favoriteModel.userId, user.id), eq(favoriteModel.modelId, modelId)))
 }
 
-const DEFAULT_FAVORITE_MODELS = ["openai/gpt-5.2"]
+const DEFAULT_FAVORITE_MODELS = [
+  "openai/gpt-5.2",
+  "anthropic/claude-sonnet-4.5",
+  "google/gemini-3-flash",
+  "zai/glm-4.7",
+  "moonshotai/kimi-k2",
+]
 
 /**
  * Initialize default favorite models for a new user.

@@ -21,9 +21,9 @@ export function createFavoriteModelsStore(initialFavorites: string[]) {
         favorites: isCurrentlyFavorite ? get().favorites.filter((id) => id !== modelId) : [...get().favorites, modelId],
       })
       if (isCurrentlyFavorite) {
-        removeFavoriteModel({ modelId })
+        removeFavoriteModel({ modelId }) // oxlint-disable-line
       } else {
-        addFavoriteModel({ modelId })
+        addFavoriteModel({ modelId }) // oxlint-disable-line
       }
     },
   }))
