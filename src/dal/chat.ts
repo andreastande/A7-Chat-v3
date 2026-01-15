@@ -65,12 +65,13 @@ export async function getMessages(chatId: string): Promise<UIMessage[]> {
 /**
  * Create a new chat for the current user.
  */
-export async function createChat(chatId: string) {
+export async function createChat(chatId: string, modelId: string) {
   const user = await requireAuth()
 
   await db.insert(chat).values({
     id: chatId,
     userId: user.id,
+    modelId,
   })
 }
 

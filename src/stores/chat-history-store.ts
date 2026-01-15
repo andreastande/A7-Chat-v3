@@ -10,7 +10,7 @@ type ChatHistoryState = {
 }
 
 type ChatHistoryActions = {
-  addChat: (id: string) => Promise<boolean>
+  addChat: (id: string, modelId: string) => Promise<boolean>
   removeChat: (id: string) => Promise<boolean>
   renameChat: (id: string, title: string) => Promise<boolean>
   touchChat: (id: string) => Promise<boolean>
@@ -37,7 +37,7 @@ export function createChatHistoryStore(initialChats: ChatListItem[]) {
     return {
       chats: initialChats,
 
-      addChat: async (id) => {
+      addChat: async (id, modelId) => {
         const previousChats = get().chats
         const newChat: ChatListItem = {
           id,
@@ -46,7 +46,7 @@ export function createChatHistoryStore(initialChats: ChatListItem[]) {
         }
         set((state) => ({ chats: [newChat, ...state.chats] }))
 
-        return persistOrRollback(() => createChat({ chatId: id }), previousChats)
+        return persistOrRollback(() => createChat({ chatId: id, modelId }), previousChats)
       },
 
       removeChat: async (id) => {

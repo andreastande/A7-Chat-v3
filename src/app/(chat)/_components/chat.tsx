@@ -47,7 +47,7 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
 
   async function handleSendMessage(text: string) {
     if (isNewChat) {
-      if (!(await addChat(id))) return
+      if (!(await addChat(id, selectedModelId))) return
       navigateToChat()
     }
 

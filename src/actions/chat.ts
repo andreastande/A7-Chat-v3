@@ -15,9 +15,9 @@ import { authActionClient } from "@/lib/safe-action"
 
 export const createChat = authActionClient
   .metadata({ errorMessage: "Failed to create chat" })
-  .inputSchema(z.object({ chatId: z.string() }))
-  .action(async ({ parsedInput: { chatId } }) => {
-    await createChatDAL(chatId)
+  .inputSchema(z.object({ chatId: z.string(), modelId: z.string() }))
+  .action(async ({ parsedInput: { chatId, modelId } }) => {
+    await createChatDAL(chatId, modelId)
   })
 
 export const updateChatTitle = authActionClient
