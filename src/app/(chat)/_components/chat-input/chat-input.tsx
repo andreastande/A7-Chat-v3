@@ -5,6 +5,7 @@ import { ArrowUp, Square } from "lucide-react"
 import { useRef, useState } from "react"
 import TextareaAutosize from "react-textarea-autosize"
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import { ChatInputActions } from "./chat-input-actions"
 import { ModelPicker } from "./model-picker"
@@ -74,6 +75,7 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
       <div className="mt-2 flex justify-between">
         <div className="flex items-center gap-2">
           <ChatInputActions />
+          <Separator orientation="vertical" className="h-4!" />
           <ModelPicker />
         </div>
         <Button data-submit size="icon-sm" disabled={!(canSend || canStop)}>

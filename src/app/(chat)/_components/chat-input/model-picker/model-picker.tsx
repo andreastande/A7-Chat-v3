@@ -47,6 +47,7 @@ export function ModelPicker() {
           size="sm"
           className="data-[state=open]:bg-accent data-[state=open]:text-accent-foreground dark:data-[state=open]:bg-accent/50"
         >
+          <CreatorLogo creator={selectedModelId.split("/")[0] as Creator} className="size-3" />
           {allModels.find((m) => m.id === selectedModelId)?.name}
           <ChevronDown className="text-muted-foreground" />
         </Button>
@@ -98,7 +99,7 @@ export function ModelPicker() {
             </div>
           )}
 
-          <ul className="flex flex-1 flex-col space-y-1 overflow-auto p-1">
+          <ul tabIndex={-1} className="flex flex-1 flex-col space-y-1 overflow-auto p-1">
             {modelsToShow.map((model) => (
               <li key={model.id}>
                 <Model
