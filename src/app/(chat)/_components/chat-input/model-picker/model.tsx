@@ -41,7 +41,6 @@ export function Model({ model, showCreatorLogo, closeModelPicker }: ModelProps) 
     >
       {showCreatorLogo && <CreatorLogo creator={model.id.split("/")[0] as Creator} className="size-3" />}
       <span className="truncate">{model.name}</span>
-      {/* biome-ignore lint/a11y/useSemanticElements: avoid button-in-button */}
       <div
         data-star
         role="button"

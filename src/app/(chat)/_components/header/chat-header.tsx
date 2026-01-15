@@ -79,7 +79,6 @@ export function ChatHeader() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/** biome-ignore lint/style/noNonNullAssertion: chatId is guaranteed to exist */}
         {renderDialog(chatId!)}
       </Dialog>
 

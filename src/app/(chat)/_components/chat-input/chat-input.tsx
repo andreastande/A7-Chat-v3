@@ -35,7 +35,6 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
   }
 
   return (
-    // biome-ignore lint/a11y/useKeyWithClickEvents: Textarea handles keyboard input
     <form
       onSubmit={(e) => {
         e.preventDefault()

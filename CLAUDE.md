@@ -12,8 +12,8 @@ pnpm start               # Start production server
 pnpm analyze             # Analyze bundle size
 
 # Code Quality
-pnpm lint                # Run Biome linter (checks code)
-pnpm format              # Format code with Biome
+pnpm lint                # Run Oxlint (checks code)
+pnpm format              # Format code with Oxfmt
 
 # Database
 pnpm db:push             # Push schema changes to database (no migrations generated)
@@ -29,7 +29,7 @@ pnpm db:push             # Push schema changes to database (no migrations genera
 - **AI**: Vercel AI SDK
 - **Styling**: Tailwind CSS v4 with shadcn/ui components
 - **Validation**: Zod for schemas
-- **Code Quality**: Biome for linting/formatting (120 char line width, no semicolons)
+- **Code Quality**: Oxlint/Oxfmt for linting/formatting (120 char line width, no semicolons)
 
 ### Key Architectural Patterns
 
@@ -102,6 +102,6 @@ Uses `envin` for type-safe env vars (`env.config.ts`):
 
 - React Compiler is enabled in Next.js config - don't use useMemo/useCallback for memoization.
 - Prefer regular function declarations over arrow functions (but use arrow functions for inline callbacks).
-- Biome excludes `src/components/ui` (shadcn components)
+- Oxfmt excludes `src/components/ui` (shadcn components)
 - pnpm workspace ignores `sharp` and `unrs-resolver` built deps
 - Database uses `prepare: false` for transaction pool mode compatibility
