@@ -2,7 +2,7 @@
 
 import { createContext, type ReactNode, useContext, useState } from "react"
 import { useStore } from "zustand"
-import { createSelectedModelStore, type SelectedModelStore } from "@/stores/selected-model-store"
+import { createSelectedModelStore, type SelectedModelStore } from "../../_stores/selected-model-store"
 
 type SelectedModelStoreApi = ReturnType<typeof createSelectedModelStore>
 

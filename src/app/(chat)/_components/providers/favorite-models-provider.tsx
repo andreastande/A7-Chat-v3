@@ -2,7 +2,7 @@
 
 import { createContext, type ReactNode, useContext, useState } from "react"
 import { useStore } from "zustand"
-import { createFavoriteModelsStore, type FavoriteModelsStore } from "@/stores/favorite-models-store"
+import { createFavoriteModelsStore, type FavoriteModelsStore } from "../../_stores/favorite-models-store"
 
 type FavoriteModelsStoreApi = ReturnType<typeof createFavoriteModelsStore>
 

@@ -55,9 +55,9 @@ export function ModelPicker() {
 
       <PopoverContent align="start" className="flex h-70 w-74 flex-col p-0">
         <div className="flex h-10 w-full items-center border-b">
-          <Search className="mx-2.75 size-3.5 text-muted-foreground" />
+          <Search className="mx-3.25 size-3.5 text-muted-foreground" />
           <input
-            className="h-full w-full flex-1 pr-2.5 pl-2 text-sm outline-none"
+            className="h-full w-full flex-1 pr-2.5 pl-1 text-sm outline-none"
             placeholder="Search models..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
