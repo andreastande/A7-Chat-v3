@@ -9,10 +9,8 @@ import { SelectedModelProvider } from "../../_components/providers/selected-mode
 export default async function Page({ params }: PageProps<"/chat/[id]">) {
   const { id: chatId } = await params
 
-  const chat = await getChat(chatId).catch(() => null)
+  const [chat, initialMessages] = await Promise.all([getChat(chatId).catch(() => null), getMessages(chatId)])
   if (!chat) return notFound()
-
-  const initialMessages = await getMessages(chatId)
   const selectedModelId = getValidModelId(chat.modelId)
 
   return (

@@ -6,13 +6,13 @@ import { type Creator, getCreatorName, getModelName, isValidModelId } from "@/li
 export async function POST(req: Request) {
   const { message, chatId, modelId }: { message: UIMessage; chatId: string; modelId: string } = await req.json()
 
-  if (!(await getCurrentUser())) return new Response("Unauthorized", { status: 401 })
+  const [user, chat, dbMessages] = await Promise.all([getCurrentUser(), getChat(chatId), getMessages(chatId)])
+
+  if (!user) return new Response("Unauthorized", { status: 401 })
   if (!isValidModelId(modelId)) return new Response("Invalid model ID", { status: 400 })
-  if (!(await getChat(chatId))) return new Response("Chat not found", { status: 404 })
+  if (!chat) return new Response("Chat not found", { status: 404 })
 
-  const dbMessages = await getMessages(chatId)
   const messages = [...dbMessages, message]
-
   await insertMessage({ chatId, ...message })
 
   const result = streamText({
