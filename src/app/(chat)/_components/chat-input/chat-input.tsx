@@ -7,6 +7,7 @@ import TextareaAutosize from "react-textarea-autosize"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
+import { useFocusOnType } from "../../_hooks/use-focus-on-type"
 import { ChatInputActions } from "./chat-input-actions"
 import { ModelPicker } from "./model-picker"
 
@@ -18,6 +19,7 @@ interface ChatInputProps {
 export function ChatInput({ className, sendMessage }: ChatInputProps) {
   const [input, setInput] = useState("")
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  useFocusOnType(textareaRef, setInput)
 
   const status = useChatStatus()
   const { stop } = useChatActions()

@@ -45,7 +45,7 @@ export function ModelPicker() {
         <Button
           variant="ghost"
           size="sm"
-          className="data-[state=open]:bg-accent data-[state=open]:text-accent-foreground dark:data-[state=open]:bg-accent/50"
+          className="font-normal data-[state=open]:bg-accent data-[state=open]:text-accent-foreground dark:data-[state=open]:bg-accent/50"
         >
           <CreatorLogo creator={selectedModelId.split("/")[0] as Creator} className="size-3" />
           {allModels.find((m) => m.id === selectedModelId)?.name}

@@ -32,9 +32,9 @@ export function HistoryItemHoverCard({ children }: { children: ReactNode }) {
                   href={`/chat/${c.id}`}
                   onClick={() => setOpen(false)}
                   className={cn(
-                    "w-full justify-start",
+                    "w-full justify-start font-normal",
                     c.title === "Untitled" && "text-muted-foreground",
-                    c.id === chatID && "bg-accent text-accent-foreground dark:bg-accent/50",
+                    c.id === chatID && "bg-accent font-medium text-accent-foreground dark:bg-accent/50",
                   )}
                 >
                   <span className="truncate">{c.title}</span>

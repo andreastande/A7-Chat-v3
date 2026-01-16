@@ -31,8 +31,8 @@ export function Model({ model, showCreatorLogo, closeModelPicker }: ModelProps) 
       size="sm"
       variant="ghost"
       className={cn(
-        "group/button w-full justify-start transition-colors [&:has([data-star]:hover)]:bg-transparent",
-        selectedModelId === model.id && "bg-accent text-accent-foreground dark:bg-accent/50",
+        "group/button w-full justify-start font-normal transition-colors [&:has([data-star]:hover)]:bg-transparent",
+        selectedModelId === model.id && "bg-accent font-medium text-accent-foreground dark:bg-accent/50",
       )}
       onClick={() => {
         setSelectedModelId({ chatId, modelId: model.id })

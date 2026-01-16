@@ -45,7 +45,7 @@ export function ChatHeader() {
             <Button
               variant="ghost"
               size="sm"
-              className="data-[state=open]:bg-accent data-[state=open]:text-accent-foreground dark:data-[state=open]:bg-accent/50"
+              className="font-normal data-[state=open]:bg-accent data-[state=open]:text-accent-foreground dark:data-[state=open]:bg-accent/50"
             >
               <span className={cn("w-full max-w-50 truncate", title === "Untitled" && "text-muted-foreground")}>
                 {title}
