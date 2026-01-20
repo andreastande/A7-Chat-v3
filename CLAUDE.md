@@ -13,7 +13,7 @@ pnpm analyze             # Analyze bundle size
 
 # Code Quality
 pnpm lint                # Run Oxlint (checks code)
-pnpm format              # Format code with Oxfmt
+pnpm fmt                 # Format code with Oxfmt
 
 # Database
 pnpm db:push             # Push schema changes to database (no migrations generated)

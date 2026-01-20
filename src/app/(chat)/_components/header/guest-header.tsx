@@ -23,7 +23,7 @@ export function GuestHeader() {
         <Button size="sm" asChild>
           <Link href="/login">Log in</Link>
         </Button>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" asChild>
           <Link href="/signup">Sign up for free</Link>
         </Button>
       </div>

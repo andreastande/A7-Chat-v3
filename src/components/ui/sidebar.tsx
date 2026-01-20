@@ -214,7 +214,7 @@ function Sidebar({
       data-side={side}
       data-slot="sidebar"
       onClick={(e) => {
-        const excludedSlots = ["sidebar-group", "sidebar-footer", "sidebar-header", "dropdown-menu-content", "dropdown-menu-sub-content", "tooltip-content", "dialog-content", "hover-card-content"]
+        const excludedSlots = ["sidebar-group", "sidebar-footer", "sidebar-header", "dropdown-menu-content", "dropdown-menu-sub-content", "tooltip-content", "dialog-content", "dialog-overlay", "hover-card-content"]
         if (!excludedSlots.some((slot) => (e.target as HTMLElement).closest(`[data-slot="${slot}"]`))) toggleSidebar()
       }}
     >
