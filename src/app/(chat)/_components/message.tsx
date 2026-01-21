@@ -1,6 +1,10 @@
 "use client"
 
+import "katex/dist/katex.min.css"
 import { useChatStatus } from "@ai-sdk-tools/store"
+import { code } from "@streamdown/code"
+import { math } from "@streamdown/math"
+import { mermaid } from "@streamdown/mermaid"
 import type { UIMessage } from "ai"
 import { Streamdown } from "streamdown"
 
@@ -20,7 +24,11 @@ function AssistantMessage({ message }: { message: UIMessage }) {
     switch (part.type) {
       case "text":
         return (
-          <Streamdown key={`${message.id}-${i}`} isAnimating={status === "streaming"}>
+          <Streamdown
+            key={`${message.id}-${i}`}
+            isAnimating={status === "streaming"}
+            plugins={{ code: code, math: math, mermaid: mermaid }}
+          >
             {part.text}
           </Streamdown>
         )
