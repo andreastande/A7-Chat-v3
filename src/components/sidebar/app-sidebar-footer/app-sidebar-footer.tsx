@@ -1,7 +1,7 @@
 "use client"
 
 import { ChevronsUpDown } from "lucide-react"
-import { SettingsDialog } from "@/components/dialogs/settings-dialog"
+import { SettingsDialog } from "./settings-dialog"
 import { useSession } from "@/components/providers/session-provider"
 import { Dialog } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"

@@ -16,7 +16,7 @@ export function FooterAvatar({ user }: { user?: User }) {
 
   return (
     <Avatar className="rounded-md group-data-[collapsible=icon]:group-[:hover,:focus,[data-state=open]]/menu-button:brightness-90">
-      <AvatarImage src={user.image ?? undefined} alt={user.name} />
+      <AvatarImage src={user.image ?? undefined} alt={user.name} referrerPolicy="no-referrer" />
       <AvatarFallback className="rounded-md">{initials}</AvatarFallback>
     </Avatar>
   )
