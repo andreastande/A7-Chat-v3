@@ -2,27 +2,26 @@
 
 import { Eye, EyeOff } from "lucide-react"
 import { type ComponentProps, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group"
 import { WithTooltip } from "@/components/ui/tooltip"
 
-export function PasswordInput({ className, ...props }: Omit<ComponentProps<"input">, "type">) {
+export function PasswordInput({ ...props }: Omit<ComponentProps<"input">, "type">) {
   const [isRevealed, setIsRevealed] = useState(false)
 
   return (
-    <div className="relative">
-      <Input type={isRevealed ? "text" : "password"} className={`pr-10 ${className ?? ""}`} {...props} />
-      <WithTooltip content={isRevealed ? "Hide password" : "Show password"} delayDuration={300} asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => setIsRevealed((v) => !v)}
-          aria-label={isRevealed ? "Hide password" : "Show password"}
-          className="absolute top-1/2 right-2 size-7 -translate-y-1/2"
-        >
-          {isRevealed ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-        </Button>
-      </WithTooltip>
-    </div>
+    <InputGroup>
+      <InputGroupInput {...props} type={isRevealed ? "text" : "password"} />
+      <InputGroupAddon align="inline-end">
+        <WithTooltip content={isRevealed ? "Hide password" : "Show password"} delayDuration={300} asChild>
+          <InputGroupButton
+            aria-label={isRevealed ? "Hide password" : "Show password"}
+            size="icon-xs"
+            onClick={() => setIsRevealed((v) => !v)}
+          >
+            {isRevealed ? <EyeOff /> : <Eye />}
+          </InputGroupButton>
+        </WithTooltip>
+      </InputGroupAddon>
+    </InputGroup>
   )
 }
