@@ -1,14 +1,7 @@
 "use client"
 
-import { Root as VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { DialogContent, DialogTitle } from "@/components/ui/dialog"
+import { DialogContent } from "@/components/base-ui/dialog"
 
 export function SettingsDialog() {
-  return (
-    <DialogContent showCloseButton={false}>
-      <VisuallyHidden>
-        <DialogTitle>Settings</DialogTitle>
-      </VisuallyHidden>
-    </DialogContent>
-  )
+  return <DialogContent showCloseButton={false}>Is this working?</DialogContent>
 }

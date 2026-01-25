@@ -3,22 +3,25 @@
 import { LogIn, LogOut, Settings, UserPlus } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { DialogTrigger } from "@/components/ui/dialog"
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { signOut } from "@/lib/auth/client"
 import { LearnMoreSubmenu } from "./learn-more-submenu"
 
-export function FooterMenuContent({ isAuthenticated }: { isAuthenticated: boolean }) {
+export function FooterMenuContent({
+  isAuthenticated,
+  onOpenSettings,
+}: {
+  isAuthenticated: boolean
+  onOpenSettings: () => void
+}) {
   const router = useRouter()
 
   return (
     <DropdownMenuContent align="start" className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg">
-      <DialogTrigger asChild>
-        <DropdownMenuItem>
-          <Settings />
-          Settings
-        </DropdownMenuItem>
-      </DialogTrigger>
+      <DropdownMenuItem onClick={onOpenSettings}>
+        <Settings />
+        Settings
+      </DropdownMenuItem>
 
       <LearnMoreSubmenu />
 
