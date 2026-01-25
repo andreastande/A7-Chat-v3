@@ -20,7 +20,7 @@ export function SocialLoginButtons({ lastMethod }: { lastMethod?: string | null 
             <Icon />
             <span className="capitalize">{name}</span>
           </Button>
-          {lastMethod && <LastUsedBadge show={lastMethod === name} />}
+          {lastMethod && <LastUsedBadge show={lastMethod === name} isSocial />}
         </div>
       ))}
     </Field>
