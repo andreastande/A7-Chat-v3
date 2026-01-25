@@ -1,12 +1,10 @@
 "use client"
 
-import { PanelLeft } from "lucide-react"
-import { Button } from "../ui/button"
-import { SidebarHeader, useSidebar } from "../ui/sidebar"
+import { SidebarHeader, useSidebar, SidebarTrigger } from "../ui/sidebar"
 import { WithTooltip } from "../ui/tooltip"
 
 export function AppSidebarHeader() {
-  const { toggleSidebar, open } = useSidebar()
+  const { open } = useSidebar()
 
   return (
     <SidebarHeader className="cursor-default items-end">
@@ -23,14 +21,7 @@ export function AppSidebarHeader() {
         side="right"
         asChild
       >
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={toggleSidebar}
-          aria-label={open ? "Close sidebar" : "Open sidebar"}
-        >
-          <PanelLeft />
-        </Button>
+        <SidebarTrigger className="size-8" />
       </WithTooltip>
     </SidebarHeader>
   )
