@@ -2,8 +2,8 @@
 
 import { ChevronRight, Folder, PlusIcon } from "lucide-react"
 import Link from "next/link"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/base-ui/collapsible"
 import { useSession } from "@/components/providers/session-provider"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   SidebarMenuAction,
   SidebarMenuButton,
@@ -27,19 +27,21 @@ export function ProjectsItem() {
               Projects
             </Link>
           </SidebarMenuButton>
-          <CollapsibleTrigger asChild>
-            <SidebarMenuAction
-              className="left-1.5 bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:rotate-90"
-              showOnHover
-            >
-              <ChevronRight />
-            </SidebarMenuAction>
+          <CollapsibleTrigger
+            render={
+              <SidebarMenuAction
+                className="left-1.5 bg-sidebar-accent text-sidebar-accent-foreground data-panel-open:rotate-90"
+                showOnHover
+              />
+            }
+          >
+            <ChevronRight />
           </CollapsibleTrigger>
           <SidebarMenuAction showOnHover>
             <PlusIcon />
             <span className="sr-only">Add project</span>
           </SidebarMenuAction>
-          <CollapsibleContent className="overflow-hidden transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+          <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-all ease-out data-ending-style:h-0 data-starting-style:h-0">
             <SidebarMenuSub>
               <SidebarMenuSubItem>
                 <SidebarMenuSubButton asChild>

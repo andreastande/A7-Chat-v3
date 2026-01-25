@@ -3,11 +3,11 @@
 import { ChevronRight, Folder, History, MoreHorizontal, Pencil, Pin, Share, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/base-ui/collapsible"
 import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog"
 import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
 import { useSession } from "@/components/providers/session-provider"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import {
   DropdownMenu,
@@ -61,16 +61,18 @@ export function HistoryItem() {
             </SidebarMenuButton>
           </HistoryItemHoverCard>
 
-          <CollapsibleTrigger asChild>
-            <SidebarMenuAction
-              className="left-1.5 bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:rotate-90"
-              showOnHover
-            >
-              <ChevronRight />
-            </SidebarMenuAction>
-          </CollapsibleTrigger>
+          <CollapsibleTrigger
+            render={
+              <SidebarMenuAction
+                className="left-1.5 bg-sidebar-accent text-sidebar-accent-foreground data-panel-open:rotate-90"
+                showOnHover
+              >
+                <ChevronRight />
+              </SidebarMenuAction>
+            }
+          />
 
-          <CollapsibleContent className="overflow-hidden transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+          <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-all ease-out data-ending-style:h-0 data-starting-style:h-0">
             <SidebarMenuSub>
               {chats.slice(0, 10).map((c) => (
                 <SidebarMenuSubItem key={c.id}>
