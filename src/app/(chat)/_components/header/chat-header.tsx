@@ -2,10 +2,10 @@
 
 import { ChevronDown, Folder, Pencil, Pin, Share, Trash2 } from "lucide-react"
 import { useState } from "react"
+import { Button } from "@/components/base-ui/button"
 import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog"
 import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
-import { Button } from "@/components/ui/button"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import {
   DropdownMenu,

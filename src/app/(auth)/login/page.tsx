@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import z from "zod"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/base-ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -94,7 +94,7 @@ export default function Page() {
                   </Field>
                 )}
                 <Field className="relative">
-                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                  <Button type="submit" disabled={form.formState.isSubmitting} focusableWhenDisabled>
                     {form.formState.isSubmitting && <Spinner />}
                     Log In
                   </Button>

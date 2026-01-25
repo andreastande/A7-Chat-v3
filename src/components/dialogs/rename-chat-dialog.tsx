@@ -2,8 +2,8 @@
 
 import { useRef, useState } from "react"
 import { useShallow } from "zustand/react/shallow"
+import { Button } from "@/components/base-ui/button"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
-import { Button } from "@/components/ui/button"
 import { DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 

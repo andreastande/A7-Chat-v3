@@ -1,7 +1,7 @@
 "use client"
 
 import { SiGithub, SiGoogle } from "@icons-pack/react-simple-icons"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/base-ui/button"
 import { Field } from "@/components/ui/field"
 import { signInSocial } from "@/lib/auth/client"
 import { LastUsedBadge } from "./last-used-badge"

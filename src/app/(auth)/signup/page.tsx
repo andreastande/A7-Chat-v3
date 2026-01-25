@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { Controller, useForm } from "react-hook-form"
 import z from "zod"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/base-ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -106,7 +106,7 @@ export default function Page() {
                   </Field>
                 )}
                 <Field>
-                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                  <Button type="submit" disabled={form.formState.isSubmitting} focusableWhenDisabled>
                     {form.formState.isSubmitting && <Spinner />}
                     Create Account
                   </Button>

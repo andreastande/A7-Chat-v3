@@ -1,8 +1,8 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { Button } from "@/components/base-ui/button"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
-import { Button } from "@/components/ui/button"
 import {
   DialogClose,
   DialogContent,

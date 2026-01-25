@@ -1,7 +1,7 @@
 "use client"
 
 import { Globe, Paperclip, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/base-ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,

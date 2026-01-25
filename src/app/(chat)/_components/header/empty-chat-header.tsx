@@ -1,7 +1,7 @@
 "use client"
 
 import { MessageCircleDashed } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/base-ui/button"
 import { WithTooltip } from "@/components/ui/tooltip"
 
 export function EmptyChatHeader() {
