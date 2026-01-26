@@ -118,11 +118,15 @@ export function HistoryItem() {
           </CollapsibleContent>
 
           <Dialog open={dialogState?.type === "rename"} onOpenChange={(open) => !open && setDialogState(null)}>
-            <RenameChatDialog chatId={dialogState?.chatId ?? ""} onClose={() => setDialogState(null)} />
+            {dialogState?.type === "rename" && (
+              <RenameChatDialog chatId={dialogState.chatId} onClose={() => setDialogState(null)} />
+            )}
           </Dialog>
 
           <Dialog open={dialogState?.type === "delete"} onOpenChange={(open) => !open && setDialogState(null)}>
-            <DeleteChatDialog chatId={dialogState?.chatId ?? ""} onClose={() => setDialogState(null)} />
+            {dialogState?.type === "delete" && (
+              <DeleteChatDialog chatId={dialogState.chatId} onClose={() => setDialogState(null)} />
+            )}
           </Dialog>
         </Collapsible>
       ) : (
