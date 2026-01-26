@@ -216,7 +216,7 @@ function DropdownMenuSeparator({
   return (
     <MenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
-      className={cn("bg-border -mx-1 my-1 h-px", className)}
+      className={cn("bg-border mx-2 my-1 h-px", className)}
       {...props}
     />
   )
@@ -224,12 +224,19 @@ function DropdownMenuSeparator({
 
 function DropdownMenuShortcut({
   className,
+  showOnFocus,
   ...props
-}: React.ComponentProps<"span">) {
+}: React.ComponentProps<"span"> & {
+  showOnFocus?: boolean
+}) {
   return (
     <span
       data-slot="dropdown-menu-shortcut"
-      className={cn("text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground ml-auto text-xs tracking-widest", className)}
+      className={cn(
+        "text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground ml-auto text-xs tracking-widest",
+        showOnFocus && "invisible group-focus/dropdown-menu-item:visible group-focus/dropdown-menu-item:text-muted-foreground!",
+        className,
+      )}
       {...props}
     />
   )
