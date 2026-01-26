@@ -1,7 +1,7 @@
 import "./globals.css"
 import type { Metadata } from "next"
 import { Geist } from "next/font/google"
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/base-ui/sonner"
 import { Providers } from "./providers"
 
 const geistSans = Geist({
@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} isolate relative antialiased`}>
+      <body className={`${geistSans.variable} relative isolate antialiased`}>
         <Providers>
           {children}
           <Toaster position="top-right" />
