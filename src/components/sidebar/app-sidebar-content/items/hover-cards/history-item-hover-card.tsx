@@ -1,9 +1,9 @@
 import Link from "next/link"
 import { ComponentProps, useState } from "react"
-import { Button } from "@/components/base-ui/button"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/base-ui/hover-card"
-import { useSidebar } from "@/components/base-ui/sidebar"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
+import { Button } from "@/components/ui/button"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { useSidebar } from "@/components/ui/sidebar"
 import { useChatId } from "@/hooks/use-chat-id"
 import { cn } from "@/lib/utils"
 

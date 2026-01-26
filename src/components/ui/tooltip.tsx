@@ -1,84 +1,123 @@
 "use client"
 
-import * as React from "react"
-import * as TooltipPrimitive from "@radix-ui/react-tooltip"
+import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"
 
 import { cn } from "@/lib/utils"
 
 function TooltipProvider({
-  delayDuration = 0,
+  delay = 0,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
+}: TooltipPrimitive.Provider.Props) {
   return (
     <TooltipPrimitive.Provider
       data-slot="tooltip-provider"
-      delayDuration={delayDuration}
+      delay={delay}
       {...props}
     />
   )
 }
 
 function Tooltip({
+  delay,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+}: TooltipPrimitive.Root.Props & Pick<TooltipPrimitive.Provider.Props, "delay">) {
   return (
-    <TooltipProvider>
+    <TooltipProvider delay={delay}>
       <TooltipPrimitive.Root data-slot="tooltip" {...props} />
     </TooltipProvider>
   )
 }
 
-function TooltipTrigger({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
+function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
 }
 
 function TooltipContent({
   className,
+  side = "top",
   sideOffset = 6,
+  align = "center",
+  alignOffset = 0,
+  animated = false,
+  showArrow = false,
   children,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+}: TooltipPrimitive.Popup.Props &
+  Pick<
+    TooltipPrimitive.Positioner.Props,
+    "align" | "alignOffset" | "side" | "sideOffset"
+  > & {
+    animated?: boolean
+    showArrow?: boolean
+  }) {
   return (
     <TooltipPrimitive.Portal>
-      <TooltipPrimitive.Content
-        data-slot="tooltip-content"
+      <TooltipPrimitive.Positioner
+        align={align}
+        alignOffset={alignOffset}
+        side={side}
         sideOffset={sideOffset}
-        className={cn(
-          "bg-foreground text-background animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-2 py-0.75 text-xs text-balance",
-          className
-        )}
-        {...props}
+        className="isolate z-50"
       >
-        {children}
-      </TooltipPrimitive.Content>
+        <TooltipPrimitive.Popup
+          data-slot="tooltip-content"
+          className={cn(
+            "rounded-md px-2 py-0.75 text-xs bg-foreground text-background z-50 w-fit max-w-xs origin-(--transform-origin)",
+            animated && "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=inline-end]:slide-in-from-left-2",
+            className
+          )}
+          {...props}
+        >
+          {children}
+          {showArrow && (
+            <TooltipPrimitive.Arrow className="size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px] data-[side=inline-start]:top-1/2! data-[side=inline-start]:-right-1 data-[side=inline-start]:-translate-y-1/2 data-[side=inline-end]:top-1/2! data-[side=inline-end]:-left-1 data-[side=inline-end]:-translate-y-1/2 bg-foreground fill-foreground z-50 data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5" />
+          )}
+        </TooltipPrimitive.Popup>
+      </TooltipPrimitive.Positioner>
     </TooltipPrimitive.Portal>
   )
 }
 
 type WithTooltipProps = {
   content: React.ReactNode
-  children: React.ReactNode
-} & Pick<React.ComponentProps<typeof TooltipPrimitive.Trigger>, "asChild"> &
-  Pick<React.ComponentProps<typeof TooltipPrimitive.Content>, "side" | "sideOffset"> &
-  React.ComponentProps<typeof TooltipPrimitive.Root>
+  children?: React.ReactNode
+  animated?: boolean
+  showArrow?: boolean
+} & Pick<TooltipPrimitive.Trigger.Props, "render"> &
+  Pick<
+    TooltipPrimitive.Positioner.Props,
+    "align" | "alignOffset" | "side" | "sideOffset"
+  > &
+  Pick<TooltipPrimitive.Provider.Props, "delay"> &
+  Omit<TooltipPrimitive.Popup.Props, "children" | "content"> &
+  Omit<TooltipPrimitive.Root.Props, "children">
 
 function WithTooltip({
   // Trigger props
   children,
-  asChild,
+  render,
   // Content props
   content,
   side,
   sideOffset,
+  align,
+  alignOffset,
+  animated,
+  showArrow,
   // Root props
   ...rootProps
 }: WithTooltipProps) {
   return (
     <Tooltip {...rootProps}>
-      <TooltipTrigger asChild={asChild}>{children}</TooltipTrigger>
-      <TooltipContent side={side} sideOffset={sideOffset}>
+      <TooltipTrigger render={render}>{children}</TooltipTrigger>
+      <TooltipContent
+        side={side}
+        sideOffset={sideOffset}
+        align={align}
+        alignOffset={alignOffset}
+        animated={animated}
+        showArrow={showArrow}
+      >
         {content}
       </TooltipContent>
     </Tooltip>

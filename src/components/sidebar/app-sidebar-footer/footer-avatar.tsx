@@ -1,5 +1,5 @@
 import { User } from "better-auth"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/base-ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export function FooterAvatar({ user }: { user?: User }) {
   if (!user) {

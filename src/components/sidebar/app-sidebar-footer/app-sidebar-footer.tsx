@@ -2,10 +2,10 @@
 
 import { ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
-import { Dialog } from "@/components/base-ui/dialog"
-import { DropdownMenu, DropdownMenuTrigger } from "@/components/base-ui/dropdown-menu"
-import { SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/base-ui/sidebar"
 import { useSession } from "@/components/providers/session-provider"
+import { Dialog } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 import { FooterAvatar } from "./footer-avatar"
 import { FooterMenuContent } from "./footer-menu-content"
 import { SettingsDialog } from "./settings-dialog"

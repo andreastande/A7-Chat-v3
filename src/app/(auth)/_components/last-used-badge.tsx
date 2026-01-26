@@ -1,6 +1,6 @@
 "use client"
 
-import { Badge } from "@/components/base-ui/badge"
+import { Badge } from "@/components/ui/badge"
 
 export function LastUsedBadge({ show, isSocial }: { show: boolean; isSocial?: boolean }) {
   if (!show) return null

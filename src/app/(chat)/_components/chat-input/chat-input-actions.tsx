@@ -1,7 +1,7 @@
 "use client"
 
 import { Globe, Paperclip, Plus } from "lucide-react"
-import { Button } from "@/components/base-ui/button"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,8 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@/components/base-ui/dropdown-menu"
-import { WithTooltip } from "@/components/base-ui/tooltip"
+} from "@/components/ui/dropdown-menu"
+import { WithTooltip } from "@/components/ui/tooltip"
 
 export function ChatInputActions() {
   return (

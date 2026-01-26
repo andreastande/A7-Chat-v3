@@ -3,7 +3,7 @@
 import { Star } from "lucide-react"
 import { useShallow } from "zustand/react/shallow"
 import { useFavoriteModelsStore } from "@/app/(chat)/_components/providers/favorite-models-provider"
-import { Button } from "@/components/base-ui/button"
+import { Button } from "@/components/ui/button"
 import { useChatId } from "@/hooks/use-chat-id"
 import type { Creator, Model as TModel } from "@/lib/models"
 import { cn } from "@/lib/utils"

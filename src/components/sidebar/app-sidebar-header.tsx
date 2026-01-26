@@ -1,7 +1,7 @@
 "use client"
 
-import { SidebarHeader, useSidebar, SidebarTrigger } from "../base-ui/sidebar"
-import { WithTooltip } from "../base-ui/tooltip"
+import { SidebarHeader, useSidebar, SidebarTrigger } from "../ui/sidebar"
+import { WithTooltip } from "../ui/tooltip"
 
 export function AppSidebarHeader() {
   const { open } = useSidebar()

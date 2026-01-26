@@ -1,6 +1,6 @@
 import Link from "next/link"
-import { Button } from "@/components/base-ui/button"
 import { AppSidebar } from "@/components/sidebar/app-sidebar"
+import { Button } from "@/components/ui/button"
 import { getCurrentUser } from "@/dal/auth"
 
 export default async function Page() {

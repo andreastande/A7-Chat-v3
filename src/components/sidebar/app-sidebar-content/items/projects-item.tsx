@@ -2,7 +2,8 @@
 
 import { ChevronRight, Folder, PlusIcon } from "lucide-react"
 import Link from "next/link"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/base-ui/collapsible"
+import { useSession } from "@/components/providers/session-provider"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   SidebarMenuAction,
   SidebarMenuButton,
@@ -10,8 +11,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/base-ui/sidebar"
-import { useSession } from "@/components/providers/session-provider"
+} from "@/components/ui/sidebar"
 
 export function ProjectsItem() {
   const session = useSession()

@@ -1,7 +1,8 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/base-ui/button"
+import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
+import { Button } from "@/components/ui/button"
 import {
   DialogClose,
   DialogContent,
@@ -9,8 +10,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/base-ui/dialog"
-import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
+} from "@/components/ui/dialog"
 import { useChatId } from "@/hooks/use-chat-id"
 
 export function DeleteChatDialog({ chatId, onClose }: { chatId: string; onClose: () => void }) {

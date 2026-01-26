@@ -4,7 +4,7 @@ import { MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useHotkeys } from "react-hotkeys-hook"
-import { SidebarMenuButton, SidebarMenuItem, SidebarMenuShortcut } from "@/components/base-ui/sidebar"
+import { SidebarMenuButton, SidebarMenuItem, SidebarMenuShortcut } from "@/components/ui/sidebar"
 
 export function ChatItem() {
   const pathname = usePathname()

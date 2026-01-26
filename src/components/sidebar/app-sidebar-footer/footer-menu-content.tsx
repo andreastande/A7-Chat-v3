@@ -14,7 +14,7 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-} from "@/components/base-ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 import { signOut } from "@/lib/auth/client"
 
 export function FooterMenuContent({

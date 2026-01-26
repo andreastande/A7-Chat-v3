@@ -2,7 +2,7 @@
 
 import { useMessageCount } from "@ai-sdk-tools/store"
 import Link from "next/link"
-import { Button } from "@/components/base-ui/button"
+import { Button } from "@/components/ui/button"
 
 export function GuestHeader() {
   const messageCount = useMessageCount()

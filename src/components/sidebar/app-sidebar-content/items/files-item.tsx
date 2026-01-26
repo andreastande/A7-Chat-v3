@@ -2,8 +2,8 @@
 
 import { FileText } from "lucide-react"
 import Link from "next/link"
-import { SidebarMenuButton, SidebarMenuItem } from "@/components/base-ui/sidebar"
 import { useSession } from "@/components/providers/session-provider"
+import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 
 export function FilesItem() {
   const session = useSession()

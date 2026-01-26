@@ -1,4 +1,4 @@
-import { SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu } from "@/components/base-ui/sidebar"
+import { SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu } from "@/components/ui/sidebar"
 import { ChatItem, FilesItem, HistoryItem, ImagesItem, ProjectsItem } from "./items"
 
 export function AppSidebarContent() {

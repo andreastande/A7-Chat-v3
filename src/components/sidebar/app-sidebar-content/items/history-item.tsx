@@ -3,15 +3,19 @@
 import { ChevronRight, Folder, History, MoreHorizontal, Pencil, Pin, Share, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/base-ui/collapsible"
-import { Dialog } from "@/components/base-ui/dialog"
+import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog"
+import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
+import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
+import { useSession } from "@/components/providers/session-provider"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { Dialog } from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/base-ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu"
 import {
   SidebarMenuAction,
   SidebarMenuButton,
@@ -21,11 +25,7 @@ import {
   SidebarMenuSubAction,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/base-ui/sidebar"
-import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog"
-import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
-import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
-import { useSession } from "@/components/providers/session-provider"
+} from "@/components/ui/sidebar"
 import { useChatId } from "@/hooks/use-chat-id"
 import { cn } from "@/lib/utils"
 import { HistoryItemHoverCard } from "./hover-cards/history-item-hover-card"

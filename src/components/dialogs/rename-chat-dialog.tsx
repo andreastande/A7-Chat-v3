@@ -2,10 +2,10 @@
 
 import { useState } from "react"
 import { useShallow } from "zustand/react/shallow"
-import { Button } from "@/components/base-ui/button"
-import { DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/base-ui/dialog"
-import { Input } from "@/components/base-ui/input"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
+import { Button } from "@/components/ui/button"
+import { DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 
 export function RenameChatDialog({ chatId, onClose }: { chatId: string; onClose: () => void }) {
   const { chats, renameChat } = useChatHistoryStore(useShallow((s) => ({ chats: s.chats, renameChat: s.renameChat })))
