@@ -1,13 +1,13 @@
 "use client"
 
+import { SidebarHeader, useSidebar, SidebarTrigger } from "../base-ui/sidebar"
 import { WithTooltip } from "../base-ui/tooltip"
-import { SidebarHeader, useSidebar, SidebarTrigger } from "../ui/sidebar"
 
 export function AppSidebarHeader() {
   const { open } = useSidebar()
 
   return (
-    <SidebarHeader className="cursor-default items-end">
+    <SidebarHeader className="items-end">
       <WithTooltip
         content={
           <div className="flex items-center gap-2">
@@ -19,7 +19,7 @@ export function AppSidebarHeader() {
           </div>
         }
         side="right"
-        render={<SidebarTrigger className="size-8" />}
+        render={<SidebarTrigger />}
       />
     </SidebarHeader>
   )

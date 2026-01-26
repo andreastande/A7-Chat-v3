@@ -1,9 +1,9 @@
 import { cookies, headers } from "next/headers"
 import type { ReactNode } from "react"
+import { SidebarProvider } from "@/components/base-ui/sidebar"
 import { ChatHistoryProvider } from "@/components/providers/chat-history-provider"
 import { SessionProvider } from "@/components/providers/session-provider"
 import { ThemeProvider } from "@/components/providers/theme-provider"
-import { SidebarProvider } from "@/components/ui/sidebar"
 import { getChats } from "@/dal/chat"
 import { auth } from "@/lib/auth/server"
 

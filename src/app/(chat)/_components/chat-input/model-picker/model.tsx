@@ -32,7 +32,7 @@ export function Model({ model, showCreatorLogo, closeModelPicker }: ModelProps) 
       variant="ghost"
       className={cn(
         "group/button w-full justify-start font-normal transition-colors [&:has([data-star]:hover)]:bg-transparent",
-        selectedModelId === model.id && "bg-accent font-medium text-accent-foreground dark:bg-accent/50",
+        selectedModelId === model.id && "bg-muted font-medium text-foreground dark:bg-muted/50",
       )}
       onClick={() => {
         setSelectedModelId({ chatId, modelId: model.id })
@@ -55,7 +55,7 @@ export function Model({ model, showCreatorLogo, closeModelPicker }: ModelProps) 
             toggleFavorite(model.id)
           }
         }}
-        className="ml-auto rounded-md p-1.5 opacity-0 transition-colors outline-none group-[:hover,:focus-visible]/button:opacity-100 hover:bg-accent focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/50 dark:hover:bg-accent/50"
+        className="ml-auto rounded-md p-1.5 opacity-0 transition-colors outline-none group-[:hover,:focus-visible]/button:opacity-100 hover:bg-muted focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/50 dark:hover:bg-muted/50"
       >
         <Star className={cn("size-3 text-muted-foreground", isFavorited && "fill-yellow-400 text-yellow-400")} />
       </div>

@@ -4,8 +4,8 @@ import { ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
 import { Dialog } from "@/components/base-ui/dialog"
 import { DropdownMenu, DropdownMenuTrigger } from "@/components/base-ui/dropdown-menu"
+import { SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/base-ui/sidebar"
 import { useSession } from "@/components/providers/session-provider"
-import { SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 import { FooterAvatar } from "./footer-avatar"
 import { FooterMenuContent } from "./footer-menu-content"
 import { SettingsDialog } from "./settings-dialog"
@@ -15,7 +15,7 @@ export function AppSidebarFooter() {
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
-    <SidebarFooter className="cursor-default">
+    <SidebarFooter>
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
@@ -29,7 +29,7 @@ export function AppSidebarFooter() {
             >
               <FooterAvatar user={session?.user} />
               <span className="flex-1 truncate text-left text-sm">{session?.user.name ?? "Guest"}</span>
-              <ChevronsUpDown className="ml-auto hidden size-4 group-[:hover,:focus-visible,[data-popup-open]]/menu-button:flex" />
+              <ChevronsUpDown className="invisible ml-auto group-[:hover,:focus-visible,[data-popup-open]]/menu-button:visible" />
             </DropdownMenuTrigger>
             <FooterMenuContent isAuthenticated={!!session} onOpenSettings={() => setSettingsOpen(true)} />
           </DropdownMenu>

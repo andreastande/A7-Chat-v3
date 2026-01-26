@@ -4,17 +4,7 @@ import { MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useHotkeys } from "react-hotkeys-hook"
-import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
-
-function NewChatShortcut() {
-  return (
-    <>
-      <kbd>⇧</kbd>
-      <kbd>⌘</kbd>
-      <kbd>O</kbd>
-    </>
-  )
-}
+import { SidebarMenuButton, SidebarMenuItem, SidebarMenuShortcut } from "@/components/base-ui/sidebar"
 
 export function ChatItem() {
   const pathname = usePathname()
@@ -24,25 +14,10 @@ export function ChatItem() {
 
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton
-        tooltip={
-          <div className="flex items-center gap-2">
-            Chat
-            <kbd className="space-x-0.5 *:kbd">
-              <NewChatShortcut />
-            </kbd>
-          </div>
-        }
-        isActive={pathname === "/"}
-        asChild
-      >
-        <Link href="/">
-          <MessageCircle />
-          Chat
-          <kbd className="invisible ml-auto space-x-0.5 *:kbd group-data-[state=expanded]:group-[:hover,:focus-visible]/menu-button:visible">
-            <NewChatShortcut />
-          </kbd>
-        </Link>
+      <SidebarMenuButton tooltip="Chat" isActive={pathname === "/"} render={<Link href="/" />}>
+        <MessageCircle />
+        Chat
+        <SidebarMenuShortcut showOnFocus>⇧⌘O</SidebarMenuShortcut>
       </SidebarMenuButton>
     </SidebarMenuItem>
   )

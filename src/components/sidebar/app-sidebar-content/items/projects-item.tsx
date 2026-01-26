@@ -3,7 +3,6 @@
 import { ChevronRight, Folder, PlusIcon } from "lucide-react"
 import Link from "next/link"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/base-ui/collapsible"
-import { useSession } from "@/components/providers/session-provider"
 import {
   SidebarMenuAction,
   SidebarMenuButton,
@@ -11,7 +10,8 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
+} from "@/components/base-ui/sidebar"
+import { useSession } from "@/components/providers/session-provider"
 
 export function ProjectsItem() {
   const session = useSession()
@@ -20,11 +20,9 @@ export function ProjectsItem() {
     <SidebarMenuItem>
       {session ? (
         <Collapsible>
-          <SidebarMenuButton asChild>
-            <Link href="/projects">
-              <Folder />
-              Projects
-            </Link>
+          <SidebarMenuButton render={<Link href="/projects" />}>
+            <Folder />
+            Projects
           </SidebarMenuButton>
           <CollapsibleTrigger
             render={
@@ -40,12 +38,10 @@ export function ProjectsItem() {
             <PlusIcon />
             <span className="sr-only">Add project</span>
           </SidebarMenuAction>
-          <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-all ease-out data-ending-style:h-0 data-starting-style:h-0">
+          <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-all duration-100 ease-out data-ending-style:h-0 data-starting-style:h-0">
             <SidebarMenuSub>
               <SidebarMenuSubItem>
-                <SidebarMenuSubButton asChild>
-                  <Link href="#">Test</Link>
-                </SidebarMenuSubButton>
+                <SidebarMenuSubButton render={<Link href="#" />}>Test</SidebarMenuSubButton>
               </SidebarMenuSubItem>
             </SidebarMenuSub>
           </CollapsibleContent>
@@ -53,7 +49,7 @@ export function ProjectsItem() {
       ) : (
         <SidebarMenuButton
           tooltip="Log in to view your projects"
-          tooltipHidden={false}
+          alwaysShowTooltip
           className="cursor-not-allowed opacity-50"
         >
           <Folder />

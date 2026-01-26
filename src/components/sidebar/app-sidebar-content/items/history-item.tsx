@@ -12,19 +12,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/base-ui/dropdown-menu"
-import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog"
-import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
-import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
-import { useSession } from "@/components/providers/session-provider"
 import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuShortcut,
   SidebarMenuSub,
   SidebarMenuSubAction,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
+} from "@/components/base-ui/sidebar"
+import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog"
+import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
+import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
+import { useSession } from "@/components/providers/session-provider"
 import { useChatId } from "@/hooks/use-chat-id"
 import { cn } from "@/lib/utils"
 import { HistoryItemHoverCard } from "./hover-cards/history-item-hover-card"
@@ -40,13 +41,10 @@ export function HistoryItem() {
       {session ? (
         <Collapsible defaultOpen>
           <HistoryItemHoverCard>
-            <SidebarMenuButton>
+            <SidebarMenuButton className="group-has-data-[sidebar=menu-action]/menu-item:pr-2">
               <History />
               History
-              <kbd className="invisible absolute top-2 right-2 flex space-x-0.5 *:kbd group-data-[state=expanded]:group-[:hover,:focus-visible]/menu-button:visible">
-                <kbd>⌘</kbd>
-                <kbd>K</kbd>
-              </kbd>
+              <SidebarMenuShortcut showOnFocus>⌘K</SidebarMenuShortcut>
             </SidebarMenuButton>
           </HistoryItemHoverCard>
 
@@ -61,14 +59,16 @@ export function HistoryItem() {
             }
           />
 
-          <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-all ease-out data-ending-style:h-0 data-starting-style:h-0">
+          <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-all duration-100 ease-out data-ending-style:h-0 data-starting-style:h-0">
             <SidebarMenuSub>
               {chats.slice(0, 10).map((c) => (
                 <SidebarMenuSubItem key={c.id}>
-                  <SidebarMenuSubButton asChild isActive={chatId === c.id} className="pr-7">
-                    <Link href={`/chat/${c.id}`}>
-                      <span className={cn(c.title === "Untitled" && "text-muted-foreground")}>{c.title}</span>
-                    </Link>
+                  <SidebarMenuSubButton
+                    render={<Link href={`/chat/${c.id}`} />}
+                    isActive={chatId === c.id}
+                    className="pr-7"
+                  >
+                    <span className={cn(c.title === "Untitled" && "text-muted-foreground")}>{c.title}</span>
                   </SidebarMenuSubButton>
 
                   <DropdownMenu>
@@ -113,10 +113,11 @@ export function HistoryItem() {
                 </SidebarMenuSubItem>
               ))}
               <SidebarMenuSubItem>
-                <SidebarMenuSubButton asChild className="w-full bg-transparent! text-[13px] text-muted-foreground">
-                  <button type="button">
-                    <span>See all</span>
-                  </button>
+                <SidebarMenuSubButton
+                  render={<button />}
+                  className="w-full bg-transparent! text-[13px]! text-muted-foreground"
+                >
+                  <span>See all</span>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
             </SidebarMenuSub>
@@ -137,7 +138,7 @@ export function HistoryItem() {
       ) : (
         <SidebarMenuButton
           tooltip="Log in to view your chat history"
-          tooltipHidden={false}
+          alwaysShowTooltip
           className="cursor-not-allowed opacity-50"
         >
           <History />

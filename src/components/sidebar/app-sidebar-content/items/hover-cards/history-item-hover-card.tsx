@@ -1,9 +1,9 @@
 import Link from "next/link"
 import { type ReactNode, useState } from "react"
 import { Button } from "@/components/base-ui/button"
+import { useSidebar } from "@/components/base-ui/sidebar"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
-import { useSidebar } from "@/components/ui/sidebar"
 import { useChatId } from "@/hooks/use-chat-id"
 import { cn } from "@/lib/utils"
 
@@ -37,7 +37,7 @@ export function HistoryItemHoverCard({ children }: { children: ReactNode }) {
                     className={cn(
                       "w-full justify-start font-normal",
                       c.title === "Untitled" && "text-muted-foreground",
-                      c.id === chatID && "bg-accent font-medium text-accent-foreground dark:bg-accent/50",
+                      c.id === chatID && "bg-muted text-foreground dark:bg-muted/50",
                     )}
                   />
                 }
