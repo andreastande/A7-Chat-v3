@@ -2,7 +2,7 @@
 
 import { Eye, EyeOff } from "lucide-react"
 import { type ComponentProps, useState } from "react"
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group"
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/base-ui/input-group"
 import { WithTooltip } from "@/components/ui/tooltip"
 
 export function PasswordInput({ ...props }: Omit<ComponentProps<"input">, "type">) {
