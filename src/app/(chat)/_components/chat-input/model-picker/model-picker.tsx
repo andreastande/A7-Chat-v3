@@ -5,8 +5,8 @@ import { useEffect, useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { useFavoriteModelsStore } from "@/app/(chat)/_components/providers/favorite-models-provider"
 import { Button } from "@/components/base-ui/button"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/base-ui/popover"
 import { Separator } from "@/components/base-ui/separator"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { WithTooltip } from "@/components/ui/tooltip"
 import { allModels, type Creator, creatorIds, getCreatorName, getModelsByCreator } from "@/lib/models"
 import { cn } from "@/lib/utils"
@@ -41,19 +41,13 @@ export function ModelPicker() {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="font-normal data-[state=open]:bg-accent data-[state=open]:text-accent-foreground dark:data-[state=open]:bg-accent/50"
-        >
-          <CreatorLogo creator={selectedModelId.split("/")[0] as Creator} className="size-3" />
-          {allModels.find((m) => m.id === selectedModelId)?.name}
-          <ChevronDown className="ml-1.5 text-muted-foreground" />
-        </Button>
+      <PopoverTrigger render={<Button variant="ghost" size="sm" className="font-normal" />}>
+        <CreatorLogo creator={selectedModelId.split("/")[0] as Creator} className="size-3" />
+        {allModels.find((m) => m.id === selectedModelId)?.name}
+        <ChevronDown className="ml-1.5 text-muted-foreground" />
       </PopoverTrigger>
 
-      <PopoverContent align="start" className="flex h-70 w-74 flex-col p-0">
+      <PopoverContent align="start" className="flex h-70 w-74 flex-col gap-0 p-0">
         <div className="flex h-10 w-full items-center border-b">
           <Search className="mx-3.25 size-3.5 text-muted-foreground" />
           <input
@@ -66,7 +60,7 @@ export function ModelPicker() {
 
         <div className="flex min-h-0 flex-1">
           {!input.trim() && (
-            <div tabIndex={-1} className="scrollbar-none flex flex-col items-center gap-1 overflow-auto border-r p-1">
+            <div tabIndex={-1} className="no-scrollbar flex flex-col items-center space-y-1 overflow-auto border-r p-1">
               {favorites.length > 0 && (
                 <>
                   <WithTooltip asChild content="Favorites" side="left" delayDuration={300}>
