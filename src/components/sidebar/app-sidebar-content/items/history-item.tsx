@@ -5,17 +5,17 @@ import Link from "next/link"
 import { useState } from "react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/base-ui/collapsible"
 import { Dialog } from "@/components/base-ui/dialog"
-import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog"
-import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
-import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
-import { useSession } from "@/components/providers/session-provider"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/base-ui/dropdown-menu"
+import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog"
+import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
+import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
+import { useSession } from "@/components/providers/session-provider"
 import {
   SidebarMenuAction,
   SidebarMenuButton,
@@ -72,16 +72,18 @@ export function HistoryItem() {
                   </SidebarMenuSubButton>
 
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuSubAction
-                        showOnHover
-                        className="bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:opacity-100"
-                      >
-                        <MoreHorizontal />
-                      </SidebarMenuSubAction>
+                    <DropdownMenuTrigger
+                      render={
+                        <SidebarMenuSubAction
+                          showOnHover
+                          className="bg-sidebar-accent text-sidebar-accent-foreground data-popup-open:opacity-100"
+                        />
+                      }
+                    >
+                      <MoreHorizontal />
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="start" className="w-44">
+                    <DropdownMenuContent className="w-44">
                       <DropdownMenuItem>
                         <Share />
                         Share
@@ -99,7 +101,10 @@ export function HistoryItem() {
                         Add to project
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem variant="destructive" onClick={() => setDialogState({ type: "delete", chatId: c.id })}>
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onClick={() => setDialogState({ type: "delete", chatId: c.id })}
+                      >
                         <Trash2 />
                         Delete
                       </DropdownMenuItem>

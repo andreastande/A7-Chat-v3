@@ -131,17 +131,6 @@
   }
 }
 
-/* Maintains hover state on dropdown triggers when expanded */
-@utility trigger-active {
-  &[aria-expanded="true"] {
-    @apply bg-accent text-accent-foreground;
-
-    @variant dark {
-      @apply bg-accent/50;
-    }
-  }
-}
-
 @utility kbd {
   @apply font-sans text-xs text-muted-foreground;
 }

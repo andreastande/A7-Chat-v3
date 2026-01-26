@@ -1,11 +1,21 @@
 "use client"
 
+import { SiGithub } from "@icons-pack/react-simple-icons"
 import { LogIn, LogOut, Settings, UserPlus } from "lucide-react"
+import { ExternalLink, HatGlasses, Info, ScrollText } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+} from "@/components/base-ui/dropdown-menu"
 import { signOut } from "@/lib/auth/client"
-import { LearnMoreSubmenu } from "./learn-more-submenu"
 
 export function FooterMenuContent({
   isAuthenticated,
@@ -17,13 +27,47 @@ export function FooterMenuContent({
   const router = useRouter()
 
   return (
-    <DropdownMenuContent align="start" className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg">
+    <DropdownMenuContent className="w-(--anchor-width) min-w-56 rounded-lg">
       <DropdownMenuItem onClick={onOpenSettings}>
         <Settings />
         Settings
       </DropdownMenuItem>
 
-      <LearnMoreSubmenu />
+      <DropdownMenuSub>
+        <DropdownMenuSubTrigger>
+          <Info />
+          Learn more
+        </DropdownMenuSubTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem render={<Link href="https://github.com/andreastande/A7-Chat-v3" target="_blank" />}>
+              <SiGithub />
+              GitHub
+              <DropdownMenuShortcut showOnFocus>
+                <ExternalLink />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem render={<Link href="/privacy-policy" target="_blank" />}>
+              <HatGlasses />
+              Privacy policy
+              <DropdownMenuShortcut showOnFocus>
+                <ExternalLink />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem render={<Link href="/terms-of-service" target="_blank" />}>
+              <ScrollText />
+              Terms of service
+              <DropdownMenuShortcut showOnFocus>
+                <ExternalLink />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuPortal>
+      </DropdownMenuSub>
 
       <DropdownMenuSeparator />
       {isAuthenticated ? (
@@ -33,17 +77,13 @@ export function FooterMenuContent({
         </DropdownMenuItem>
       ) : (
         <>
-          <DropdownMenuItem asChild>
-            <Link href="/login">
-              <LogIn />
-              Log in
-            </Link>
+          <DropdownMenuItem render={<Link href="/login" />}>
+            <LogIn />
+            Log in
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/signup">
-              <UserPlus />
-              Sign up for free
-            </Link>
+          <DropdownMenuItem render={<Link href="/signup" />}>
+            <UserPlus />
+            Sign up for free
           </DropdownMenuItem>
         </>
       )}

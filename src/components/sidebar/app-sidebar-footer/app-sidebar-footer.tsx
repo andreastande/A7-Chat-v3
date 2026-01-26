@@ -3,8 +3,8 @@
 import { ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
 import { Dialog } from "@/components/base-ui/dialog"
+import { DropdownMenu, DropdownMenuTrigger } from "@/components/base-ui/dropdown-menu"
 import { useSession } from "@/components/providers/session-provider"
-import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 import { FooterAvatar } from "./footer-avatar"
 import { FooterMenuContent } from "./footer-menu-content"
@@ -19,15 +19,17 @@ export function AppSidebarFooter() {
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              >
-                <FooterAvatar user={session?.user} />
-                <span className="flex-1 truncate text-left text-sm">{session?.user.name ?? "Guest"}</span>
-                <ChevronsUpDown className="ml-auto hidden size-4 group-[:hover,:focus-visible,[data-state=open]]/menu-button:flex" />
-              </SidebarMenuButton>
+            <DropdownMenuTrigger
+              render={
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground"
+                />
+              }
+            >
+              <FooterAvatar user={session?.user} />
+              <span className="flex-1 truncate text-left text-sm">{session?.user.name ?? "Guest"}</span>
+              <ChevronsUpDown className="ml-auto hidden size-4 group-[:hover,:focus-visible,[data-popup-open]]/menu-button:flex" />
             </DropdownMenuTrigger>
             <FooterMenuContent isAuthenticated={!!session} onOpenSettings={() => setSettingsOpen(true)} />
           </DropdownMenu>
