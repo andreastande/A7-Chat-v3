@@ -106,7 +106,7 @@ export default function Page() {
                   </Field>
                 )}
                 <Field>
-                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                  <Button type="submit" disabled={form.formState.isSubmitting} focusableWhenDisabled>
                     {form.formState.isSubmitting && <Spinner />}
                     Create Account
                   </Button>

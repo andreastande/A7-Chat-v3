@@ -12,7 +12,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function ProjectsItem() {
   const session = useSession()
@@ -21,46 +20,41 @@ export function ProjectsItem() {
     <SidebarMenuItem>
       {session ? (
         <Collapsible>
-          <SidebarMenuButton asChild>
-            <Link href="/projects">
-              <Folder />
-              Projects
-            </Link>
+          <SidebarMenuButton render={<Link href="/projects" />}>
+            <Folder />
+            Projects
           </SidebarMenuButton>
-          <CollapsibleTrigger asChild>
-            <SidebarMenuAction
-              className="left-1.5 bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:rotate-90"
-              showOnHover
-            >
-              <ChevronRight />
-            </SidebarMenuAction>
+          <CollapsibleTrigger
+            render={
+              <SidebarMenuAction
+                className="left-1.5 bg-sidebar-accent text-sidebar-accent-foreground data-panel-open:rotate-90"
+                showOnHover
+              />
+            }
+          >
+            <ChevronRight />
           </CollapsibleTrigger>
           <SidebarMenuAction showOnHover>
             <PlusIcon />
             <span className="sr-only">Add project</span>
           </SidebarMenuAction>
-          <CollapsibleContent className="overflow-hidden transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+          <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-all duration-100 ease-out data-ending-style:h-0 data-starting-style:h-0">
             <SidebarMenuSub>
               <SidebarMenuSubItem>
-                <SidebarMenuSubButton asChild>
-                  <Link href="#">Test</Link>
-                </SidebarMenuSubButton>
+                <SidebarMenuSubButton render={<Link href="#" />}>Test</SidebarMenuSubButton>
               </SidebarMenuSubItem>
             </SidebarMenuSub>
           </CollapsibleContent>
         </Collapsible>
       ) : (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <SidebarMenuButton asChild>
-              <span className="cursor-not-allowed opacity-50">
-                <Folder />
-                Projects
-              </span>
-            </SidebarMenuButton>
-          </TooltipTrigger>
-          <TooltipContent side="right">Log in to view your projects</TooltipContent>
-        </Tooltip>
+        <SidebarMenuButton
+          tooltip="Log in to view your projects"
+          alwaysShowTooltip
+          className="cursor-not-allowed opacity-50"
+        >
+          <Folder />
+          Projects
+        </SidebarMenuButton>
       )}
     </SidebarMenuItem>
   )

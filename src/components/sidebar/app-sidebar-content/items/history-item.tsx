@@ -8,7 +8,7 @@ import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
 import { useSession } from "@/components/providers/session-provider"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog } from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +20,7 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuShortcut,
   SidebarMenuSub,
   SidebarMenuSubAction,
   SidebarMenuSubButton,
@@ -33,111 +34,111 @@ export function HistoryItem() {
   const session = useSession()
   const chats = useChatHistoryStore((s) => s.chats)
   const chatId = useChatId()
-  const [openDialog, setOpenDialog] = useState<"rename" | "delete" | null>(null)
-
-  function renderDialog(chatId: string) {
-    switch (openDialog) {
-      case "rename":
-        return <RenameChatDialog chatId={chatId} />
-      case "delete":
-        return <DeleteChatDialog chatId={chatId} />
-      default:
-        return null
-    }
-  }
+  const [dialogState, setDialogState] = useState<{ type: "rename" | "delete"; chatId: string } | null>(null)
 
   return (
     <SidebarMenuItem>
       {session ? (
         <Collapsible defaultOpen>
-          <HistoryItemHoverCard>
-            <SidebarMenuButton>
-              <History />
-              History
-              <kbd className="invisible absolute top-2 right-2 flex space-x-0.5 *:kbd group-data-[state=expanded]:group-[:hover,:focus-visible]/menu-button:visible">
-                <kbd>⌘</kbd>
-                <kbd>K</kbd>
-              </kbd>
-            </SidebarMenuButton>
+          <HistoryItemHoverCard
+            render={<SidebarMenuButton className="group-has-data-[sidebar=menu-action]/menu-item:pr-2" />}
+          >
+            <History />
+            History
+            <SidebarMenuShortcut showOnFocus>⌘K</SidebarMenuShortcut>
           </HistoryItemHoverCard>
 
-          <CollapsibleTrigger asChild>
-            <SidebarMenuAction
-              className="left-1.5 bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:rotate-90"
-              showOnHover
-            >
-              <ChevronRight />
-            </SidebarMenuAction>
-          </CollapsibleTrigger>
+          <CollapsibleTrigger
+            render={
+              <SidebarMenuAction
+                className="left-1.5 bg-sidebar-accent text-sidebar-accent-foreground data-panel-open:rotate-90"
+                showOnHover
+              >
+                <ChevronRight />
+              </SidebarMenuAction>
+            }
+          />
 
-          <CollapsibleContent className="overflow-hidden transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+          <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-all duration-100 ease-out data-ending-style:h-0 data-starting-style:h-0">
             <SidebarMenuSub>
               {chats.slice(0, 10).map((c) => (
                 <SidebarMenuSubItem key={c.id}>
-                  <SidebarMenuSubButton asChild isActive={chatId === c.id} className="pr-7">
-                    <Link href={`/chat/${c.id}`}>
-                      <span className={cn(c.title === "Untitled" && "text-muted-foreground")}>{c.title}</span>
-                    </Link>
+                  <SidebarMenuSubButton
+                    render={<Link href={`/chat/${c.id}`} />}
+                    isActive={chatId === c.id}
+                    className="pr-7"
+                  >
+                    <span className={cn(c.title === "Untitled" && "text-muted-foreground")}>{c.title}</span>
                   </SidebarMenuSubButton>
 
-                  <Dialog onOpenChange={(open) => open === false && setOpenDialog(null)}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      render={
                         <SidebarMenuSubAction
                           showOnHover
-                          className="bg-sidebar-accent text-sidebar-accent-foreground data-[state=open]:opacity-100"
-                        >
-                          <MoreHorizontal />
-                        </SidebarMenuSubAction>
-                      </DropdownMenuTrigger>
+                          className="bg-sidebar-accent text-sidebar-accent-foreground data-popup-open:opacity-100"
+                        />
+                      }
+                    >
+                      <MoreHorizontal />
+                    </DropdownMenuTrigger>
 
-                      <DropdownMenuContent align="start" className="w-44">
-                        <DropdownMenuItem>
-                          <Share />
-                          Share
-                        </DropdownMenuItem>
-                        <DialogTrigger asChild>
-                          <DropdownMenuItem onSelect={() => setOpenDialog("rename")}>
-                            <Pencil />
-                            Rename
-                          </DropdownMenuItem>
-                        </DialogTrigger>
-                        <DropdownMenuItem>
-                          <Pin />
-                          Pin
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Folder />
-                          Add to project
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DialogTrigger asChild>
-                          <DropdownMenuItem variant="destructive" onSelect={() => setOpenDialog("delete")}>
-                            <Trash2 />
-                            Delete
-                          </DropdownMenuItem>
-                        </DialogTrigger>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    {renderDialog(c.id)}
-                  </Dialog>
+                    <DropdownMenuContent className="w-44">
+                      <DropdownMenuItem>
+                        <Share />
+                        Share
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setDialogState({ type: "rename", chatId: c.id })}>
+                        <Pencil />
+                        Rename
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Pin />
+                        Pin
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Folder />
+                        Add to project
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onClick={() => setDialogState({ type: "delete", chatId: c.id })}
+                      >
+                        <Trash2 />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </SidebarMenuSubItem>
               ))}
               <SidebarMenuSubItem>
-                <SidebarMenuSubButton asChild className="w-full bg-transparent! text-[13px] text-muted-foreground">
-                  <button type="button">
-                    <span>See all</span>
-                  </button>
+                <SidebarMenuSubButton
+                  render={<button />}
+                  className="w-full bg-transparent! text-[13px]! text-muted-foreground"
+                >
+                  <span>See all</span>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
             </SidebarMenuSub>
           </CollapsibleContent>
+
+          <Dialog open={dialogState?.type === "rename"} onOpenChange={(open) => !open && setDialogState(null)}>
+            {dialogState?.type === "rename" && (
+              <RenameChatDialog chatId={dialogState.chatId} onClose={() => setDialogState(null)} />
+            )}
+          </Dialog>
+
+          <Dialog open={dialogState?.type === "delete"} onOpenChange={(open) => !open && setDialogState(null)}>
+            {dialogState?.type === "delete" && (
+              <DeleteChatDialog chatId={dialogState.chatId} onClose={() => setDialogState(null)} />
+            )}
+          </Dialog>
         </Collapsible>
       ) : (
         <SidebarMenuButton
           tooltip="Log in to view your chat history"
-          tooltipHidden={false}
+          alwaysShowTooltip
           className="cursor-not-allowed opacity-50"
         >
           <History />

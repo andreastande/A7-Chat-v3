@@ -94,7 +94,7 @@ export default function Page() {
                   </Field>
                 )}
                 <Field className="relative">
-                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                  <Button type="submit" disabled={form.formState.isSubmitting} focusableWhenDisabled>
                     {form.formState.isSubmitting && <Spinner />}
                     Log In
                   </Button>

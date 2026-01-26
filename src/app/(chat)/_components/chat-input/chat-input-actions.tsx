@@ -7,6 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { WithTooltip } from "@/components/ui/tooltip"
@@ -14,21 +15,23 @@ import { WithTooltip } from "@/components/ui/tooltip"
 export function ChatInputActions() {
   return (
     <DropdownMenu>
-      <WithTooltip content="Add files and more" side="bottom" asChild>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon-sm" className="trigger-active">
-            <Plus />
-          </Button>
-        </DropdownMenuTrigger>
+      <WithTooltip
+        content={
+          <>
+            Add files and more
+            <span className="ml-2 text-xs text-muted-foreground">/</span>
+          </>
+        }
+        side="bottom"
+        render={<DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />} />}
+      >
+        <Plus />
       </WithTooltip>
-      <DropdownMenuContent align="start">
-        <DropdownMenuItem className="group/item">
+      <DropdownMenuContent className="w-52">
+        <DropdownMenuItem>
           <Paperclip />
-          <span className="mr-4">Add files or photos</span>
-          <kbd className="invisible ml-auto space-x-0.5 *:kbd group-[:hover,:focus-visible]/item:visible">
-            <kbd>⌘</kbd>
-            <kbd>U</kbd>
-          </kbd>
+          Add files or photos
+          <DropdownMenuShortcut showOnFocus>⌘D</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>

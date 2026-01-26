@@ -1,49 +1,41 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { useShallow } from "zustand/react/shallow"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
 import { Button } from "@/components/ui/button"
 import { DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 
-export function RenameChatDialog({ chatId }: { chatId: string }) {
+export function RenameChatDialog({ chatId, onClose }: { chatId: string; onClose: () => void }) {
   const { chats, renameChat } = useChatHistoryStore(useShallow((s) => ({ chats: s.chats, renameChat: s.renameChat })))
 
   const chat = chats.find((c) => c.id === chatId)
   const title = chat?.title ?? "Untitled"
 
   const [input, setInput] = useState(title)
-  const closeRef = useRef<HTMLButtonElement>(null)
 
   return (
     <DialogContent showCloseButton={false}>
       <DialogHeader>
         <DialogTitle>Rename chat</DialogTitle>
       </DialogHeader>
-      <Input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") closeRef.current?.click()
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          onClose()
+          const newTitle = input.trim() || "Untitled"
+          if (newTitle !== title) void renameChat(chatId, newTitle)
         }}
-      />
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button variant="outline">Cancel</Button>
-        </DialogClose>
-        <DialogClose ref={closeRef} asChild>
-          <Button
-            onClick={async () => {
-              const newTitle = input.trim() || "Untitled"
-              if (newTitle !== title) await renameChat(chatId, newTitle)
-            }}
-          >
-            Save
-          </Button>
-        </DialogClose>
-      </DialogFooter>
+      >
+        <Input type="text" value={input} onChange={(e) => setInput(e.target.value)} />
+        <DialogFooter className="mt-6">
+          <DialogClose type="button" render={<Button variant="outline" />}>
+            Cancel
+          </DialogClose>
+          <Button type="submit">Save</Button>
+        </DialogFooter>
+      </form>
     </DialogContent>
   )
 }

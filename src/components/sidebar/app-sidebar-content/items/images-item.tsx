@@ -11,16 +11,14 @@ export function ImagesItem() {
   return (
     <SidebarMenuItem>
       {session ? (
-        <SidebarMenuButton tooltip="Images" asChild>
-          <Link href="/images">
-            <Image />
-            Images
-          </Link>
+        <SidebarMenuButton tooltip="Images" render={<Link href="/images" />}>
+          <Image />
+          Images
         </SidebarMenuButton>
       ) : (
         <SidebarMenuButton
           tooltip="Log in to view and edit your images"
-          tooltipHidden={false}
+          alwaysShowTooltip
           className="cursor-not-allowed opacity-50"
         >
           <Image />

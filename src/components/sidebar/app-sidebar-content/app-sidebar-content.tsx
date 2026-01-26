@@ -3,7 +3,7 @@ import { ChatItem, FilesItem, HistoryItem, ImagesItem, ProjectsItem } from "./it
 
 export function AppSidebarContent() {
   return (
-    <SidebarContent>
+    <SidebarContent className="group-data-[state=collapsed]:cursor-e-resize group-data-[state=expanded]:cursor-w-resize">
       <SidebarGroup className="cursor-default">
         <SidebarGroupContent>
           <SidebarMenu>

@@ -15,16 +15,16 @@ export default async function Page() {
           It may have been deleted or you might not have permission to view it.
         </p>
         {user ? (
-          <Button asChild>
-            <Link href="/">Start a new chat</Link>
+          <Button render={<Link href="/" />} nativeButton={false}>
+            Start a new chat
           </Button>
         ) : (
           <div className="flex gap-2">
-            <Button asChild>
-              <Link href="/login">Log in</Link>
+            <Button render={<Link href="/login" />} nativeButton={false}>
+              Log in
             </Button>
-            <Button asChild variant="outline">
-              <Link href="/">Start a new chat</Link>
+            <Button variant="outline" render={<Link href="/" />} nativeButton={false}>
+              Start a new chat
             </Button>
           </div>
         )}

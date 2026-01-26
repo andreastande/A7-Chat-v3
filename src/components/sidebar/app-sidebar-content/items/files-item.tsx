@@ -11,16 +11,14 @@ export function FilesItem() {
   return (
     <SidebarMenuItem>
       {session ? (
-        <SidebarMenuButton tooltip="Files" asChild>
-          <Link href="/files">
-            <FileText />
-            Files
-          </Link>
+        <SidebarMenuButton tooltip="Files" render={<Link href="/files" />}>
+          <FileText />
+          Files
         </SidebarMenuButton>
       ) : (
         <SidebarMenuButton
           tooltip="Log in to view and chat with your files"
-          tooltipHidden={false}
+          alwaysShowTooltip
           className="cursor-not-allowed opacity-50"
         >
           <FileText />

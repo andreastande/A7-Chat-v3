@@ -1,37 +1,23 @@
 "use client"
 
-import { PanelLeft } from "lucide-react"
-import { Button } from "../ui/button"
-import { SidebarHeader, useSidebar } from "../ui/sidebar"
+import { SidebarHeader, useSidebar, SidebarTrigger } from "../ui/sidebar"
 import { WithTooltip } from "../ui/tooltip"
 
 export function AppSidebarHeader() {
-  const { toggleSidebar, open } = useSidebar()
+  const { open } = useSidebar()
 
   return (
-    <SidebarHeader className="cursor-default items-end">
+    <SidebarHeader className="items-end">
       <WithTooltip
         content={
-          <div className="flex items-center gap-2">
+          <>
             {open ? "Close sidebar" : "Open sidebar"}
-            <kbd className="*:kbd">
-              <kbd>⌘</kbd>
-              <kbd>B</kbd>
-            </kbd>
-          </div>
+            <span className="ml-2 text-xs text-muted-foreground">⌘B</span>
+          </>
         }
         side="right"
-        asChild
-      >
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={toggleSidebar}
-          aria-label={open ? "Close sidebar" : "Open sidebar"}
-        >
-          <PanelLeft />
-        </Button>
-      </WithTooltip>
+        render={<SidebarTrigger />}
+      />
     </SidebarHeader>
   )
 }

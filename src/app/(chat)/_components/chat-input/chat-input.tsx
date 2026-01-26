@@ -47,7 +47,7 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
         }
       }}
       onClick={(e) => {
-        const excludedSlots = ["tooltip-content", "popover-content"]
+        const excludedSlots = ["tooltip-content", "tooltip-trigger", "popover-content"]
         if (!excludedSlots.some((slot) => (e.target as HTMLElement).closest(`[data-slot="${slot}"]`))) {
           textareaRef.current?.focus()
         }
@@ -76,7 +76,7 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
       <div className="mt-2 flex justify-between">
         <div className="flex items-center gap-2">
           <ChatInputActions />
-          <Separator orientation="vertical" className="h-4!" />
+          <Separator orientation="vertical" className="h-4 self-center!" />
           <ModelPicker />
         </div>
         <Button data-submit size="icon-sm" disabled={!(canSend || canStop)}>

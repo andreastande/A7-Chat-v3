@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": [".next/**", "src/components/ui/**"],
+  "ignorePatterns": [".next/**", "src/components/ui/**", "src/components/base-ui/**"],
   "printWidth": 120,
   "semi": false,
   "experimentalSortImports": {
