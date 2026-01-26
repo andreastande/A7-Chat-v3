@@ -14,7 +14,16 @@ export function ChatItem() {
 
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton tooltip="Chat" isActive={pathname === "/"} render={<Link href="/" />}>
+      <SidebarMenuButton
+        tooltip={
+          <>
+            Chat
+            <span className="ml-2 text-xs text-muted-foreground">⇧⌘O</span>
+          </>
+        }
+        isActive={pathname === "/"}
+        render={<Link href="/" />}
+      >
         <MessageCircle />
         Chat
         <SidebarMenuShortcut showOnFocus>⇧⌘O</SidebarMenuShortcut>

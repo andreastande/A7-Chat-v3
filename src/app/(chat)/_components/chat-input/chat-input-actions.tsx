@@ -16,7 +16,12 @@ export function ChatInputActions() {
   return (
     <DropdownMenu>
       <WithTooltip
-        content="Add files and more"
+        content={
+          <>
+            Add files and more
+            <span className="ml-2 text-xs text-muted-foreground">/</span>
+          </>
+        }
         side="bottom"
         render={<DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />} />}
       >

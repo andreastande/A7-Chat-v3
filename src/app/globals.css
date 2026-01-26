@@ -131,10 +131,6 @@
   }
 }
 
-@utility kbd {
-  @apply font-sans text-xs text-muted-foreground;
-}
-
 @utility sticky-shadow {
   &::after {
     @apply pointer-events-none absolute inset-x-0 top-full h-4 bg-linear-to-b from-background to-transparent content-[''];

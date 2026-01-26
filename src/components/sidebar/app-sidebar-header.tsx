@@ -10,13 +10,10 @@ export function AppSidebarHeader() {
     <SidebarHeader className="items-end">
       <WithTooltip
         content={
-          <div className="flex items-center gap-2">
+          <>
             {open ? "Close sidebar" : "Open sidebar"}
-            <kbd className="*:kbd">
-              <kbd>⌘</kbd>
-              <kbd>B</kbd>
-            </kbd>
-          </div>
+            <span className="ml-2 text-xs text-muted-foreground">⌘B</span>
+          </>
         }
         side="right"
         render={<SidebarTrigger />}
