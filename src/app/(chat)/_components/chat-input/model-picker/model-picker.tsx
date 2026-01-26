@@ -7,7 +7,7 @@ import { useFavoriteModelsStore } from "@/app/(chat)/_components/providers/favor
 import { Button } from "@/components/base-ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/base-ui/popover"
 import { Separator } from "@/components/base-ui/separator"
-import { WithTooltip } from "@/components/ui/tooltip"
+import { WithTooltip } from "@/components/base-ui/tooltip"
 import { allModels, type Creator, creatorIds, getCreatorName, getModelsByCreator } from "@/lib/models"
 import { cn } from "@/lib/utils"
 import { useSelectedModelStore } from "../../providers/selected-model-provider"
@@ -63,31 +63,40 @@ export function ModelPicker() {
             <div tabIndex={-1} className="no-scrollbar flex flex-col items-center space-y-1 overflow-auto border-r p-1">
               {favorites.length > 0 && (
                 <>
-                  <WithTooltip asChild content="Favorites" side="left" delayDuration={300}>
-                    <Button
-                      size="icon-sm"
-                      variant="ghost"
-                      onClick={() => setSelectedFilter("favorites")}
-                      className={cn(
-                        selectedFilter === "favorites" && "bg-accent text-accent-foreground dark:bg-accent/50",
-                      )}
-                    >
-                      <Star className="fill-yellow-400 text-yellow-400" />
-                    </Button>
+                  <WithTooltip
+                    content="Favorites"
+                    side="left"
+                    delay={400}
+                    render={
+                      <Button
+                        size="icon-sm"
+                        variant="ghost"
+                        onClick={() => setSelectedFilter("favorites")}
+                        className={cn(selectedFilter === "favorites" && "bg-muted text-foreground dark:bg-muted/50")}
+                      />
+                    }
+                  >
+                    <Star className="fill-yellow-400 text-yellow-400" />
                   </WithTooltip>
                   <Separator className="w-4!" />
                 </>
               )}
               {creatorIds.map((id) => (
-                <WithTooltip key={id} asChild content={getCreatorName(id)} side="left" delayDuration={500}>
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    onClick={() => setSelectedFilter(id)}
-                    className={cn(selectedFilter === id && "bg-accent text-accent-foreground dark:bg-accent/50")}
-                  >
-                    <CreatorLogo creator={id} />
-                  </Button>
+                <WithTooltip
+                  key={id}
+                  content={getCreatorName(id)}
+                  side="left"
+                  delay={400}
+                  render={
+                    <Button
+                      size="icon-sm"
+                      variant="ghost"
+                      onClick={() => setSelectedFilter(id)}
+                      className={cn(selectedFilter === id && "bg-muted text-foreground dark:bg-muted/50")}
+                    />
+                  }
+                >
+                  <CreatorLogo creator={id} />
                 </WithTooltip>
               ))}
             </div>

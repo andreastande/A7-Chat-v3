@@ -10,15 +10,17 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/base-ui/dropdown-menu"
-import { WithTooltip } from "@/components/ui/tooltip"
+import { WithTooltip } from "@/components/base-ui/tooltip"
 
 export function ChatInputActions() {
   return (
     <DropdownMenu>
-      <WithTooltip content="Add files and more" side="bottom" asChild>
-        <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
-          <Plus />
-        </DropdownMenuTrigger>
+      <WithTooltip
+        content="Add files and more"
+        side="bottom"
+        render={<DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />} />}
+      >
+        <Plus />
       </WithTooltip>
       <DropdownMenuContent className="w-52">
         <DropdownMenuItem>

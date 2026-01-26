@@ -12,7 +12,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function ProjectsItem() {
   const session = useSession()
@@ -52,17 +51,14 @@ export function ProjectsItem() {
           </CollapsibleContent>
         </Collapsible>
       ) : (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <SidebarMenuButton asChild>
-              <span className="cursor-not-allowed opacity-50">
-                <Folder />
-                Projects
-              </span>
-            </SidebarMenuButton>
-          </TooltipTrigger>
-          <TooltipContent side="right">Log in to view your projects</TooltipContent>
-        </Tooltip>
+        <SidebarMenuButton
+          tooltip="Log in to view your projects"
+          tooltipHidden={false}
+          className="cursor-not-allowed opacity-50"
+        >
+          <Folder />
+          Projects
+        </SidebarMenuButton>
       )}
     </SidebarMenuItem>
   )

@@ -1,7 +1,7 @@
 "use client"
 
+import { WithTooltip } from "../base-ui/tooltip"
 import { SidebarHeader, useSidebar, SidebarTrigger } from "../ui/sidebar"
-import { WithTooltip } from "../ui/tooltip"
 
 export function AppSidebarHeader() {
   const { open } = useSidebar()
@@ -19,10 +19,8 @@ export function AppSidebarHeader() {
           </div>
         }
         side="right"
-        asChild
-      >
-        <SidebarTrigger className="size-8" />
-      </WithTooltip>
+        render={<SidebarTrigger className="size-8" />}
+      />
     </SidebarHeader>
   )
 }
