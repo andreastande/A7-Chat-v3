@@ -40,12 +40,12 @@ export function HistoryItem() {
     <SidebarMenuItem>
       {session ? (
         <Collapsible defaultOpen>
-          <HistoryItemHoverCard>
-            <SidebarMenuButton className="group-has-data-[sidebar=menu-action]/menu-item:pr-2">
-              <History />
-              History
-              <SidebarMenuShortcut showOnFocus>⌘K</SidebarMenuShortcut>
-            </SidebarMenuButton>
+          <HistoryItemHoverCard
+            render={<SidebarMenuButton className="group-has-data-[sidebar=menu-action]/menu-item:pr-2" />}
+          >
+            <History />
+            History
+            <SidebarMenuShortcut showOnFocus>⌘K</SidebarMenuShortcut>
           </HistoryItemHoverCard>
 
           <CollapsibleTrigger

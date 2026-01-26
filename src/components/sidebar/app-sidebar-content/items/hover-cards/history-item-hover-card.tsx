@@ -1,28 +1,27 @@
 import Link from "next/link"
-import { type ReactNode, useState } from "react"
+import { ComponentProps, useState } from "react"
 import { Button } from "@/components/base-ui/button"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/base-ui/hover-card"
 import { useSidebar } from "@/components/base-ui/sidebar"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { useChatId } from "@/hooks/use-chat-id"
 import { cn } from "@/lib/utils"
 
-export function HistoryItemHoverCard({ children }: { children: ReactNode }) {
+export function HistoryItemHoverCard({
+  children,
+  render,
+}: Pick<ComponentProps<typeof HoverCardTrigger>, "children" | "render">) {
   const { isMobile, state } = useSidebar()
   const [open, setOpen] = useState(false)
   const chats = useChatHistoryStore((s) => s.chats)
   const chatID = useChatId()
 
   return (
-    <HoverCard open={open} onOpenChange={setOpen} openDelay={0} closeDelay={0}>
-      <HoverCardTrigger asChild>{children}</HoverCardTrigger>
-      <HoverCardContent
-        hasBridge
-        side="right"
-        align="start"
-        hidden={state !== "collapsed" || isMobile}
-        className="w-56 p-2"
-      >
+    <HoverCard open={open} onOpenChange={setOpen}>
+      <HoverCardTrigger delay={0} closeDelay={0} render={render}>
+        {children}
+      </HoverCardTrigger>
+      <HoverCardContent side="right" align="start" hidden={state !== "collapsed" || isMobile} className="w-56 p-2">
         <p className="mb-2 px-3 text-sm font-bold">History</p>
         <ul className="space-y-1">
           {chats.slice(0, 10).map((c) => (
