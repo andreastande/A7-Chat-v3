@@ -1,4 +1,4 @@
-import { User } from "better-auth"
+import type { User } from "better-auth"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export function FooterAvatar({ user }: { user?: User }) {
@@ -20,7 +20,7 @@ export function FooterAvatar({ user }: { user?: User }) {
   return (
     <Avatar
       key={user.id}
-      className="rounded-md group-data-[collapsible=icon]:group-[:hover,:focus,[data-state=open]]/menu-button:brightness-90 after:rounded-md"
+      className="rounded-md group-data-[collapsible=icon]:group-[:hover,:focus-visible,[data-popup-open]]/menu-button:brightness-90 after:rounded-md"
     >
       <AvatarImage className="rounded-md" src={user.image ?? undefined} alt={user.name} referrerPolicy="no-referrer" />
       <AvatarFallback className="rounded-md bg-primary text-white">{initials}</AvatarFallback>
