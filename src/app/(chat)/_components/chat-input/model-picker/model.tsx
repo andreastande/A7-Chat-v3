@@ -26,39 +26,30 @@ export function Model({ model, showCreatorLogo, closeModelPicker }: ModelProps) 
   )
 
   return (
-    <Button
-      key={model.id}
-      size="sm"
-      variant="ghost"
-      className={cn(
-        "group/button w-full justify-start font-normal transition-colors [&:has([data-star]:hover)]:bg-transparent",
-        selectedModelId === model.id && "bg-muted font-medium text-foreground dark:bg-muted/50",
-      )}
-      onClick={() => {
-        setSelectedModelId({ chatId, modelId: model.id })
-        closeModelPicker()
-      }}
-    >
-      {showCreatorLogo && <CreatorLogo creator={model.id.split("/")[0] as Creator} className="size-3" />}
-      <span className="truncate">{model.name}</span>
-      <div
-        data-star
-        role="button"
-        tabIndex={0}
-        onClick={(e) => {
-          e.stopPropagation()
-          toggleFavorite(model.id)
+    <div className="relative">
+      <Button
+        size="sm"
+        variant="ghost"
+        className={cn(
+          "peer/button w-full justify-start font-normal",
+          selectedModelId === model.id && "bg-muted text-foreground dark:bg-muted/50",
+        )}
+        onClick={() => {
+          setSelectedModelId({ chatId, modelId: model.id })
+          closeModelPicker()
         }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.stopPropagation()
-            toggleFavorite(model.id)
-          }
-        }}
-        className="ml-auto rounded-md p-1.5 opacity-0 transition-colors outline-none group-[:hover,:focus-visible]/button:opacity-100 hover:bg-muted focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/50 dark:hover:bg-muted/50"
+      >
+        {showCreatorLogo && <CreatorLogo creator={model.id.split("/")[0] as Creator} className="size-3" />}
+        <span className="truncate">{model.name}</span>
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon-xs"
+        onClick={() => toggleFavorite(model.id)}
+        className="absolute top-1 right-1 size-6 opacity-0 peer-[:hover,:focus-visible]/button:opacity-100 [:hover,:focus-visible]:opacity-100"
       >
         <Star className={cn("size-3 text-muted-foreground", isFavorited && "fill-yellow-400 text-yellow-400")} />
-      </div>
-    </Button>
+      </Button>
+    </div>
   )
 }

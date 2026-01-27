@@ -1,7 +1,7 @@
 "use client"
 
 import { ChevronDown, Search, Star } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { useFavoriteModelsStore } from "@/app/(chat)/_components/providers/favorite-models-provider"
 import { Button } from "@/components/ui/button"
@@ -24,15 +24,6 @@ export function ModelPicker() {
 
   useHotkeys("mod+slash, mod+7", () => setOpen((prev) => !prev), { preventDefault: true, enableOnFormTags: true })
 
-  useEffect(() => {
-    if (!open) {
-      setTimeout(() => {
-        setInput("")
-        setSelectedFilter("favorites")
-      }, 150) // time it takes to close popover
-    }
-  }, [open])
-
   const modelsToShow = input.trim()
     ? allModels.filter((model) => model.name.toLowerCase().includes(input.toLowerCase().trim()))
     : selectedFilter === "favorites"
@@ -40,7 +31,16 @@ export function ModelPicker() {
       : getModelsByCreator(selectedFilter)
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={setOpen}
+      onOpenChangeComplete={(open) => {
+        if (!open) {
+          setInput("")
+          setSelectedFilter("favorites")
+        }
+      }}
+    >
       <PopoverTrigger render={<Button variant="ghost" size="sm" className="font-normal" />}>
         <CreatorLogo creator={selectedModelId.split("/")[0] as Creator} className="size-3" />
         {allModels.find((m) => m.id === selectedModelId)?.name}
@@ -49,9 +49,11 @@ export function ModelPicker() {
 
       <PopoverContent align="start" className="flex h-70 w-74 flex-col gap-0 p-0">
         <div className="flex h-10 w-full items-center border-b">
-          <Search className="mx-3.25 size-3.5 text-muted-foreground" />
+          <div className="flex h-full w-10 items-center justify-center">
+            <Search className="size-3.5 text-muted-foreground" />
+          </div>
           <input
-            className="h-full w-full flex-1 pr-2.5 pl-1 text-sm outline-none"
+            className="h-full flex-1 pr-1 pl-1.25 text-sm outline-none"
             placeholder="Search models..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -60,7 +62,10 @@ export function ModelPicker() {
 
         <div className="flex min-h-0 flex-1">
           {!input.trim() && (
-            <div tabIndex={-1} className="no-scrollbar flex flex-col items-center space-y-1 overflow-auto border-r p-1">
+            <div
+              tabIndex={-1}
+              className="no-scrollbar flex w-10 flex-col items-center space-y-1 overflow-auto border-r p-1"
+            >
               {favorites.length > 0 && (
                 <>
                   <WithTooltip
