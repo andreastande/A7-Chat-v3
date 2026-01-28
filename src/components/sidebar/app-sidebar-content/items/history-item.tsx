@@ -115,7 +115,7 @@ export function HistoryItem() {
               <SidebarMenuSubItem>
                 <SidebarMenuSubButton
                   render={<button />}
-                  className="w-full bg-transparent! text-[13px]! text-muted-foreground"
+                  className="w-full bg-transparent! text-[13px]! font-normal text-muted-foreground"
                 >
                   <span>See all</span>
                 </SidebarMenuSubButton>

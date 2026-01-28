@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { ComponentProps, useState } from "react"
+import type { ComponentProps } from "react"
+import { useState } from "react"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
 import { Button } from "@/components/ui/button"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
@@ -51,7 +52,7 @@ export function HistoryItemHoverCard({
               variant="ghost"
               size="sm"
               onClick={() => setOpen(false)}
-              className="w-full justify-start bg-transparent! text-[13px] text-muted-foreground"
+              className="w-full justify-start bg-transparent! text-[13px] font-normal text-muted-foreground"
             >
               See all
             </Button>
