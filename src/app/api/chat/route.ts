@@ -1,19 +1,19 @@
 import { convertToModelMessages, generateId, streamText, type UIMessage } from "ai"
 import dedent from "dedent"
 import { getCurrentUser } from "@/dal/auth"
-import { getChat, getMessages, insertMessage } from "@/dal/chat"
+import { getChatWithMessages, insertMessage } from "@/dal/chat"
 import { type Creator, getCreatorName, getModelName, isValidModelId } from "@/lib/models"
 
 export async function POST(req: Request) {
   const { message, chatId, modelId }: { message: UIMessage; chatId: string; modelId: string } = await req.json()
 
-  const [user, chat, dbMessages] = await Promise.all([getCurrentUser(), getChat(chatId), getMessages(chatId)])
+  const [user, chat] = await Promise.all([getCurrentUser(), getChatWithMessages(chatId)])
 
   if (!user) return new Response("Unauthorized", { status: 401 })
   if (!isValidModelId(modelId)) return new Response("Invalid model ID", { status: 400 })
   if (!chat) return new Response("Chat not found", { status: 404 })
 
-  const messages = [...dbMessages, message]
+  const messages = [...chat.messages, message]
   await insertMessage({ chatId, ...message })
 
   const result = streamText({

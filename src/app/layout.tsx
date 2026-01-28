@@ -10,7 +10,10 @@ const geistSans = Geist({
 })
 
 export const metadata: Metadata = {
-  title: "A7 Chat",
+  title: {
+    default: "A7 Chat",
+    template: "%s - A7 Chat",
+  },
   description: "To be written",
 }
 

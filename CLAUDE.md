@@ -65,7 +65,7 @@ Database uses snake_case (configured in `drizzle.config.ts` and `src/db/index.ts
 - **Route**: `/api/chat/route.ts` handles streaming AI responses
 - **Flow**:
   1. Client sends message to API route
-  2. API fetches existing messages from DB via `getMessages(chatId)`
+  2. API fetches existing messages from DB via `getMessages(chatId)` and `getChatWithMessages(chatId)`
   3. Streams response using Vercel AI SDK's `streamText()`
   4. Saves both user and assistant messages via `insertMessage()`
 - **Storage**: Messages stored with role and parts (supports multimodal)

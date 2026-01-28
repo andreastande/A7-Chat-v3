@@ -43,10 +43,19 @@ export async function getChat(chatId: string): Promise<Chat | null> {
  * Verifies user owns the chat before returning messages.
  */
 export async function getMessages(chatId: string): Promise<UIMessage[]> {
+  const result = await getChatWithMessages(chatId)
+  return result?.messages ?? []
+}
+
+/**
+ * Get a chat with all its messages in a single query.
+ */
+export async function getChatWithMessages(chatId: string): Promise<(Chat & { messages: UIMessage[] }) | null> {
   const user = await requireAuth()
 
   const result = await db.query.chat.findFirst({
     where: and(eq(chat.id, chatId), eq(chat.userId, user.id)),
+    columns: { userId: false },
     with: {
       messages: {
         orderBy: (messages, { asc }) => asc(messages.createdAt),
@@ -55,7 +64,7 @@ export async function getMessages(chatId: string): Promise<UIMessage[]> {
     },
   })
 
-  return result?.messages ?? []
+  return result ?? null
 }
 
 // =============================================================================
