@@ -6,7 +6,6 @@ import { DeleteChatDialog } from "@/components/dialogs/delete-chat-dialog"
 import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
 import { Button } from "@/components/ui/button"
-import { Dialog } from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,13 +56,16 @@ export function ChatHeader() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Dialog open={openDialog === "rename"} onOpenChange={(open) => !open && setOpenDialog(null)}>
-        {openDialog === "rename" && <RenameChatDialog chatId={chatId!} onClose={() => setOpenDialog(null)} />}
-      </Dialog>
-
-      <Dialog open={openDialog === "delete"} onOpenChange={(open) => !open && setOpenDialog(null)}>
-        {openDialog === "delete" && <DeleteChatDialog chatId={chatId!} onClose={() => setOpenDialog(null)} />}
-      </Dialog>
+      <RenameChatDialog
+        chatId={chatId!}
+        open={openDialog === "rename"}
+        onOpenChange={(open) => !open && setOpenDialog(null)}
+      />
+      <DeleteChatDialog
+        chatId={chatId!}
+        open={openDialog === "delete"}
+        onOpenChange={(open) => !open && setOpenDialog(null)}
+      />
 
       <Button variant="ghost" size="sm">
         <Share />

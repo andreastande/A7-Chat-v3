@@ -2,13 +2,12 @@
 
 import { ChevronsUpDown } from "lucide-react"
 import { useState } from "react"
+import { SettingsDialog } from "@/components/dialogs/settings-dialog"
 import { useSession } from "@/components/providers/session-provider"
-import { Dialog } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 import { FooterAvatar } from "./footer-avatar"
 import { FooterMenuContent } from "./footer-menu-content"
-import { SettingsDialog } from "./settings-dialog"
 
 export function AppSidebarFooter() {
   const session = useSession()
@@ -34,9 +33,7 @@ export function AppSidebarFooter() {
             <FooterMenuContent isAuthenticated={!!session} onOpenSettings={() => setSettingsOpen(true)} />
           </DropdownMenu>
 
-          <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-            <SettingsDialog />
-          </Dialog>
+          <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarFooter>

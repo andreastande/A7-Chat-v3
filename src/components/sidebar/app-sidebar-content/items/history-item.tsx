@@ -8,7 +8,6 @@ import { RenameChatDialog } from "@/components/dialogs/rename-chat-dialog"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
 import { useSession } from "@/components/providers/session-provider"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Dialog } from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -123,17 +122,16 @@ export function HistoryItem() {
             </SidebarMenuSub>
           </CollapsibleContent>
 
-          <Dialog open={dialogState?.type === "rename"} onOpenChange={(open) => !open && setDialogState(null)}>
-            {dialogState?.type === "rename" && (
-              <RenameChatDialog chatId={dialogState.chatId} onClose={() => setDialogState(null)} />
-            )}
-          </Dialog>
-
-          <Dialog open={dialogState?.type === "delete"} onOpenChange={(open) => !open && setDialogState(null)}>
-            {dialogState?.type === "delete" && (
-              <DeleteChatDialog chatId={dialogState.chatId} onClose={() => setDialogState(null)} />
-            )}
-          </Dialog>
+          <RenameChatDialog
+            chatId={dialogState?.chatId ?? ""}
+            open={dialogState?.type === "rename"}
+            onOpenChange={(open) => !open && setDialogState(null)}
+          />
+          <DeleteChatDialog
+            chatId={dialogState?.chatId ?? ""}
+            open={dialogState?.type === "delete"}
+            onOpenChange={(open) => !open && setDialogState(null)}
+          />
         </Collapsible>
       ) : (
         <SidebarMenuButton
