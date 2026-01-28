@@ -1,11 +1,13 @@
 "use client"
 
 import { SiGithub } from "@icons-pack/react-simple-icons"
-import { LogIn, LogOut, Settings, UserPlus } from "lucide-react"
+import { LogIn, LogOut, MonitorSmartphone, Moon, Settings, Sun, SunMoon, UserPlus } from "lucide-react"
 import { ExternalLink, HatGlasses, Info, ScrollText } from "lucide-react"
+import { useTheme } from "next-themes"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuPortal,
@@ -25,6 +27,7 @@ export function FooterMenuContent({
   onOpenSettings: () => void
 }) {
   const router = useRouter()
+  const { theme, setTheme } = useTheme()
 
   return (
     <DropdownMenuContent className="w-(--anchor-width) min-w-56 rounded-lg">
@@ -35,11 +38,34 @@ export function FooterMenuContent({
 
       <DropdownMenuSub>
         <DropdownMenuSubTrigger>
+          <SunMoon />
+          Theme
+        </DropdownMenuSubTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuSubContent className="w-48">
+            <DropdownMenuCheckboxItem checked={theme === "system"} onCheckedChange={() => setTheme("system")}>
+              <MonitorSmartphone />
+              System
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem checked={theme === "dark"} onCheckedChange={() => setTheme("dark")}>
+              <Moon />
+              Dark
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem checked={theme === "light"} onCheckedChange={() => setTheme("light")}>
+              <Sun />
+              Light
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuPortal>
+      </DropdownMenuSub>
+
+      <DropdownMenuSub>
+        <DropdownMenuSubTrigger>
           <Info />
           Learn more
         </DropdownMenuSubTrigger>
         <DropdownMenuPortal>
-          <DropdownMenuSubContent>
+          <DropdownMenuSubContent className="w-48">
             <DropdownMenuItem render={<Link href="https://github.com/andreastande/A7-Chat-v3" target="_blank" />}>
               <SiGithub />
               GitHub
