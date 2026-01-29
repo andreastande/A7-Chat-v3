@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import { useShallow } from "zustand/react/shallow"
 import { generateChatTitle } from "@/actions/chat"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
+import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
 import { useChatSession } from "../_hooks/use-chat-session"
 import { useScrollOnMount } from "../_hooks/use-scroll-on-mount"
@@ -25,7 +26,7 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
     useShallow((s) => ({ addChat: s.addChat, touchChat: s.touchChat, renameChat: s.renameChat })),
   )
   const { id, navigateToChat } = useChatSession(chatId)
-  const { messages, sendMessage } = useChat({
+  const { messages, status, sendMessage } = useChat({
     id,
     messages: initialMessages,
     transport: new DefaultChatTransport({
@@ -80,6 +81,7 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
             {currentExchange.map((message) => (
               <Message key={message.id} message={message} />
             ))}
+            {status === "submitted" && messages.at(-1)?.role === "user" && <Spinner />}
           </div>
         </div>
         <div className="sticky bottom-0 z-10 bg-background pb-4">
