@@ -1,7 +1,19 @@
 "use client"
 
 import { SiGithub } from "@icons-pack/react-simple-icons"
-import { LogIn, LogOut, MonitorSmartphone, Moon, Settings, Sun, SunMoon, UserPlus } from "lucide-react"
+import {
+  Lightbulb,
+  LogIn,
+  LogOut,
+  MonitorSmartphone,
+  Moon,
+  Settings,
+  Sparkles,
+  Sun,
+  SunMoon,
+  UserPlus,
+  Zap,
+} from "lucide-react"
 import { ExternalLink, HatGlasses, Info, ScrollText } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
@@ -42,7 +54,7 @@ export function FooterMenuContent({
           Theme
         </DropdownMenuSubTrigger>
         <DropdownMenuPortal>
-          <DropdownMenuSubContent className="w-48">
+          <DropdownMenuSubContent className="w-52">
             <DropdownMenuCheckboxItem checked={theme === "system"} onCheckedChange={() => setTheme("system")}>
               <MonitorSmartphone />
               System
@@ -65,7 +77,19 @@ export function FooterMenuContent({
           Learn more
         </DropdownMenuSubTrigger>
         <DropdownMenuPortal>
-          <DropdownMenuSubContent className="w-48">
+          <DropdownMenuSubContent className="w-52">
+            <DropdownMenuItem>
+              <Zap />
+              Keyboard shortcuts
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Lightbulb />
+              Tips and tricks
+            </DropdownMenuItem>
+            <DropdownMenuItem render={<Link href="/features" />}>
+              <Sparkles />
+              Features
+            </DropdownMenuItem>
             <DropdownMenuItem render={<Link href="https://github.com/andreastande/A7-Chat-v3" target="_blank" />}>
               <SiGithub />
               GitHub
@@ -73,9 +97,7 @@ export function FooterMenuContent({
                 <ExternalLink />
               </DropdownMenuShortcut>
             </DropdownMenuItem>
-
             <DropdownMenuSeparator />
-
             <DropdownMenuItem render={<Link href="/privacy-policy" target="_blank" />}>
               <HatGlasses />
               Privacy policy
@@ -83,7 +105,6 @@ export function FooterMenuContent({
                 <ExternalLink />
               </DropdownMenuShortcut>
             </DropdownMenuItem>
-
             <DropdownMenuItem render={<Link href="/terms-of-service" target="_blank" />}>
               <ScrollText />
               Terms of service

@@ -33,7 +33,10 @@ export function SettingsNav({
           <Button
             key={page.id}
             variant="ghost"
-            className={cn("justify-start", activePage === page.id && "bg-muted text-foreground dark:bg-muted/50")}
+            className={cn(
+              "justify-start font-normal",
+              activePage === page.id && "bg-muted text-foreground dark:bg-muted/50",
+            )}
             onClick={() => setActivePage(page.id)}
           >
             <page.icon />
