@@ -1,3 +1,5 @@
-export function ModelsPage() {
-  return <div className="p-6">Models</div>
+import { cn } from "@/lib/utils"
+
+export function ModelsPage({ className }: { className?: string } = {}) {
+  return <div className={cn(className)}>Models</div>
 }

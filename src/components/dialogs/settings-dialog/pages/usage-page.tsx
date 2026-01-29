@@ -1,3 +1,5 @@
-export function UsagePage() {
-  return <div className="p-6">Usage</div>
+import { cn } from "@/lib/utils"
+
+export function UsagePage({ className }: { className?: string } = {}) {
+  return <div className={cn(className)}>Usage</div>
 }

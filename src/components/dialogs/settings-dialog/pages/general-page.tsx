@@ -1,3 +1,5 @@
-export function GeneralPage() {
-  return <div className="p-6">General</div>
+import { cn } from "@/lib/utils"
+
+export function GeneralPage({ className }: { className?: string } = {}) {
+  return <div className={cn(className)}>General</div>
 }

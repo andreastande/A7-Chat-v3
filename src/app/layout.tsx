@@ -1,6 +1,7 @@
 import "./globals.css"
 import type { Metadata } from "next"
 import { Geist } from "next/font/google"
+import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { Toaster } from "@/components/ui/sonner"
 import { Providers } from "./providers"
 
@@ -25,10 +26,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} relative isolate antialiased`}>
-        <Providers>
-          {children}
-          <Toaster position="top-right" />
-        </Providers>
+        <NuqsAdapter>
+          <Providers>
+            {children}
+            <Toaster position="top-right" />
+          </Providers>
+        </NuqsAdapter>
       </body>
     </html>
   )

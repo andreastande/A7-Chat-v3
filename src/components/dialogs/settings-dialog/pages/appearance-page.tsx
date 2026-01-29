@@ -1,3 +1,5 @@
-export function AppearancePage() {
-  return <div className="p-6">Appearance</div>
+import { cn } from "@/lib/utils"
+
+export function AppearancePage({ className }: { className?: string } = {}) {
+  return <div className={cn(className)}>Appearance</div>
 }

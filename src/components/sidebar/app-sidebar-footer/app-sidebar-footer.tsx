@@ -1,8 +1,9 @@
 "use client"
 
 import { ChevronsUpDown } from "lucide-react"
-import { useState } from "react"
+import { parseAsStringLiteral, useQueryState } from "nuqs"
 import { SettingsDialog } from "@/components/dialogs/settings-dialog"
+import { settingsPages } from "@/components/dialogs/settings-dialog/types"
 import { useSession } from "@/components/providers/session-provider"
 import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
@@ -11,7 +12,7 @@ import { FooterMenuContent } from "./footer-menu-content"
 
 export function AppSidebarFooter() {
   const session = useSession()
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [settingsPage, setSettingsPage] = useQueryState("settings", parseAsStringLiteral(settingsPages))
 
   return (
     <SidebarFooter>
@@ -30,10 +31,17 @@ export function AppSidebarFooter() {
               <span className="flex-1 truncate text-left text-sm">{session?.user.name ?? "Guest"}</span>
               <ChevronsUpDown className="invisible ml-auto group-[:hover,:focus-visible,[data-popup-open]]/menu-button:visible" />
             </DropdownMenuTrigger>
-            <FooterMenuContent isAuthenticated={!!session} onOpenSettings={() => setSettingsOpen(true)} />
+            <FooterMenuContent isAuthenticated={!!session} onOpenSettings={() => setSettingsPage("general")} />
           </DropdownMenu>
 
-          <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+          <SettingsDialog
+            open={settingsPage !== null}
+            onOpenChange={(open) => {
+              if (!open) void setSettingsPage(null)
+            }}
+            activePage={settingsPage}
+            setActivePage={setSettingsPage}
+          />
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarFooter>

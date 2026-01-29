@@ -72,12 +72,7 @@ export function HistoryItem() {
 
                   <DropdownMenu>
                     <DropdownMenuTrigger
-                      render={
-                        <SidebarMenuSubAction
-                          showOnHover
-                          className="bg-sidebar-accent text-sidebar-accent-foreground data-popup-open:opacity-100"
-                        />
-                      }
+                      render={<SidebarMenuSubAction showOnHover className="data-popup-open:opacity-100" />}
                     >
                       <MoreHorizontal />
                     </DropdownMenuTrigger>
