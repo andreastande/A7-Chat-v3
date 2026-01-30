@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import { useShallow } from "zustand/react/shallow"
 import { generateChatTitle } from "@/actions/chat"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
+import { useSession } from "@/components/providers/session-provider"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
 import { useChatSession } from "../_hooks/use-chat-session"
@@ -21,6 +22,7 @@ interface ChatProps {
 }
 
 export function Chat({ chatId, initialMessages = [] }: ChatProps) {
+  const session = useSession()
   const selectedModelId = useSelectedModelStore((s) => s.modelId)
   const { addChat, touchChat, renameChat } = useChatHistoryStore(
     useShallow((s) => ({ addChat: s.addChat, touchChat: s.touchChat, renameChat: s.renameChat })),
@@ -30,8 +32,9 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
     id,
     messages: initialMessages,
     transport: new DefaultChatTransport({
+      api: session ? "/api/chat" : "/api/chat/guest",
       prepareSendMessagesRequest({ messages, id: chatId, body }) {
-        return { body: { message: messages[messages.length - 1], chatId, ...body } }
+        return session ? { body: { message: messages.at(-1), chatId, ...body } } : { body: { messages, ...body } }
       },
     }),
   })
@@ -47,19 +50,21 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
   useScrollOnSubmit()
 
   async function handleSendMessage(text: string) {
-    if (isNewChat) {
+    if (isNewChat && session) {
       if (!(await addChat(id, selectedModelId))) return
       navigateToChat()
     }
 
     sendMessage({ text }, { body: { modelId: selectedModelId } }) // oxlint-disable-line
 
-    if (isNewChat) {
-      const { data: title, serverError } = await generateChatTitle({ text })
-      if (serverError) return toast.error("Failed to generate chat title")
-      if (title) await renameChat(id, title)
-    } else {
-      await touchChat(id)
+    if (session) {
+      if (isNewChat) {
+        const { data: title, serverError } = await generateChatTitle({ text })
+        if (serverError) return toast.error("Failed to generate chat title")
+        if (title) await renameChat(id, title)
+      } else {
+        await touchChat(id)
+      }
     }
   }
 

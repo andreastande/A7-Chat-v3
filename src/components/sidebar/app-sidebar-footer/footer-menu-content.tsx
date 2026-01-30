@@ -17,7 +17,6 @@ import {
 import { ExternalLink, HatGlasses, Info, ScrollText } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -38,7 +37,6 @@ export function FooterMenuContent({
   isAuthenticated: boolean
   onOpenSettings: () => void
 }) {
-  const router = useRouter()
   const { theme, setTheme } = useTheme()
 
   return (
@@ -118,7 +116,17 @@ export function FooterMenuContent({
 
       <DropdownMenuSeparator />
       {isAuthenticated ? (
-        <DropdownMenuItem onClick={() => signOut({ fetchOptions: { onSuccess: () => router.push("/") } })}>
+        <DropdownMenuItem
+          onClick={() =>
+            signOut({
+              fetchOptions: {
+                onSuccess: () => {
+                  window.location.href = "/"
+                },
+              },
+            })
+          }
+        >
           <LogOut />
           Log out
         </DropdownMenuItem>

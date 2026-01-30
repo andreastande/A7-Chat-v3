@@ -1,8 +1,7 @@
 import { convertToModelMessages, generateId, streamText, type UIMessage } from "ai"
-import dedent from "dedent"
 import { getCurrentUser } from "@/dal/auth"
 import { getChatWithMessages, insertMessage } from "@/dal/chat"
-import { type Creator, getCreatorName, getModelName, isValidModelId } from "@/lib/models"
+import { getSystemPrompt, isValidModelId } from "@/lib/models"
 
 export async function POST(req: Request) {
   const { message, chatId, modelId }: { message: UIMessage; chatId: string; modelId: string } = await req.json()
@@ -19,14 +18,7 @@ export async function POST(req: Request) {
   const result = streamText({
     model: modelId,
     messages: await convertToModelMessages(messages),
-    system: dedent`
-      If the user asks who you are, you are ${getModelName(modelId)} \
-      from ${getCreatorName(modelId.split("/")[0] as Creator)}.
-
-      Use double dollar signs ($$) to delimit mathematical expressions. Do not use \
-      single dollar signs ($) for math to avoid conflicts with currency symbols in \
-      regular text.
-    `,
+    system: getSystemPrompt(modelId),
   })
 
   result.consumeStream()

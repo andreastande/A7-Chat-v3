@@ -1,3 +1,5 @@
+import dedent from "dedent"
+
 export type Model = {
   id: string
   name: string
@@ -109,4 +111,15 @@ export function getCreatorName(creator: Creator) {
 
 export function getModelName(modelId: string) {
   return allModels.find((m) => m.id === modelId)?.name
+}
+
+export function getSystemPrompt(modelId: string) {
+  return dedent`
+    If the user asks who you are, you are ${getModelName(modelId)} \
+    from ${getCreatorName(modelId.split("/")[0] as Creator)}.
+
+    Use double dollar signs ($$) to delimit mathematical expressions. Do not use \
+    single dollar signs ($) for math to avoid conflicts with currency symbols in \
+    regular text.
+  `
 }

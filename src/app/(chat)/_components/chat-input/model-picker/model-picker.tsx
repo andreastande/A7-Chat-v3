@@ -4,6 +4,7 @@ import { ChevronDown, Search, Star } from "lucide-react"
 import { useState } from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { useFavoriteModelsStore } from "@/app/(chat)/_components/providers/favorite-models-provider"
+import { useSession } from "@/components/providers/session-provider"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
@@ -15,12 +16,15 @@ import { CreatorLogo } from "./creator-logo"
 import { Model } from "./model"
 
 export function ModelPicker() {
+  const session = useSession()
   const favorites = useFavoriteModelsStore((s) => s.favorites)
   const selectedModelId = useSelectedModelStore((s) => s.modelId)
 
   const [input, setInput] = useState("")
   const [open, setOpen] = useState(false)
-  const [selectedFilter, setSelectedFilter] = useState<"favorites" | Creator>("favorites")
+  const [selectedFilter, setSelectedFilter] = useState<"favorites" | Creator>(() =>
+    session ? "favorites" : creatorIds[0],
+  )
 
   useHotkeys("mod+slash, mod+7", () => setOpen((prev) => !prev), { preventDefault: true, enableOnFormTags: true })
 
@@ -37,7 +41,7 @@ export function ModelPicker() {
       onOpenChangeComplete={(open) => {
         if (!open) {
           setInput("")
-          setSelectedFilter("favorites")
+          setSelectedFilter(session ? "favorites" : creatorIds[0])
         }
       }}
     >
