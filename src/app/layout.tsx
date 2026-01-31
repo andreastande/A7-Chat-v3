@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="scrollbar-thin-transparent">
       <body className={`${geistSans.variable} relative isolate antialiased`}>
         <NuqsAdapter>
           <Providers>

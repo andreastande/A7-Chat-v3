@@ -68,7 +68,7 @@ export function ModelPicker() {
           {!input.trim() && (
             <div
               tabIndex={-1}
-              className="no-scrollbar flex w-10 flex-col items-center space-y-1 overflow-auto border-r p-1"
+              className="no-scrollbar flex w-10 flex-col items-center space-y-1 overflow-y-auto border-r p-1"
             >
               {favorites.length > 0 && (
                 <>
@@ -111,7 +111,7 @@ export function ModelPicker() {
             </div>
           )}
 
-          <ul tabIndex={-1} className="flex flex-1 flex-col space-y-1 overflow-auto p-1">
+          <ul tabIndex={-1} className="scrollbar-thin-transparent flex flex-1 flex-col space-y-1 overflow-y-auto p-1">
             {modelsToShow.map((model) => (
               <li key={model.id}>
                 <Model

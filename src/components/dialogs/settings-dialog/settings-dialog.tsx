@@ -32,7 +32,7 @@ export function SettingsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="flex h-150 w-full max-w-170! gap-0 p-0">
         <SettingsNav activePage={activePage ?? "general"} setActivePage={setActivePage} />
-        <ActivePage className="flex-1 overflow-y-auto p-3.5" />
+        <ActivePage className="scrollbar-thin-transparent flex-1 overflow-y-auto p-3.5" />
       </DialogContent>
     </Dialog>
   )
