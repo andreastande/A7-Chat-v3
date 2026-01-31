@@ -29,7 +29,7 @@ export default function RootLayout({
         <NuqsAdapter>
           <Providers>
             {children}
-            <Toaster position="top-right" />
+            <Toaster richColors position="top-right" />
           </Providers>
         </NuqsAdapter>
       </body>

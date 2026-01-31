@@ -4,13 +4,25 @@ import { MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useHotkeys } from "react-hotkeys-hook"
+import { useSession } from "@/components/providers/session-provider"
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuShortcut } from "@/components/ui/sidebar"
 
 export function ChatItem() {
+  const session = useSession()
   const pathname = usePathname()
   const router = useRouter()
 
-  useHotkeys("shift+mod+o", () => router.push("/"), { preventDefault: true, enableOnFormTags: true })
+  useHotkeys(
+    "shift+mod+o",
+    () => {
+      if (session) {
+        router.push("/")
+      } else {
+        window.location.href = "/"
+      }
+    },
+    { preventDefault: true, enableOnFormTags: true },
+  )
 
   return (
     <SidebarMenuItem>
@@ -22,7 +34,8 @@ export function ChatItem() {
           </>
         }
         isActive={pathname === "/"}
-        render={<Link href="/" />}
+        // oxlint-disable-next-line nextjs/no-html-link-for-pages
+        render={session ? <Link href="/" /> : <a href="/" />}
       >
         <MessageCircle />
         Chat

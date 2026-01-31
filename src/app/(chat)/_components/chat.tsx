@@ -5,6 +5,7 @@ import { DefaultChatTransport, type UIMessage } from "ai"
 import { toast } from "sonner"
 import { useShallow } from "zustand/react/shallow"
 import { generateChatTitle } from "@/actions/chat"
+import { useApiKeysStore } from "@/components/providers/api-keys-provider"
 import { useChatHistoryStore } from "@/components/providers/chat-history-provider"
 import { useSession } from "@/components/providers/session-provider"
 import { Spinner } from "@/components/ui/spinner"
@@ -13,6 +14,7 @@ import { useChatSession } from "../_hooks/use-chat-session"
 import { useScrollOnMount } from "../_hooks/use-scroll-on-mount"
 import { useScrollOnSubmit } from "../_hooks/use-scroll-on-submit"
 import { ChatInput } from "./chat-input"
+import { ErrorMessage } from "./error-message"
 import { Message } from "./message"
 import { useSelectedModelStore } from "./providers/selected-model-provider"
 
@@ -24,11 +26,12 @@ interface ChatProps {
 export function Chat({ chatId, initialMessages = [] }: ChatProps) {
   const session = useSession()
   const selectedModelId = useSelectedModelStore((s) => s.modelId)
+  const getActiveKeyPayload = useApiKeysStore((s) => s.getActiveKeyPayload)
   const { addChat, touchChat, renameChat } = useChatHistoryStore(
     useShallow((s) => ({ addChat: s.addChat, touchChat: s.touchChat, renameChat: s.renameChat })),
   )
   const { id, navigateToChat } = useChatSession(chatId)
-  const { messages, status, sendMessage } = useChat({
+  const { messages, status, error, sendMessage } = useChat({
     id,
     messages: initialMessages,
     transport: new DefaultChatTransport({
@@ -55,11 +58,12 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
       navigateToChat()
     }
 
-    sendMessage({ text }, { body: { modelId: selectedModelId } }) // oxlint-disable-line
+    const apiKey = getActiveKeyPayload()
+    void sendMessage({ text }, { body: { modelId: selectedModelId, apiKey } })
 
     if (session) {
       if (isNewChat) {
-        const { data: title, serverError } = await generateChatTitle({ text })
+        const { data: title, serverError } = await generateChatTitle({ text, apiKey })
         if (serverError) return toast.error("Failed to generate chat title")
         if (title) await renameChat(id, title)
       } else {
@@ -87,6 +91,7 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
               <Message key={message.id} message={message} />
             ))}
             {status === "submitted" && messages.at(-1)?.role === "user" && <Spinner />}
+            {error && <ErrorMessage error={error} />}
           </div>
         </div>
         <div className="sticky bottom-0 z-10 bg-background pb-4">

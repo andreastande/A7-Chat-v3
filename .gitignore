@@ -26,6 +26,7 @@
 .claude
 /.vscode/
 TODO.md
+PROMPT.md
 
 # debug
 npm-debug.log*

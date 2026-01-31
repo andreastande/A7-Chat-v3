@@ -1,6 +1,7 @@
 "use server"
 
-import { generateText } from "ai"
+import { createOpenRouter } from "@openrouter/ai-sdk-provider"
+import { createGateway, generateText } from "ai"
 import { z } from "zod"
 import {
   addFavoriteModel as addFavoriteModelDAL,
@@ -11,6 +12,7 @@ import {
   updateChatModel as updateChatModelDAL,
   updateChatTitle as updateChatTitleDAL,
 } from "@/dal/chat"
+import type { ApiKeyPayload } from "@/lib/api-keys/types"
 import { authActionClient } from "@/lib/safe-action"
 
 export const createChat = authActionClient
@@ -50,10 +52,27 @@ export const touchChat = authActionClient
 
 export const generateChatTitle = authActionClient
   .metadata({ errorMessage: "Failed to generate chat title" })
-  .inputSchema(z.object({ text: z.string() }))
-  .action(async ({ parsedInput: { text } }) => {
+  .inputSchema(
+    z.object({
+      text: z.string(),
+      apiKey: z
+        .object({
+          provider: z.enum(["ai-gateway", "openrouter"]),
+          key: z.string(),
+        })
+        .nullable() satisfies z.ZodType<ApiKeyPayload | null>,
+    }),
+  )
+  .action(async ({ parsedInput: { text, apiKey } }) => {
+    if (!apiKey) throw new Error("API key required to generate title")
+
+    const provider =
+      apiKey.provider === "openrouter"
+        ? createOpenRouter({ apiKey: apiKey.key })
+        : createGateway({ apiKey: apiKey.key })
+
     const { text: title } = await generateText({
-      model: "openai/gpt-oss-120b",
+      model: provider("google/gemini-2.0-flash"),
       system: `
         You are a helpful assistant that writes concise, topic-specific chat titles
         based on the user's first message. Limit to 2-5 words.
