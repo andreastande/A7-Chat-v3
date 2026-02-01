@@ -26,7 +26,7 @@ export function ChatHeader() {
 
   return (
     // Show bg when title overlaps: 768 (conversation, w-3xl) + 2×(242+8) (title+padding) = 1268px
-    <div className="sticky top-0 z-10 flex justify-between p-2 @max-[1268px]:sticky-shadow @max-[1268px]:bg-background">
+    <div className="sticky top-0 z-10 flex h-12 justify-between p-2 @max-[1268px]:sticky-shadow @max-[1268px]:bg-background">
       <DropdownMenu>
         <DropdownMenuTrigger render={<Button variant="ghost" size="sm" className="font-normal" />}>
           <span className={cn("w-full max-w-50 truncate", title === "Untitled" && "text-muted-foreground")}>
