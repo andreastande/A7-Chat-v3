@@ -1,8 +1,9 @@
 import { useChatActions } from "@ai-sdk-tools/store"
-import { AlertCircle } from "lucide-react"
+import { AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useApiKeysStore } from "@/components/providers/api-keys-provider"
+import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { useSelectedModelStore } from "./providers/selected-model-provider"
 
@@ -17,20 +18,27 @@ export function ErrorMessage({ error }: { error: Error }) {
   )
 
   return (
-    <div className="space-y-4 rounded-lg border border-destructive/20 bg-destructive/10 p-4 dark:border-destructive/30 dark:bg-destructive/20">
-      <div className="flex items-center gap-2 text-destructive">
-        <AlertCircle className="size-5" />
-        <p>{isAPIKeyError ? "API key missing or invalid" : "Something went wrong"}</p>
-      </div>
-      {isAPIKeyError ? (
-        <Button nativeButton={false} render={<Link href={`${pathname}?settings=api-keys`} />}>
-          Configure API key
-        </Button>
-      ) : (
-        <Button onClick={() => regenerate({ body: { modelId: selectedModelId, apiKey: getActiveKeyPayload() } })}>
-          Retry
-        </Button>
-      )}
-    </div>
+    <>
+      <Alert className="max-w-lg border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
+        <AlertTriangle />
+        <AlertTitle>{isAPIKeyError ? "API key missing or invalid" : "Something went wrong"}</AlertTitle>
+        {isAPIKeyError ? (
+          <AlertDescription>Configure an API key to continue chatting.</AlertDescription>
+        ) : (
+          <AlertDescription>An unexpected error occurred. Please try again.</AlertDescription>
+        )}
+        <AlertAction>
+          {isAPIKeyError ? (
+            <Button size="xs" nativeButton={false} render={<Link href={`${pathname}?settings=api-keys`} />}>
+              Configure API key
+            </Button>
+          ) : (
+            <Button onClick={() => regenerate({ body: { modelId: selectedModelId, apiKey: getActiveKeyPayload() } })}>
+              Retry
+            </Button>
+          )}
+        </AlertAction>
+      </Alert>
+    </>
   )
 }
