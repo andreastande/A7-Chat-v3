@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import z from "zod"
@@ -21,6 +22,7 @@ const loginSchema = z.object({
 })
 
 export default function Page() {
+  const router = useRouter()
   const [lastMethod, setLastMethod] = useState<string | null>(null)
 
   // Avoid hydration mismatch (Better Auth uses document.cookie, which is unavailable during SSR)
@@ -41,7 +43,7 @@ export default function Page() {
     if (error) {
       return form.setError("root.serverError", { message: error.message ?? "Invalid email or password" })
     }
-    window.location.href = "/"
+    router.push("/")
   }
 
   return (
