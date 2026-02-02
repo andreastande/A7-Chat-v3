@@ -9,6 +9,7 @@ import z from "zod"
 import { useShallow } from "zustand/react/shallow"
 import { PasswordInput } from "@/app/(auth)/_components/password-input"
 import { useApiKeysStore } from "@/app/(sidebar)/_components/providers/api-keys-provider"
+import { useSession } from "@/components/providers/session-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
@@ -46,6 +47,7 @@ const items: { label: ApiKeyProviderLabel; value: ApiKeyProvider }[] = [
 ]
 
 export function ApiKeysPage({ className }: { className?: string } = {}) {
+  const session = useSession()
   const form = useForm<z.infer<typeof apiKeySchema>>({
     resolver: zodResolver(apiKeySchema),
     defaultValues: {
@@ -54,14 +56,25 @@ export function ApiKeysPage({ className }: { className?: string } = {}) {
       key: "",
     },
   })
-  const { keys, activeKeyId, isInitialized, addKey, removeKey, setActiveKey } = useApiKeysStore(
+  const {
+    keys,
+    activeKeyId,
+    anonymousKeysCount,
+    isInitialized,
+    addKey,
+    removeKey,
+    setActiveKey,
+    transferFromAnonymous,
+  } = useApiKeysStore(
     useShallow((s) => ({
       keys: s.keys,
       activeKeyId: s.activeKeyId,
+      anonymousKeysCount: s.anonymousKeysCount,
       isInitialized: s.isInitialized,
       addKey: s.addKey,
       removeKey: s.removeKey,
       setActiveKey: s.setActiveKey,
+      transferFromAnonymous: s.transferFromAnonymous,
     })),
   )
 
@@ -94,24 +107,44 @@ export function ApiKeysPage({ className }: { className?: string } = {}) {
       </div>
 
       {keys.length === 0 && !isAdding ? (
-        <Empty className="justify-start">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Key />
-            </EmptyMedia>
-            <EmptyTitle>No API keys</EmptyTitle>
-            <EmptyDescription>
-              You haven&apos;t configured any API keys yet. Add an API key to start chatting.
-            </EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent className="flex-row justify-center gap-2">
-            <Button onClick={() => setIsAdding(true)}>Add API key</Button>
-          </EmptyContent>
-        </Empty>
+        anonymousKeysCount > 0 && session ? (
+          <Empty className="justify-start">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Key />
+              </EmptyMedia>
+              <EmptyTitle>Transfer your API keys</EmptyTitle>
+              <EmptyDescription>
+                We found {anonymousKeysCount} key{anonymousKeysCount !== 1 && "s"} from before you signed in.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent className="flex-row justify-center gap-2">
+              <Button onClick={transferFromAnonymous}>Transfer keys</Button>
+              <Button variant="outline" onClick={() => setIsAdding(true)}>
+                Add new key
+              </Button>
+            </EmptyContent>
+          </Empty>
+        ) : (
+          <Empty className="justify-start">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Key />
+              </EmptyMedia>
+              <EmptyTitle>No API keys</EmptyTitle>
+              <EmptyDescription>
+                You haven&apos;t configured any API keys yet. Add an API key to start chatting.
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent className="flex-row justify-center gap-2">
+              <Button onClick={() => setIsAdding(true)}>Add API key</Button>
+            </EmptyContent>
+          </Empty>
+        )
       ) : (
         <div className="space-y-6">
           {keys.length > 0 && (
-            <RadioGroup value={activeKeyId} onValueChange={(value) => setActiveKey(value)}>
+            <RadioGroup value={activeKeyId} onValueChange={setActiveKey}>
               {keys.map((key) => (
                 <FieldLabel key={key.id} htmlFor={key.id}>
                   <Field orientation="horizontal">

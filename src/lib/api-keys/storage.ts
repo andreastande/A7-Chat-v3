@@ -143,3 +143,65 @@ export async function setActiveKeyId(namespace: string, id: string | null): Prom
     request.onsuccess = () => resolve()
   })
 }
+
+/**
+ * Get the count of keys in the anonymous namespace.
+ */
+export async function getAnonymousKeysCount(): Promise<number> {
+  const db = await openDatabase()
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(KEYS_STORE, "readonly")
+    const store = transaction.objectStore(KEYS_STORE)
+    const index = store.index("namespace")
+    const request = index.count("anonymous")
+
+    request.onerror = () => reject(request.error)
+    request.onsuccess = () => resolve(request.result)
+  })
+}
+
+/**
+ * Transfer all keys from anonymous namespace to target namespace.
+ * Updates the namespace field in place (since id is the keyPath).
+ * Also transfers active key metadata if target has no active key.
+ */
+export async function transferKeysToNamespace(targetNamespace: string): Promise<StoredApiKey[]> {
+  const db = await openDatabase()
+  const anonymousKeys = await getAllStoredKeys("anonymous")
+
+  if (anonymousKeys.length === 0) {
+    return []
+  }
+
+  const [anonymousActiveKeyId, targetActiveKeyId] = await Promise.all([
+    getActiveKeyId("anonymous"),
+    getActiveKeyId(targetNamespace),
+  ])
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([KEYS_STORE, META_STORE], "readwrite")
+    const keysStore = transaction.objectStore(KEYS_STORE)
+    const metaStore = transaction.objectStore(META_STORE)
+
+    const transferredKeys: StoredApiKey[] = []
+
+    transaction.onerror = () => reject(transaction.error)
+    transaction.oncomplete = () => resolve(transferredKeys)
+
+    // Update each key's namespace (put overwrites since id is keyPath)
+    for (const key of anonymousKeys) {
+      const updatedKey: StoredApiKey = { ...key, namespace: targetNamespace }
+      keysStore.put(updatedKey)
+      transferredKeys.push(updatedKey)
+    }
+
+    // Clear anonymous active key metadata
+    metaStore.delete(`activeKeyId-anonymous`)
+
+    // Transfer active key if target has none
+    if (!targetActiveKeyId && anonymousActiveKeyId) {
+      metaStore.put({ key: `activeKeyId-${targetNamespace}`, value: anonymousActiveKeyId })
+    }
+  })
+}
