@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { getLastUsedLoginMethod, signInEmail } from "@/lib/auth/client"
 import { LastUsedBadge } from "../_components/last-used-badge"
-import { PasswordInput } from "../_components/password-input"
+import { SecretInput } from "../_components/secret-input"
 import { SocialLoginButtons } from "../_components/social-login-buttons"
 
 const loginSchema = z.object({
@@ -85,7 +85,7 @@ export default function Page() {
                           Forgot your password?
                         </Link>
                       </div>
-                      <PasswordInput {...field} id="password" aria-invalid={fieldState.invalid} />
+                      <SecretInput {...field} id="password" aria-invalid={fieldState.invalid} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}

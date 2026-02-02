@@ -5,7 +5,7 @@ import { type ComponentProps, useState } from "react"
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group"
 import { WithTooltip } from "@/components/ui/tooltip"
 
-export function PasswordInput({ className, ...props }: Omit<ComponentProps<"input">, "type">) {
+export function SecretInput({ className, ...props }: Omit<ComponentProps<"input">, "type">) {
   const [isRevealed, setIsRevealed] = useState(false)
 
   return (
@@ -14,10 +14,10 @@ export function PasswordInput({ className, ...props }: Omit<ComponentProps<"inpu
       <InputGroupAddon align="inline-end">
         <WithTooltip
           animated
-          content={isRevealed ? "Hide password" : "Show password"}
+          content={isRevealed ? "Hide" : "Show"}
           render={
             <InputGroupButton
-              aria-label={isRevealed ? "Hide password" : "Show password"}
+              aria-label={isRevealed ? "Hide" : "Show"}
               size="icon-xs"
               onClick={() => setIsRevealed((v) => !v)}
             />

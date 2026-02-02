@@ -11,7 +11,7 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSepar
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { signUpEmail } from "@/lib/auth/client"
-import { PasswordInput } from "../_components/password-input"
+import { SecretInput } from "../_components/secret-input"
 import { SocialLoginButtons } from "../_components/social-login-buttons"
 
 const signupSchema = z.object({
@@ -96,7 +96,7 @@ export default function Page() {
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="password">Password</FieldLabel>
-                      <PasswordInput {...field} id="password" aria-invalid={fieldState.invalid} />
+                      <SecretInput {...field} id="password" aria-invalid={fieldState.invalid} />
                       <FieldDescription>Must be at least 10 characters long.</FieldDescription>
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>

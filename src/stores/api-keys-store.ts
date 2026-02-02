@@ -22,6 +22,7 @@ type ApiKeysState = {
 type ApiKeysActions = {
   initialize: () => Promise<void>
   addKey: (key: { provider: ApiKeyProvider; name: string; key: string }) => Promise<string>
+  updateKey: (id: string, key: { provider: ApiKeyProvider; name: string; key: string }) => Promise<void>
   removeKey: (id: string) => Promise<void>
   setActiveKey: (id: string | null) => Promise<void>
   getActiveKeyPayload: () => ApiKeyPayload | null
@@ -101,29 +102,72 @@ export function createApiKeysStore(namespace: string) {
         createdAt: storedKey.createdAt,
       }
 
+      const { activeKeyId } = get()
+
       set((state) => ({
         keys: [...state.keys, decryptedKey],
       }))
 
-      // Auto-activate new key
-      await get().setActiveKey(id)
+      // Auto-activate if no key is currently active
+      if (!activeKeyId) {
+        await get().setActiveKey(id)
+      }
 
       return id
+    },
+
+    updateKey: async (id, { provider, name, key }) => {
+      const { namespace, keys } = get()
+      const existingKey = keys.find((k) => k.id === id)
+
+      if (!existingKey) {
+        throw new Error("API key not found")
+      }
+
+      const { encrypted, iv } = await encrypt(key)
+
+      const storedKey: StoredApiKey = {
+        id,
+        namespace,
+        provider,
+        name,
+        encryptedKey: encrypted,
+        iv,
+        createdAt: existingKey.createdAt,
+      }
+
+      await saveStoredKey(storedKey)
+
+      const decryptedKey: DecryptedApiKey = {
+        id,
+        provider,
+        name,
+        key,
+        createdAt: existingKey.createdAt,
+      }
+
+      set((state) => ({
+        keys: state.keys.map((k) => (k.id === id ? decryptedKey : k)),
+      }))
     },
 
     removeKey: async (id) => {
       await deleteStoredKey(id)
 
-      const { activeKeyId, namespace } = get()
+      const { activeKeyId, namespace, keys } = get()
+      const remainingKeys = keys.filter((k) => k.id !== id)
 
-      set((state) => ({
-        keys: state.keys.filter((k) => k.id !== id),
-        activeKeyId: activeKeyId === id ? null : activeKeyId,
-      }))
-
-      if (activeKeyId === id) {
-        await setActiveKeyId(namespace, null)
+      // Auto-select if only 1 key remains, otherwise clear if active was removed
+      let newActiveKeyId = activeKeyId === id ? null : activeKeyId
+      if (remainingKeys.length === 1 && !newActiveKeyId) {
+        newActiveKeyId = remainingKeys[0].id
       }
+
+      if (newActiveKeyId !== activeKeyId) {
+        await setActiveKeyId(namespace, newActiveKeyId)
+      }
+
+      set({ keys: remainingKeys, activeKeyId: newActiveKeyId })
     },
 
     setActiveKey: async (id) => {
