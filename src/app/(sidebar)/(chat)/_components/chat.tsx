@@ -3,7 +3,6 @@
 import { useChat } from "@ai-sdk-tools/store"
 import { DefaultChatTransport, type UIMessage } from "ai"
 import { toast } from "sonner"
-import { useShallow } from "zustand/react/shallow"
 import { generateChatTitle } from "@/actions/chat"
 import { useApiKeysStore } from "@/app/(sidebar)/_components/providers/api-keys-provider"
 import { useChatHistoryStore } from "@/app/(sidebar)/_components/providers/chat-history-provider"
@@ -25,12 +24,14 @@ interface ChatProps {
 
 export function Chat({ chatId, initialMessages = [] }: ChatProps) {
   const session = useSession()
+  const { id, navigateToChat } = useChatSession(chatId)
+
   const selectedModelId = useSelectedModelStore((s) => s.modelId)
   const getActiveKeyPayload = useApiKeysStore((s) => s.getActiveKeyPayload)
-  const { addChat, touchChat, renameChat } = useChatHistoryStore(
-    useShallow((s) => ({ addChat: s.addChat, touchChat: s.touchChat, renameChat: s.renameChat })),
-  )
-  const { id, navigateToChat } = useChatSession(chatId)
+  const addChat = useChatHistoryStore((s) => s.addChat)
+  const touchChat = useChatHistoryStore((s) => s.touchChat)
+  const renameChat = useChatHistoryStore((s) => s.renameChat)
+
   const { messages, status, error, sendMessage } = useChat({
     id,
     messages: initialMessages,
@@ -42,15 +43,15 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
     }),
   })
 
+  useScrollOnMount()
+  useScrollOnSubmit()
+
   const isNewChat = messages.length === 0
   const hasNewMessages = messages.length > initialMessages.length
 
   const lastUserIndex = messages.findLastIndex((m) => m.role === "user")
   const earlierMessages = messages.slice(0, lastUserIndex)
   const currentExchange = messages.slice(lastUserIndex)
-
-  useScrollOnMount()
-  useScrollOnSubmit()
 
   async function handleSendMessage(text: string) {
     if (isNewChat && session) {

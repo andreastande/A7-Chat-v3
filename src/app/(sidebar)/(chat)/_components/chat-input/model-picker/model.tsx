@@ -1,7 +1,6 @@
 "use client"
 
 import { Star } from "lucide-react"
-import { useShallow } from "zustand/react/shallow"
 import { useFavoriteModelsStore } from "@/app/(sidebar)/(chat)/_components/providers/favorite-models-provider"
 import { useSession } from "@/components/providers/session-provider"
 import { Button } from "@/components/ui/button"
@@ -20,12 +19,11 @@ interface ModelProps {
 export function Model({ model, showCreatorLogo, closeModelPicker }: ModelProps) {
   const session = useSession()
   const chatId = useChatId()
-  const { selectedModelId, setSelectedModelId } = useSelectedModelStore(
-    useShallow((s) => ({ selectedModelId: s.modelId, setSelectedModelId: s.setModelId })),
-  )
-  const { isFavorited, toggleFavorite } = useFavoriteModelsStore(
-    useShallow((s) => ({ isFavorited: s.favorites.includes(model.id), toggleFavorite: s.toggleFavorite })),
-  )
+
+  const selectedModelId = useSelectedModelStore((s) => s.modelId)
+  const setSelectedModelId = useSelectedModelStore((s) => s.setModelId)
+  const isFavorited = useFavoriteModelsStore((s) => s.favorites.includes(model.id))
+  const toggleFavorite = useFavoriteModelsStore((s) => s.toggleFavorite)
 
   return (
     <div className="relative">

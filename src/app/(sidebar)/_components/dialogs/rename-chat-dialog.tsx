@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useShallow } from "zustand/react/shallow"
 import { useChatHistoryStore } from "@/app/(sidebar)/_components/providers/chat-history-provider"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -16,7 +15,8 @@ export function RenameChatDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const { chats, renameChat } = useChatHistoryStore(useShallow((s) => ({ chats: s.chats, renameChat: s.renameChat })))
+  const chats = useChatHistoryStore((s) => s.chats)
+  const renameChat = useChatHistoryStore((s) => s.renameChat)
 
   const chat = chats.find((c) => c.id === chatId)
   const title = chat?.title ?? "Untitled"

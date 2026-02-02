@@ -6,7 +6,6 @@ import Link from "next/link"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import z from "zod"
-import { useShallow } from "zustand/react/shallow"
 import { PasswordInput } from "@/app/(auth)/_components/password-input"
 import { useApiKeysStore } from "@/app/(sidebar)/_components/providers/api-keys-provider"
 import { useSession } from "@/components/providers/session-provider"
@@ -56,27 +55,15 @@ export function ApiKeysPage({ className }: { className?: string } = {}) {
       key: "",
     },
   })
-  const {
-    keys,
-    activeKeyId,
-    anonymousKeysCount,
-    isInitialized,
-    addKey,
-    removeKey,
-    setActiveKey,
-    transferFromAnonymous,
-  } = useApiKeysStore(
-    useShallow((s) => ({
-      keys: s.keys,
-      activeKeyId: s.activeKeyId,
-      anonymousKeysCount: s.anonymousKeysCount,
-      isInitialized: s.isInitialized,
-      addKey: s.addKey,
-      removeKey: s.removeKey,
-      setActiveKey: s.setActiveKey,
-      transferFromAnonymous: s.transferFromAnonymous,
-    })),
-  )
+
+  const keys = useApiKeysStore((s) => s.keys)
+  const activeKeyId = useApiKeysStore((s) => s.activeKeyId)
+  const anonymousKeysCount = useApiKeysStore((s) => s.anonymousKeysCount)
+  const isInitialized = useApiKeysStore((s) => s.isInitialized)
+  const addKey = useApiKeysStore((s) => s.addKey)
+  const removeKey = useApiKeysStore((s) => s.removeKey)
+  const setActiveKey = useApiKeysStore((s) => s.setActiveKey)
+  const transferFromAnonymous = useApiKeysStore((s) => s.transferFromAnonymous)
 
   const [isAdding, setIsAdding] = useState(false)
 
