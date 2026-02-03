@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form"
 import { useApiKeysStore } from "@/app/(sidebar)/_components/providers/api-keys-provider"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner"
 import { WithTooltip } from "@/components/ui/tooltip"
 import type { DecryptedApiKey } from "@/lib/api-keys/types"
 import { cn } from "@/lib/utils"
@@ -64,14 +65,6 @@ export function ApiKeysPage({ className }: { className?: string } = {}) {
     }
   }
 
-  if (!isInitialized) {
-    return (
-      <div className={cn("flex items-center justify-center py-12", className)}>
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    )
-  }
-
   return (
     <div className={cn("flex flex-col gap-6", className)}>
       <div className="space-y-2">
@@ -81,7 +74,14 @@ export function ApiKeysPage({ className }: { className?: string } = {}) {
         </p>
       </div>
 
-      {keys.length === 0 && !editingKey ? (
+      {!isInitialized ? (
+        <div className={cn("flex-1", className)}>
+          <div className="mt-20 flex items-center justify-center gap-2 text-muted-foreground">
+            <Spinner />
+            <p>Loading API keys...</p>
+          </div>
+        </div>
+      ) : keys.length === 0 && !editingKey ? (
         <EmptyApiKeys onAddKey={() => setEditingKey("new")} />
       ) : (
         <div className="space-y-4">

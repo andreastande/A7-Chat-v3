@@ -7,6 +7,7 @@
 // - "meta": Stores metadata like the active key ID (per namespace)
 // =============================================================================
 
+import { openDB, type DBSchema, type IDBPDatabase } from "idb"
 import type { StoredApiKey } from "./types"
 
 const DB_NAME = "a7-chat-keys"
@@ -14,40 +15,36 @@ const DB_VERSION = 1
 const KEYS_STORE = "keys"
 const META_STORE = "meta"
 
-let cachedDb: IDBDatabase | null = null
+type MetaRecord = {
+  key: string
+  value: string
+}
+
+interface ApiKeysDB extends DBSchema {
+  keys: {
+    key: string
+    value: StoredApiKey
+    indexes: { namespace: string }
+  }
+  meta: {
+    key: string
+    value: MetaRecord
+  }
+}
+
+let dbPromise: Promise<IDBPDatabase<ApiKeysDB>> | null = null
 
 /**
  * Open the IndexedDB database, creating object stores if needed.
  * Caches the connection for reuse across operations.
  */
-function openDatabase(): Promise<IDBDatabase> {
-  if (cachedDb) return Promise.resolve(cachedDb)
+function openDatabase(): Promise<IDBPDatabase<ApiKeysDB>> {
+  if (dbPromise) return dbPromise
 
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION)
+  let dbRef: IDBPDatabase<ApiKeysDB> | null = null
 
-    request.onerror = () => reject(request.error)
-
-    request.onsuccess = () => {
-      cachedDb = request.result
-
-      // Reset cache if connection closes unexpectedly
-      cachedDb.onclose = () => {
-        cachedDb = null
-      }
-
-      // Handle version change from another tab
-      cachedDb.onversionchange = () => {
-        cachedDb?.close()
-        cachedDb = null
-      }
-
-      resolve(cachedDb)
-    }
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result
-
+  dbPromise = openDB<ApiKeysDB>(DB_NAME, DB_VERSION, {
+    upgrade(db) {
       if (!db.objectStoreNames.contains(KEYS_STORE)) {
         const keysStore = db.createObjectStore(KEYS_STORE, { keyPath: "id" })
         keysStore.createIndex("namespace", "namespace", { unique: false })
@@ -56,8 +53,25 @@ function openDatabase(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains(META_STORE)) {
         db.createObjectStore(META_STORE, { keyPath: "key" })
       }
-    }
+    },
+    blocking() {
+      dbRef?.close()
+      dbPromise = null
+    },
+    terminated() {
+      dbPromise = null
+    },
   })
+    .then((db) => {
+      dbRef = db
+      return db
+    })
+    .catch((error) => {
+      dbPromise = null
+      throw error
+    })
+
+  return dbPromise
 }
 
 /**
@@ -66,15 +80,7 @@ function openDatabase(): Promise<IDBDatabase> {
 export async function getAllStoredKeys(namespace: string): Promise<StoredApiKey[]> {
   const db = await openDatabase()
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(KEYS_STORE, "readonly")
-    const store = transaction.objectStore(KEYS_STORE)
-    const index = store.index("namespace")
-    const request = index.getAll(namespace)
-
-    request.onerror = () => reject(request.error)
-    request.onsuccess = () => resolve(request.result)
-  })
+  return db.getAllFromIndex(KEYS_STORE, "namespace", namespace)
 }
 
 /**
@@ -83,14 +89,7 @@ export async function getAllStoredKeys(namespace: string): Promise<StoredApiKey[
 export async function saveStoredKey(key: StoredApiKey): Promise<void> {
   const db = await openDatabase()
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(KEYS_STORE, "readwrite")
-    const store = transaction.objectStore(KEYS_STORE)
-    const request = store.put(key)
-
-    request.onerror = () => reject(request.error)
-    request.onsuccess = () => resolve()
-  })
+  await db.put(KEYS_STORE, key)
 }
 
 /**
@@ -99,14 +98,7 @@ export async function saveStoredKey(key: StoredApiKey): Promise<void> {
 export async function deleteStoredKey(id: string): Promise<void> {
   const db = await openDatabase()
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(KEYS_STORE, "readwrite")
-    const store = transaction.objectStore(KEYS_STORE)
-    const request = store.delete(id)
-
-    request.onerror = () => reject(request.error)
-    request.onsuccess = () => resolve()
-  })
+  await db.delete(KEYS_STORE, id)
 }
 
 /**
@@ -116,14 +108,8 @@ export async function getActiveKeyId(namespace: string): Promise<string | null> 
   const db = await openDatabase()
   const metaKey = `activeKeyId-${namespace}`
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(META_STORE, "readonly")
-    const store = transaction.objectStore(META_STORE)
-    const request = store.get(metaKey)
-
-    request.onerror = () => reject(request.error)
-    request.onsuccess = () => resolve(request.result?.value ?? null)
-  })
+  const record = await db.get(META_STORE, metaKey)
+  return record?.value ?? null
 }
 
 /**
@@ -133,15 +119,12 @@ export async function setActiveKeyId(namespace: string, id: string | null): Prom
   const db = await openDatabase()
   const metaKey = `activeKeyId-${namespace}`
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(META_STORE, "readwrite")
-    const store = transaction.objectStore(META_STORE)
+  if (id === null) {
+    await db.delete(META_STORE, metaKey)
+    return
+  }
 
-    const request = id === null ? store.delete(metaKey) : store.put({ key: metaKey, value: id })
-
-    request.onerror = () => reject(request.error)
-    request.onsuccess = () => resolve()
-  })
+  await db.put(META_STORE, { key: metaKey, value: id })
 }
 
 /**
@@ -150,15 +133,7 @@ export async function setActiveKeyId(namespace: string, id: string | null): Prom
 export async function getAnonymousKeysCount(): Promise<number> {
   const db = await openDatabase()
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(KEYS_STORE, "readonly")
-    const store = transaction.objectStore(KEYS_STORE)
-    const index = store.index("namespace")
-    const request = index.count("anonymous")
-
-    request.onerror = () => reject(request.error)
-    request.onsuccess = () => resolve(request.result)
-  })
+  return db.countFromIndex(KEYS_STORE, "namespace", "anonymous")
 }
 
 /**
@@ -179,29 +154,27 @@ export async function transferKeysToNamespace(targetNamespace: string): Promise<
     getActiveKeyId(targetNamespace),
   ])
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([KEYS_STORE, META_STORE], "readwrite")
-    const keysStore = transaction.objectStore(KEYS_STORE)
-    const metaStore = transaction.objectStore(META_STORE)
+  const transaction = db.transaction([KEYS_STORE, META_STORE], "readwrite")
+  const keysStore = transaction.objectStore(KEYS_STORE)
+  const metaStore = transaction.objectStore(META_STORE)
 
-    const transferredKeys: StoredApiKey[] = []
+  const transferredKeys: StoredApiKey[] = []
 
-    transaction.onerror = () => reject(transaction.error)
-    transaction.oncomplete = () => resolve(transferredKeys)
+  // Update each key's namespace (put overwrites since id is keyPath)
+  for (const key of anonymousKeys) {
+    const updatedKey: StoredApiKey = { ...key, namespace: targetNamespace }
+    await keysStore.put(updatedKey)
+    transferredKeys.push(updatedKey)
+  }
 
-    // Update each key's namespace (put overwrites since id is keyPath)
-    for (const key of anonymousKeys) {
-      const updatedKey: StoredApiKey = { ...key, namespace: targetNamespace }
-      keysStore.put(updatedKey)
-      transferredKeys.push(updatedKey)
-    }
+  // Clear anonymous active key metadata
+  await metaStore.delete(`activeKeyId-anonymous`)
 
-    // Clear anonymous active key metadata
-    metaStore.delete(`activeKeyId-anonymous`)
+  // Transfer active key if target has none
+  if (!targetActiveKeyId && anonymousActiveKeyId) {
+    await metaStore.put({ key: `activeKeyId-${targetNamespace}`, value: anonymousActiveKeyId })
+  }
 
-    // Transfer active key if target has none
-    if (!targetActiveKeyId && anonymousActiveKeyId) {
-      metaStore.put({ key: `activeKeyId-${targetNamespace}`, value: anonymousActiveKeyId })
-    }
-  })
+  await transaction.done
+  return transferredKeys
 }
