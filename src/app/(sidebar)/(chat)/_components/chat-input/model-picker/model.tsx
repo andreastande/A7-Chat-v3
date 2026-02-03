@@ -26,12 +26,12 @@ export function Model({ model, showCreatorLogo, closeModelPicker }: ModelProps) 
   const toggleFavorite = useFavoriteModelsStore((s) => s.toggleFavorite)
 
   return (
-    <div className="relative">
+    <div className="group/model relative">
       <Button
         size="sm"
         variant="ghost"
         className={cn(
-          "peer/button w-full justify-start font-normal",
+          "w-full justify-start font-normal",
           selectedModelId === model.id && "bg-muted text-foreground dark:bg-muted/50",
         )}
         onClick={() => {
@@ -40,17 +40,19 @@ export function Model({ model, showCreatorLogo, closeModelPicker }: ModelProps) 
         }}
       >
         {showCreatorLogo && <CreatorLogo creator={model.id.split("/")[0] as Creator} className="size-3" />}
-        <span className="truncate">{model.name}</span>
+        <span className="truncate group-hover/model:pr-10 group-has-focus-visible/model:pr-10">{model.name}</span>
       </Button>
       {session && (
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          onClick={() => toggleFavorite(model.id)}
-          className="absolute top-1 right-1 size-6 opacity-0 peer-[:hover,:focus-visible]/button:opacity-100 [:hover,:focus-visible]:opacity-100"
-        >
-          <Star className={cn("size-3 text-muted-foreground", isFavorited && "fill-yellow-400 text-yellow-400")} />
-        </Button>
+        <div className="absolute top-1 right-1 flex gap-px">
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            onClick={() => toggleFavorite(model.id)}
+            className="size-6 opacity-0 group-hover/model:opacity-100 group-has-focus-visible/model:opacity-100"
+          >
+            <Star className={cn("size-3 text-muted-foreground", isFavorited && "fill-yellow-400 text-yellow-400")} />
+          </Button>
+        </div>
       )}
     </div>
   )

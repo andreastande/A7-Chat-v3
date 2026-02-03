@@ -1,7 +1,7 @@
 "server-only"
 
 import type { UIMessage } from "ai"
-import { and, eq } from "drizzle-orm"
+import { and, eq, max } from "drizzle-orm"
 import { db } from "@/db"
 import { type Chat, chat, favoriteModel, message } from "@/db/schemas/chat"
 import { requireAuth } from "./auth"
@@ -205,7 +205,7 @@ export async function getFavoriteModels() {
 
   const results = await db.query.favoriteModel.findMany({
     where: eq(favoriteModel.userId, user.id),
-    orderBy: (favoriteModel, { asc }) => asc(favoriteModel.createdAt),
+    orderBy: (favoriteModel, { asc }) => [asc(favoriteModel.order), asc(favoriteModel.createdAt)],
     columns: { modelId: true },
   })
 
@@ -218,7 +218,15 @@ export async function getFavoriteModels() {
 export async function addFavoriteModel(modelId: string) {
   const user = await requireAuth()
 
-  await db.insert(favoriteModel).values({ userId: user.id, modelId }).onConflictDoNothing()
+  // Get current max order
+  const [result] = await db
+    .select({ maxOrder: max(favoriteModel.order) })
+    .from(favoriteModel)
+    .where(eq(favoriteModel.userId, user.id))
+
+  const newOrder = (result?.maxOrder ?? -1) + 1
+
+  await db.insert(favoriteModel).values({ userId: user.id, modelId, order: newOrder }).onConflictDoNothing()
 }
 
 /**
@@ -228,6 +236,23 @@ export async function removeFavoriteModel(modelId: string) {
   const user = await requireAuth()
 
   await db.delete(favoriteModel).where(and(eq(favoriteModel.userId, user.id), eq(favoriteModel.modelId, modelId)))
+}
+
+/**
+ * Reorder favorite models for the current user.
+ * Updates the order field for each model based on the new order.
+ */
+export async function reorderFavoriteModels(modelIds: string[]) {
+  const user = await requireAuth()
+
+  await db.transaction(async (tx) => {
+    for (let i = 0; i < modelIds.length; i++) {
+      await tx
+        .update(favoriteModel)
+        .set({ order: i })
+        .where(and(eq(favoriteModel.userId, user.id), eq(favoriteModel.modelId, modelIds[i])))
+    }
+  })
 }
 
 const DEFAULT_FAVORITE_MODELS = [
@@ -243,5 +268,7 @@ const DEFAULT_FAVORITE_MODELS = [
  * Called from auth hook on signup - no auth check needed.
  */
 export async function initializeDefaultFavorites(userId: string) {
-  await db.insert(favoriteModel).values(DEFAULT_FAVORITE_MODELS.map((modelId) => ({ userId, modelId })))
+  await db
+    .insert(favoriteModel)
+    .values(DEFAULT_FAVORITE_MODELS.map((modelId, index) => ({ userId, modelId, order: index })))
 }

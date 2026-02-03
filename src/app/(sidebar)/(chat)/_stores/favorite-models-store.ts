@@ -1,5 +1,5 @@
 import { createStore } from "zustand"
-import { addFavoriteModel, removeFavoriteModel } from "@/actions/chat"
+import { addFavoriteModel, removeFavoriteModel, reorderFavoriteModels } from "@/actions/chat"
 
 type FavoriteModelsState = {
   favorites: string[]
@@ -7,6 +7,7 @@ type FavoriteModelsState = {
 
 type FavoriteModelsActions = {
   toggleFavorite: (modelId: string) => void
+  reorderFavorites: (modelIds: string[]) => void
 }
 
 export type FavoriteModelsStore = FavoriteModelsState & FavoriteModelsActions
@@ -25,6 +26,11 @@ export function createFavoriteModelsStore(initialFavorites: string[]) {
       } else {
         addFavoriteModel({ modelId }) // oxlint-disable-line
       }
+    },
+
+    reorderFavorites: (modelIds) => {
+      set({ favorites: modelIds })
+      reorderFavoriteModels({ modelIds }) // oxlint-disable-line
     },
   }))
 }

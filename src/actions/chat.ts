@@ -8,6 +8,7 @@ import {
   createChat as createChatDAL,
   deleteChat as deleteChatDAL,
   removeFavoriteModel as removeFavoriteModelDAL,
+  reorderFavoriteModels as reorderFavoriteModelsDAL,
   touchChat as touchChatDAL,
   updateChatModel as updateChatModelDAL,
   updateChatTitle as updateChatTitleDAL,
@@ -94,4 +95,11 @@ export const removeFavoriteModel = authActionClient
   .inputSchema(z.object({ modelId: z.string() }))
   .action(async ({ parsedInput: { modelId } }) => {
     await removeFavoriteModelDAL(modelId)
+  })
+
+export const reorderFavoriteModels = authActionClient
+  .metadata({ errorMessage: "Failed to reorder favorite models" })
+  .inputSchema(z.object({ modelIds: z.array(z.string()) }))
+  .action(async ({ parsedInput: { modelIds } }) => {
+    await reorderFavoriteModelsDAL(modelIds)
   })

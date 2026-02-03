@@ -1,5 +1,5 @@
 import type { UIMessage } from "ai"
-import { index, jsonb, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core"
+import { index, integer, jsonb, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core"
 import { user } from "./auth"
 
 export const chat = pgTable(
@@ -47,11 +47,13 @@ export const favoriteModel = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     modelId: text().notNull(),
+    order: integer().notNull().default(0),
     createdAt: timestamp().defaultNow().notNull(),
   },
   (table) => [
     primaryKey({ columns: [table.userId, table.modelId] }),
     index("favorite_model_userId_idx").on(table.userId),
+    index("favorite_model_userId_order_idx").on(table.userId, table.order),
   ],
 )
 
