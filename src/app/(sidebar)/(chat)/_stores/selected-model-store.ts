@@ -1,5 +1,6 @@
 import { createStore } from "zustand"
 import { updateChatModel } from "@/actions/chat"
+import { setCookie } from "@/lib/cookies"
 
 type SelectedModelState = {
   modelId: string
@@ -16,8 +17,8 @@ export function createSelectedModelStore(initialModelId: string) {
     modelId: initialModelId,
     setModelId: ({ chatId, modelId }) => {
       set({ modelId })
-      if (chatId) updateChatModel({ chatId, modelId }) // oxlint-disable-line
-      document.cookie = `selectedModelId=${modelId}; path=/; max-age=${60 * 60 * 24 * 30}`
+      setCookie("selectedModelId", modelId, 60 * 60 * 24 * 30)
+      if (chatId) void updateChatModel({ chatId, modelId })
     },
   }))
 }

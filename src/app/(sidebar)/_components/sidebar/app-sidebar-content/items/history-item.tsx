@@ -27,10 +27,11 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { useKeyboardKeys } from "@/hooks/use-keyboard-keys"
+import { setCookie } from "@/lib/cookies"
 import { cn } from "@/lib/utils"
 import { HistoryItemHoverCard } from "./hover-cards/history-item-hover-card"
 
-export function HistoryItem() {
+export function HistoryItem({ defaultOpen = true }: { defaultOpen?: boolean }) {
   const session = useSession()
   const chats = useChatHistoryStore((s) => s.chats)
   const chatId = useChatId()
@@ -40,7 +41,7 @@ export function HistoryItem() {
   return (
     <SidebarMenuItem>
       {session ? (
-        <Collapsible defaultOpen>
+        <Collapsible defaultOpen={defaultOpen} onOpenChange={(open) => setCookie("history_state", open)}>
           <HistoryItemHoverCard
             render={<SidebarMenuButton className="group-has-data-[sidebar=menu-action]/menu-item:pr-2" />}
           >
@@ -49,80 +50,83 @@ export function HistoryItem() {
             <SidebarMenuShortcut showOnFocus>{mod}K</SidebarMenuShortcut>
           </HistoryItemHoverCard>
 
-          <CollapsibleTrigger
-            render={
-              <SidebarMenuAction
-                className="left-1.5 bg-sidebar-accent text-sidebar-accent-foreground data-panel-open:rotate-90"
-                showOnHover
-              >
-                <ChevronRight />
-              </SidebarMenuAction>
-            }
-          />
-
-          <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-all duration-100 ease-out data-ending-style:h-0 data-starting-style:h-0">
-            <SidebarMenuSub>
-              {chats.slice(0, 10).map((c) => (
-                <SidebarMenuSubItem key={c.id}>
-                  <SidebarMenuSubButton
-                    render={<Link href={`/chat/${c.id}`} />}
-                    isActive={chatId === c.id}
-                    className="pr-7"
+          {chats.length > 0 && (
+            <>
+              <CollapsibleTrigger
+                render={
+                  <SidebarMenuAction
+                    className="left-1.5 bg-sidebar-accent text-sidebar-accent-foreground data-panel-open:rotate-90"
+                    showOnHover
                   >
-                    <span className={cn(c.title === "Untitled" && "text-muted-foreground")}>{c.title}</span>
-                  </SidebarMenuSubButton>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <SidebarMenuSubAction
-                          showOnHover
-                          className="data-popup-open:bg-sidebar-accent data-popup-open:opacity-100"
-                        />
-                      }
-                    >
-                      <MoreHorizontal />
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent className="w-44">
-                      <DropdownMenuItem>
-                        <Share />
-                        Share
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setDialogState({ type: "rename", chatId: c.id })}>
-                        <Pencil />
-                        Rename
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Pin />
-                        Pin
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Folder />
-                        Add to project
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={() => setDialogState({ type: "delete", chatId: c.id })}
+                    <ChevronRight />
+                  </SidebarMenuAction>
+                }
+              />
+              <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-all duration-100 ease-out data-ending-style:h-0 data-starting-style:h-0">
+                <SidebarMenuSub>
+                  {chats.slice(0, 10).map((c) => (
+                    <SidebarMenuSubItem key={c.id}>
+                      <SidebarMenuSubButton
+                        render={<Link href={`/chat/${c.id}`} />}
+                        isActive={chatId === c.id}
+                        className="pr-7"
                       >
-                        <Trash2 />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </SidebarMenuSubItem>
-              ))}
-              <SidebarMenuSubItem>
-                <SidebarMenuSubButton
-                  render={<button />}
-                  className="w-full bg-transparent! text-[13px]! font-normal text-muted-foreground"
-                >
-                  <span>See all</span>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-            </SidebarMenuSub>
-          </CollapsibleContent>
+                        <span className={cn(c.title === "Untitled" && "text-muted-foreground")}>{c.title}</span>
+                      </SidebarMenuSubButton>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <SidebarMenuSubAction
+                              showOnHover
+                              className="data-popup-open:bg-sidebar-accent data-popup-open:opacity-100"
+                            />
+                          }
+                        >
+                          <MoreHorizontal />
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="w-44">
+                          <DropdownMenuItem>
+                            <Share />
+                            Share
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setDialogState({ type: "rename", chatId: c.id })}>
+                            <Pencil />
+                            Rename
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Pin />
+                            Pin
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Folder />
+                            Add to project
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => setDialogState({ type: "delete", chatId: c.id })}
+                          >
+                            <Trash2 />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </SidebarMenuSubItem>
+                  ))}
+                  <SidebarMenuSubItem>
+                    <SidebarMenuSubButton
+                      render={<button />}
+                      className="w-full bg-transparent! text-[13px]! font-normal text-muted-foreground"
+                    >
+                      <span>See all</span>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                </SidebarMenuSub>
+              </CollapsibleContent>
+            </>
+          )}
 
           <RenameChatDialog
             chatId={dialogState?.chatId ?? ""}
