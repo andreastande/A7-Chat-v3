@@ -25,13 +25,19 @@ export function createChatHistoryStore(initialChats: ChatListItem[]) {
       serverAction: () => Promise<{ serverError?: string }>,
       previousChats: ChatListItem[],
     ): Promise<boolean> {
-      const { serverError } = await serverAction()
-      if (serverError) {
-        toast.error(serverError)
+      try {
+        const { serverError } = await serverAction()
+        if (serverError) {
+          toast.error(serverError)
+          set({ chats: previousChats })
+          return false
+        }
+        return true
+      } catch {
+        toast.error("An unexpected error occurred")
         set({ chats: previousChats })
         return false
       }
-      return true
     }
 
     return {
