@@ -2,7 +2,7 @@
 
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react"
 import { useStore } from "zustand"
-import { type ApiKeysStore, createApiKeysStore } from "@/stores/api-keys-store"
+import { type ApiKeysStore, createApiKeysStore } from "@/app/(sidebar)/_stores/api-keys-store"
 import { useSession } from "../../../../components/providers/session-provider"
 
 type ApiKeysStoreApi = ReturnType<typeof createApiKeysStore>

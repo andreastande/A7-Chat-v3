@@ -2,10 +2,10 @@ import Link from "next/link"
 import type { ComponentProps } from "react"
 import { useState } from "react"
 import { useChatHistoryStore } from "@/app/(sidebar)/_components/providers/chat-history-provider"
+import { useChatId } from "@/app/(sidebar)/_hooks/use-chat-id"
 import { Button } from "@/components/ui/button"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { useSidebar } from "@/components/ui/sidebar"
-import { useChatId } from "@/hooks/use-chat-id"
 import { cn } from "@/lib/utils"
 
 export function HistoryItemHoverCard({

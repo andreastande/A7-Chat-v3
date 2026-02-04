@@ -5,6 +5,7 @@ import { useState } from "react"
 import { DeleteChatDialog } from "@/app/(sidebar)/_components/dialogs/delete-chat-dialog"
 import { RenameChatDialog } from "@/app/(sidebar)/_components/dialogs/rename-chat-dialog"
 import { useChatHistoryStore } from "@/app/(sidebar)/_components/providers/chat-history-provider"
+import { useChatId } from "@/app/(sidebar)/_hooks/use-chat-id"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -13,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useChatId } from "@/hooks/use-chat-id"
 import { cn } from "@/lib/utils"
 
 export function ChatHeader() {

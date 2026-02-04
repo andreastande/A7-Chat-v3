@@ -3,7 +3,7 @@
 import { createContext, type ReactNode, useContext, useState } from "react"
 import { useStore } from "zustand"
 import type { Chat } from "@/db/schemas/chat"
-import { type ChatHistoryStore, createChatHistoryStore } from "../../../../stores/chat-history-store"
+import { type ChatHistoryStore, createChatHistoryStore } from "../../_stores/chat-history-store"
 
 type ChatHistoryStoreApi = ReturnType<typeof createChatHistoryStore>
 

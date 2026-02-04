@@ -2,9 +2,9 @@
 
 import { Star } from "lucide-react"
 import { useFavoriteModelsStore } from "@/app/(sidebar)/(chat)/_components/providers/favorite-models-provider"
+import { useChatId } from "@/app/(sidebar)/_hooks/use-chat-id"
 import { useSession } from "@/components/providers/session-provider"
 import { Button } from "@/components/ui/button"
-import { useChatId } from "@/hooks/use-chat-id"
 import type { Creator, Model as TModel } from "@/lib/models"
 import { cn } from "@/lib/utils"
 import { useSelectedModelStore } from "../../providers/selected-model-provider"

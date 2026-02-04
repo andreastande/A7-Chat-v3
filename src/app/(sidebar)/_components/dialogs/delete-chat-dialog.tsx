@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useChatHistoryStore } from "@/app/(sidebar)/_components/providers/chat-history-provider"
+import { useChatId } from "@/app/(sidebar)/_hooks/use-chat-id"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -12,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { useChatId } from "@/hooks/use-chat-id"
 
 export function DeleteChatDialog({
   chatId,

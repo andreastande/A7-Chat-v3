@@ -6,6 +6,7 @@ import { useState } from "react"
 import { DeleteChatDialog } from "@/app/(sidebar)/_components/dialogs/delete-chat-dialog"
 import { RenameChatDialog } from "@/app/(sidebar)/_components/dialogs/rename-chat-dialog"
 import { useChatHistoryStore } from "@/app/(sidebar)/_components/providers/chat-history-provider"
+import { useChatId } from "@/app/(sidebar)/_hooks/use-chat-id"
 import { useSession } from "@/components/providers/session-provider"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
@@ -25,7 +26,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { useChatId } from "@/hooks/use-chat-id"
 import { cn } from "@/lib/utils"
 import { HistoryItemHoverCard } from "./hover-cards/history-item-hover-card"
 
