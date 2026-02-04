@@ -11,8 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { WithTooltip } from "@/components/ui/tooltip"
+import { useKeyboardKeys } from "@/hooks/use-keyboard-keys"
 
 export function ChatInputActions() {
+  const { mod } = useKeyboardKeys()
+
   return (
     <DropdownMenu>
       <WithTooltip
@@ -31,7 +34,7 @@ export function ChatInputActions() {
         <DropdownMenuItem>
           <Paperclip />
           Add files or photos
-          <DropdownMenuShortcut showOnFocus>⌘D</DropdownMenuShortcut>
+          <DropdownMenuShortcut showOnFocus>{mod}D</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>

@@ -6,11 +6,13 @@ import { usePathname, useRouter } from "next/navigation"
 import { useHotkeys } from "react-hotkeys-hook"
 import { useSession } from "@/components/providers/session-provider"
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuShortcut } from "@/components/ui/sidebar"
+import { useKeyboardKeys } from "@/hooks/use-keyboard-keys"
 
 export function ChatItem() {
   const session = useSession()
   const pathname = usePathname()
   const router = useRouter()
+  const { mod, shift } = useKeyboardKeys()
 
   useHotkeys(
     "shift+mod+o",
@@ -30,7 +32,10 @@ export function ChatItem() {
         tooltip={
           <>
             Chat
-            <span className="ml-2 text-xs text-muted-foreground">⇧⌘O</span>
+            <span className="ml-2 text-xs text-muted-foreground">
+              {shift}
+              {mod}O
+            </span>
           </>
         }
         isActive={pathname === "/"}
@@ -39,7 +44,10 @@ export function ChatItem() {
       >
         <MessageCircle />
         Chat
-        <SidebarMenuShortcut showOnFocus>⇧⌘O</SidebarMenuShortcut>
+        <SidebarMenuShortcut showOnFocus>
+          {shift}
+          {mod}O
+        </SidebarMenuShortcut>
       </SidebarMenuButton>
     </SidebarMenuItem>
   )

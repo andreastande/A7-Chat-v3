@@ -26,6 +26,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { useKeyboardKeys } from "@/hooks/use-keyboard-keys"
 import { cn } from "@/lib/utils"
 import { HistoryItemHoverCard } from "./hover-cards/history-item-hover-card"
 
@@ -34,6 +35,7 @@ export function HistoryItem() {
   const chats = useChatHistoryStore((s) => s.chats)
   const chatId = useChatId()
   const [dialogState, setDialogState] = useState<{ type: "rename" | "delete"; chatId: string } | null>(null)
+  const { mod } = useKeyboardKeys()
 
   return (
     <SidebarMenuItem>
@@ -44,7 +46,7 @@ export function HistoryItem() {
           >
             <History />
             History
-            <SidebarMenuShortcut showOnFocus>⌘K</SidebarMenuShortcut>
+            <SidebarMenuShortcut showOnFocus>{mod}K</SidebarMenuShortcut>
           </HistoryItemHoverCard>
 
           <CollapsibleTrigger
