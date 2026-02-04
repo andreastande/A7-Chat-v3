@@ -47,7 +47,8 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
         }
       }}
       onClick={(e) => {
-        const excludedSlots = ["tooltip-content", "tooltip-trigger", "popover-content", "popover-trigger"]
+        // oxfmt-ignore
+        const excludedSlots = ["tooltip-content", "tooltip-trigger", "popover-content", "popover-trigger", "dropdown-menu-content"]
         if (!excludedSlots.some((slot) => (e.target as HTMLElement).closest(`[data-slot="${slot}"]`))) {
           textareaRef.current?.focus()
         }
