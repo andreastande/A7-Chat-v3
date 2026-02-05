@@ -2,6 +2,9 @@ import { defineEnv } from "envin"
 import * as z from "zod"
 
 const env = defineEnv({
+  shared: {
+    NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  },
   server: {
     DATABASE_URL: z.url(),
     BETTER_AUTH_SECRET: z.string().min(1),

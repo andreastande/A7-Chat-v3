@@ -1,9 +1,12 @@
+import { devToolsMiddleware } from "@ai-sdk/devtools"
 import { createOpenRouter } from "@openrouter/ai-sdk-provider"
-import { convertToModelMessages, generateId, streamText, type UIMessage, createGateway } from "ai"
+import { convertToModelMessages, generateId, streamText, createGateway, wrapLanguageModel } from "ai"
 import { getCurrentUser } from "@/dal/auth"
 import { getChatWithMessages, insertMessage } from "@/dal/chat"
 import type { ApiKeyPayload } from "@/lib/api-keys/types"
 import { getSystemPrompt, isValidModelId } from "@/lib/models"
+import type { UIMessage } from "@/types/ui-message"
+import env from "~/env.config"
 
 interface RequestBody {
   message: UIMessage
@@ -22,7 +25,7 @@ export async function POST(req: Request) {
 
   // Save user message before validation so it persists even if API key/model is invalid
   const messages = [...chat.messages, message]
-  await insertMessage({ chatId, ...message })
+  await insertMessage(chatId, message)
 
   if (!apiKey)
     return Response.json(
@@ -35,8 +38,16 @@ export async function POST(req: Request) {
   const provider =
     apiKey.provider === "openrouter" ? createOpenRouter({ apiKey: apiKey.key }) : createGateway({ apiKey: apiKey.key })
 
+  const model =
+    env.NODE_ENV === "development"
+      ? wrapLanguageModel({
+          model: provider(modelId),
+          middleware: devToolsMiddleware(),
+        })
+      : provider(modelId)
+
   const result = streamText({
-    model: provider(modelId),
+    model,
     messages: await convertToModelMessages(messages),
     system: getSystemPrompt(modelId),
   })
@@ -47,7 +58,15 @@ export async function POST(req: Request) {
     originalMessages: messages,
     generateMessageId: generateId,
     onFinish: async ({ responseMessage }) => {
-      await insertMessage({ chatId, ...responseMessage })
+      await insertMessage(chatId, responseMessage)
+    },
+    messageMetadata: ({ part }) => {
+      if (part.type === "finish") {
+        return {
+          modelId,
+          totalUsage: part.totalUsage,
+        }
+      }
     },
   })
 }

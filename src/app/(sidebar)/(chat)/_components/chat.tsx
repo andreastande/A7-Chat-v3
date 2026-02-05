@@ -1,7 +1,7 @@
 "use client"
 
 import { useChat } from "@ai-sdk-tools/store"
-import { DefaultChatTransport, type UIMessage } from "ai"
+import { DefaultChatTransport } from "ai"
 import { toast } from "sonner"
 import { generateChatTitle } from "@/actions/chat"
 import { useApiKeysStore } from "@/app/(sidebar)/_components/providers/api-keys-provider"
@@ -9,6 +9,7 @@ import { useChatHistoryStore } from "@/app/(sidebar)/_components/providers/chat-
 import { useSession } from "@/components/providers/session-provider"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
+import type { UIMessage } from "../../../../types/ui-message"
 import { useChatSession } from "../_hooks/use-chat-session"
 import { useScrollOnMount } from "../_hooks/use-scroll-on-mount"
 import { useScrollOnSubmit } from "../_hooks/use-scroll-on-submit"
@@ -32,7 +33,7 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
   const touchChat = useChatHistoryStore((s) => s.touchChat)
   const renameChat = useChatHistoryStore((s) => s.renameChat)
 
-  const { messages, status, error, sendMessage } = useChat({
+  const { messages, status, error, sendMessage } = useChat<UIMessage>({
     id,
     messages: initialMessages,
     transport: new DefaultChatTransport({

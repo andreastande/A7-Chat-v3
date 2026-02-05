@@ -19,6 +19,10 @@ pnpm fmt                 # Format code with Oxfmt
 pnpm db:push             # Push schema changes to database (no migrations generated)
 ```
 
+## Tools
+
+When looking up documentation for libraries in this project, use the context7 MCP plugin (`mcp__plugin_context7_context7__query-docs`) instead of web search for accurate, up-to-date information.
+
 ## Architecture Overview
 
 ### Tech Stack
