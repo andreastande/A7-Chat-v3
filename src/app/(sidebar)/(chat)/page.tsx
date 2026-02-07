@@ -1,6 +1,6 @@
 import { Provider as ChatProvider } from "@ai-sdk-tools/store"
 import { cookies } from "next/headers"
-import { getValidModelId } from "@/lib/models"
+import { getValidModelId } from "@/lib/models/utils"
 import { Chat } from "./_components/chat"
 import { Header } from "./_components/header"
 import { SelectedModelProvider } from "./_components/providers/selected-model-provider"

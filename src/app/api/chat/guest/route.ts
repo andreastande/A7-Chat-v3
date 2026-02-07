@@ -1,7 +1,7 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider"
 import { convertToModelMessages, createGateway, streamText, type UIMessage } from "ai"
 import type { ApiKeyPayload } from "@/lib/api-keys/types"
-import { getSystemPrompt, isValidModelId } from "@/lib/models"
+import { getSystemPrompt, isValidModelId } from "@/lib/models/utils"
 
 interface RequestBody {
   messages: UIMessage[]

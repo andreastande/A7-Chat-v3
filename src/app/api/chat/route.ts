@@ -4,7 +4,7 @@ import { convertToModelMessages, generateId, streamText, createGateway, wrapLang
 import { getCurrentUser } from "@/dal/auth"
 import { getChatWithMessages, insertMessage } from "@/dal/chat"
 import type { ApiKeyPayload } from "@/lib/api-keys/types"
-import { getSystemPrompt, isValidModelId } from "@/lib/models"
+import { getSystemPrompt, isValidModelId } from "@/lib/models/utils"
 import type { UIMessage } from "@/types/ui-message"
 import env from "~/env.config"
 

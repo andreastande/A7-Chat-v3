@@ -1,6 +1,6 @@
 import { Anthropic, DeepSeek, Gemini, Meta, Minimax, Moonshot, OpenAI, Qwen, XAI, ZAI } from "@lobehub/icons"
 import type { ComponentProps } from "react"
-import type { Creator } from "@/lib/models"
+import type { Creator } from "@/lib/models/types"
 
 const creatorLogos: Record<Creator, React.FC<ComponentProps<"svg">>> = {
   openai: OpenAI,

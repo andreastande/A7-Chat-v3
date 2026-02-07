@@ -5,7 +5,7 @@ import { useFavoriteModelsStore } from "@/app/(sidebar)/(chat)/_components/provi
 import { useChatId } from "@/app/(sidebar)/_hooks/use-chat-id"
 import { useSession } from "@/components/providers/session-provider"
 import { Button } from "@/components/ui/button"
-import type { Creator, Model as TModel } from "@/lib/models"
+import type { Creator, Model as TModel } from "@/lib/models/types"
 import { cn } from "@/lib/utils"
 import { useSelectedModelStore } from "../../providers/selected-model-provider"
 import { CreatorLogo } from "./creator-logo"

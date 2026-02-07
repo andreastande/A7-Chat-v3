@@ -13,7 +13,7 @@ import { restrictToFirstScrollableAncestor, restrictToVerticalAxis } from "@dnd-
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useState } from "react"
 import { useFavoriteModelsStore } from "@/app/(sidebar)/(chat)/_components/providers/favorite-models-provider"
-import type { Model } from "@/lib/models"
+import type { Model } from "@/lib/models/types"
 import { FavoriteModel } from "./favorite-model"
 
 interface FavoriteModelsListProps {

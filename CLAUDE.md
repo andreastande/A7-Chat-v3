@@ -109,3 +109,4 @@ Uses `envin` for type-safe env vars (`env.config.ts`):
 - Oxfmt excludes `src/components/ui` (shadcn components)
 - pnpm workspace ignores `sharp` and `unrs-resolver` built deps
 - Database uses `prepare: false` for transaction pool mode compatibility
+- Use `pnpm lint` (not `pnpm build`) to verify code changes - it's faster and sufficient for catching errors
