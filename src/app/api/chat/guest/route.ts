@@ -29,5 +29,14 @@ export async function POST(req: Request) {
     system: getSystemPrompt(modelId),
   })
 
-  return result.toUIMessageStreamResponse()
+  return result.toUIMessageStreamResponse({
+    messageMetadata: ({ part }) => {
+      if (part.type === "finish") {
+        return {
+          modelId,
+          totalUsage: part.totalUsage,
+        }
+      }
+    },
+  })
 }
