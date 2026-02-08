@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { useFocusOnType } from "../../_hooks/use-focus-on-type"
 import { ChatInputActions } from "./chat-input-actions"
 import { ModelPicker } from "./model-picker"
+import { TokenUsage } from "./token-usage"
 
 interface ChatInputProps {
   className?: string
@@ -48,7 +49,7 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
       }}
       onClick={(e) => {
         // oxfmt-ignore
-        const excludedSlots = ["tooltip-content", "tooltip-trigger", "popover-content", "popover-trigger", "dropdown-menu-content"]
+        const excludedSlots = ["tooltip-content", "tooltip-trigger", "popover-content", "popover-trigger", "dropdown-menu-content", "hover-card-content"]
         if (!excludedSlots.some((slot) => (e.target as HTMLElement).closest(`[data-slot="${slot}"]`))) {
           textareaRef.current?.focus()
         }
@@ -80,9 +81,12 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
           <Separator orientation="vertical" className="h-4 self-center!" />
           <ModelPicker />
         </div>
-        <Button data-submit size="icon-sm" disabled={!(canSend || canStop)}>
-          {canStop ? <Square /> : <ArrowUp />}
-        </Button>
+        <div className="flex items-center gap-2">
+          <TokenUsage />
+          <Button data-submit size="icon-sm" disabled={!(canSend || canStop)}>
+            {canStop ? <Square /> : <ArrowUp />}
+          </Button>
+        </div>
       </div>
     </form>
   )

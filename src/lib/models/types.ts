@@ -1,12 +1,6 @@
-export type Tier = {
+export type PriceTier = {
   cost: number
-  min: number
-  max?: number
-}
-
-export type PriceSchedule = {
-  base: number
-  tiers?: Tier[]
+  upTo?: number
 }
 
 export type Model = {
@@ -15,13 +9,13 @@ export type Model = {
   maxContextTokens: number
   maxOutputTokens: number
   pricing: {
-    input: PriceSchedule
-    inputCacheRead?: PriceSchedule
-    output: PriceSchedule
+    input: number | PriceTier[]
+    inputCacheRead?: number | PriceTier[]
+    output: number | PriceTier[]
   }
 }
 
-export type Creator =
+export type CreatorId =
   | "openai"
   | "anthropic"
   | "google"
@@ -32,3 +26,8 @@ export type Creator =
   | "alibaba"
   | "meta"
   | "minimax"
+
+export type Creator = {
+  name: string
+  models: Model[]
+}

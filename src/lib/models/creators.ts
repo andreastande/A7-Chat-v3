@@ -1,4 +1,4 @@
-import type { Model, Creator } from "./types"
+import type { Creator, CreatorId } from "./types"
 
 export const creators = {
   openai: {
@@ -10,9 +10,9 @@ export const creators = {
         maxContextTokens: 400000,
         maxOutputTokens: 128000,
         pricing: {
-          input: { base: 1.75 },
-          inputCacheRead: { base: 0.18 },
-          output: { base: 14 },
+          input: 1.75,
+          inputCacheRead: 0.18,
+          output: 14,
         },
       },
       {
@@ -21,9 +21,9 @@ export const creators = {
         maxContextTokens: 400000,
         maxOutputTokens: 128000,
         pricing: {
-          input: { base: 1.25 },
-          inputCacheRead: { base: 0.13 },
-          output: { base: 10 },
+          input: 1.25,
+          inputCacheRead: 0.13,
+          output: 10,
         },
       },
       {
@@ -32,9 +32,9 @@ export const creators = {
         maxContextTokens: 400000,
         maxOutputTokens: 128000,
         pricing: {
-          input: { base: 0.25 },
-          inputCacheRead: { base: 0.03 },
-          output: { base: 2 },
+          input: 0.25,
+          inputCacheRead: 0.03,
+          output: 2,
         },
       },
       {
@@ -43,9 +43,9 @@ export const creators = {
         maxContextTokens: 128000,
         maxOutputTokens: 16384,
         pricing: {
-          input: { base: 2.5 },
-          inputCacheRead: { base: 1.25 },
-          output: { base: 10 },
+          input: 2.5,
+          inputCacheRead: 1.25,
+          output: 10,
         },
       },
       {
@@ -54,8 +54,8 @@ export const creators = {
         maxContextTokens: 131072,
         maxOutputTokens: 131072,
         pricing: {
-          input: { base: 0.1 },
-          output: { base: 0.5 },
+          input: 0.1,
+          output: 0.5,
         },
       },
       {
@@ -64,8 +64,8 @@ export const creators = {
         maxContextTokens: 128000,
         maxOutputTokens: 8192,
         pricing: {
-          input: { base: 0.07 },
-          output: { base: 0.3 },
+          input: 0.07,
+          output: 0.3,
         },
       },
     ],
@@ -79,27 +79,9 @@ export const creators = {
         maxContextTokens: 1000000,
         maxOutputTokens: 64000,
         pricing: {
-          input: {
-            base: 3,
-            tiers: [
-              { cost: 3, min: 0, max: 200001 },
-              { cost: 6, min: 200001 },
-            ],
-          },
-          inputCacheRead: {
-            base: 0.3,
-            tiers: [
-              { cost: 0.3, min: 0, max: 200001 },
-              { cost: 0.6, min: 200001 },
-            ],
-          },
-          output: {
-            base: 15,
-            tiers: [
-              { cost: 15, min: 0, max: 200001 },
-              { cost: 22.5, min: 200001 },
-            ],
-          },
+          input: [{ cost: 3, upTo: 200_000 }, { cost: 6 }],
+          inputCacheRead: [{ cost: 0.3, upTo: 200_000 }, { cost: 0.6 }],
+          output: [{ cost: 15, upTo: 200_000 }, { cost: 22.5 }],
         },
       },
       {
@@ -108,9 +90,9 @@ export const creators = {
         maxContextTokens: 200000,
         maxOutputTokens: 64000,
         pricing: {
-          input: { base: 1 },
-          inputCacheRead: { base: 0.1 },
-          output: { base: 5 },
+          input: 1,
+          inputCacheRead: 0.1,
+          output: 5,
         },
       },
       {
@@ -119,9 +101,9 @@ export const creators = {
         maxContextTokens: 200000,
         maxOutputTokens: 64000,
         pricing: {
-          input: { base: 5 },
-          inputCacheRead: { base: 0.5 },
-          output: { base: 25 },
+          input: 5,
+          inputCacheRead: 0.5,
+          output: 25,
         },
       },
     ],
@@ -135,27 +117,9 @@ export const creators = {
         maxContextTokens: 1000000,
         maxOutputTokens: 64000,
         pricing: {
-          input: {
-            base: 0.5,
-            tiers: [
-              { cost: 0.5, min: 0, max: 200001 },
-              { cost: 0.5, min: 200001 },
-            ],
-          },
-          inputCacheRead: {
-            base: 0.05,
-            tiers: [
-              { cost: 0.05, min: 0, max: 200001 },
-              { cost: 0.05, min: 200001 },
-            ],
-          },
-          output: {
-            base: 3,
-            tiers: [
-              { cost: 3, min: 0, max: 200001 },
-              { cost: 3, min: 200001 },
-            ],
-          },
+          input: 0.5,
+          inputCacheRead: 0.05,
+          output: 3,
         },
       },
       {
@@ -164,27 +128,9 @@ export const creators = {
         maxContextTokens: 1000000,
         maxOutputTokens: 64000,
         pricing: {
-          input: {
-            base: 2,
-            tiers: [
-              { cost: 2, min: 0, max: 200001 },
-              { cost: 4, min: 200001 },
-            ],
-          },
-          inputCacheRead: {
-            base: 0.2,
-            tiers: [
-              { cost: 0.2, min: 0, max: 200001 },
-              { cost: 0.4, min: 200001 },
-            ],
-          },
-          output: {
-            base: 12,
-            tiers: [
-              { cost: 12, min: 0, max: 200001 },
-              { cost: 18, min: 200001 },
-            ],
-          },
+          input: [{ cost: 2, upTo: 200_000 }, { cost: 4 }],
+          inputCacheRead: [{ cost: 0.2, upTo: 200_000 }, { cost: 0.4 }],
+          output: [{ cost: 12, upTo: 200_000 }, { cost: 18 }],
         },
       },
       {
@@ -193,8 +139,8 @@ export const creators = {
         maxContextTokens: 65536,
         maxOutputTokens: 32768,
         pricing: {
-          input: { base: 2 },
-          output: { base: 120 },
+          input: 2,
+          output: 120,
         },
       },
     ],
@@ -208,21 +154,9 @@ export const creators = {
         maxContextTokens: 2000000,
         maxOutputTokens: 30000,
         pricing: {
-          input: {
-            base: 0.2,
-            tiers: [
-              { cost: 0.2, min: 0, max: 128001 },
-              { cost: 0.4, min: 128001 },
-            ],
-          },
-          inputCacheRead: { base: 0.05 },
-          output: {
-            base: 0.5,
-            tiers: [
-              { cost: 0.5, min: 0, max: 128001 },
-              { cost: 1, min: 128001 },
-            ],
-          },
+          input: [{ cost: 0.2, upTo: 128_000 }, { cost: 0.4 }],
+          inputCacheRead: 0.05,
+          output: [{ cost: 0.5, upTo: 128_000 }, { cost: 1 }],
         },
       },
       {
@@ -231,21 +165,9 @@ export const creators = {
         maxContextTokens: 2000000,
         maxOutputTokens: 30000,
         pricing: {
-          input: {
-            base: 0.2,
-            tiers: [
-              { cost: 0.2, min: 0, max: 128001 },
-              { cost: 0.4, min: 128001 },
-            ],
-          },
-          inputCacheRead: { base: 0.05 },
-          output: {
-            base: 0.5,
-            tiers: [
-              { cost: 0.5, min: 0, max: 128001 },
-              { cost: 1, min: 128001 },
-            ],
-          },
+          input: [{ cost: 0.2, upTo: 128_000 }, { cost: 0.4 }],
+          inputCacheRead: 0.05,
+          output: [{ cost: 0.5, upTo: 128_000 }, { cost: 1 }],
         },
       },
       {
@@ -254,9 +176,9 @@ export const creators = {
         maxContextTokens: 256000,
         maxOutputTokens: 256000,
         pricing: {
-          input: { base: 0.2 },
-          inputCacheRead: { base: 0.02 },
-          output: { base: 1.5 },
+          input: 0.2,
+          inputCacheRead: 0.02,
+          output: 1.5,
         },
       },
     ],
@@ -270,9 +192,9 @@ export const creators = {
         maxContextTokens: 202752,
         maxOutputTokens: 120000,
         pricing: {
-          input: { base: 0.43 },
-          inputCacheRead: { base: 0.08 },
-          output: { base: 1.75 },
+          input: 0.43,
+          inputCacheRead: 0.08,
+          output: 1.75,
         },
       },
     ],
@@ -286,8 +208,8 @@ export const creators = {
         maxContextTokens: 131072,
         maxOutputTokens: 16384,
         pricing: {
-          input: { base: 0.5 },
-          output: { base: 2 },
+          input: 0.5,
+          output: 2,
         },
       },
       {
@@ -296,8 +218,8 @@ export const creators = {
         maxContextTokens: 256000,
         maxOutputTokens: 16384,
         pricing: {
-          input: { base: 2.4 },
-          output: { base: 10 },
+          input: 2.4,
+          output: 10,
         },
       },
       {
@@ -306,9 +228,9 @@ export const creators = {
         maxContextTokens: 216144,
         maxOutputTokens: 216144,
         pricing: {
-          input: { base: 0.47 },
-          inputCacheRead: { base: 0.141 },
-          output: { base: 2 },
+          input: 0.47,
+          inputCacheRead: 0.141,
+          output: 2,
         },
       },
       {
@@ -317,9 +239,9 @@ export const creators = {
         maxContextTokens: 262114,
         maxOutputTokens: 262114,
         pricing: {
-          input: { base: 1.15 },
-          inputCacheRead: { base: 0.15 },
-          output: { base: 8 },
+          input: 1.15,
+          inputCacheRead: 0.15,
+          output: 8,
         },
       },
     ],
@@ -333,9 +255,9 @@ export const creators = {
         maxContextTokens: 163842,
         maxOutputTokens: 8000,
         pricing: {
-          input: { base: 0.27 },
-          inputCacheRead: { base: 0.216 },
-          output: { base: 0.4 },
+          input: 0.27,
+          inputCacheRead: 0.216,
+          output: 0.4,
         },
       },
       {
@@ -344,9 +266,9 @@ export const creators = {
         maxContextTokens: 128000,
         maxOutputTokens: 64000,
         pricing: {
-          input: { base: 0.28 },
-          inputCacheRead: { base: 0.028 },
-          output: { base: 0.42 },
+          input: 0.28,
+          inputCacheRead: 0.028,
+          output: 0.42,
         },
       },
       {
@@ -355,8 +277,8 @@ export const creators = {
         maxContextTokens: 163840,
         maxOutputTokens: 163840,
         pricing: {
-          input: { base: 0.27 },
-          output: { base: 0.4 },
+          input: 0.27,
+          output: 0.4,
         },
       },
       {
@@ -365,9 +287,9 @@ export const creators = {
         maxContextTokens: 160000,
         maxOutputTokens: 16384,
         pricing: {
-          input: { base: 0.5 },
-          inputCacheRead: { base: 0.4 },
-          output: { base: 2.15 },
+          input: 0.5,
+          inputCacheRead: 0.4,
+          output: 2.15,
         },
       },
     ],
@@ -381,8 +303,8 @@ export const creators = {
         maxContextTokens: 40960,
         maxOutputTokens: 16384,
         pricing: {
-          input: { base: 0.071 },
-          output: { base: 0.463 },
+          input: 0.071,
+          output: 0.463,
         },
       },
       {
@@ -391,22 +313,8 @@ export const creators = {
         maxContextTokens: 262144,
         maxOutputTokens: 65536,
         pricing: {
-          input: {
-            base: 0.845,
-            tiers: [
-              { cost: 0.845, min: 0, max: 32769 },
-              { cost: 1.4, min: 32769, max: 131073 },
-              { cost: 2.11, min: 131073 },
-            ],
-          },
-          output: {
-            base: 3.38,
-            tiers: [
-              { cost: 3.38, min: 0, max: 32769 },
-              { cost: 5.64, min: 32769, max: 131073 },
-              { cost: 8.45, min: 131073 },
-            ],
-          },
+          input: [{ cost: 0.845, upTo: 32_768 }, { cost: 1.4, upTo: 131_072 }, { cost: 2.11 }],
+          output: [{ cost: 3.38, upTo: 32_768 }, { cost: 5.64, upTo: 131_072 }, { cost: 8.45 }],
         },
       },
     ],
@@ -420,8 +328,8 @@ export const creators = {
         maxContextTokens: 131072,
         maxOutputTokens: 8192,
         pricing: {
-          input: { base: 0.15 },
-          output: { base: 0.6 },
+          input: 0.15,
+          output: 0.6,
         },
       },
       {
@@ -430,8 +338,8 @@ export const creators = {
         maxContextTokens: 131072,
         maxOutputTokens: 8192,
         pricing: {
-          input: { base: 0.08 },
-          output: { base: 0.3 },
+          input: 0.08,
+          output: 0.3,
         },
       },
     ],
@@ -445,9 +353,9 @@ export const creators = {
         maxContextTokens: 204800,
         maxOutputTokens: 131072,
         pricing: {
-          input: { base: 0.3 },
-          inputCacheRead: { base: 0.15 },
-          output: { base: 1.2 },
+          input: 0.3,
+          inputCacheRead: 0.15,
+          output: 1.2,
         },
       },
       {
@@ -456,14 +364,14 @@ export const creators = {
         maxContextTokens: 204800,
         maxOutputTokens: 131072,
         pricing: {
-          input: { base: 0.3 },
-          inputCacheRead: { base: 0.03 },
-          output: { base: 2.4 },
+          input: 0.3,
+          inputCacheRead: 0.03,
+          output: 2.4,
         },
       },
     ],
   },
-} satisfies Record<string, { name: string; models: Model[] }>
+} satisfies Record<string, Creator>
 
-export const creatorIds = Object.keys(creators) as Creator[]
+export const creatorIds = Object.keys(creators) as CreatorId[]
 export const allModels = Object.values(creators).flatMap((c) => c.models)
