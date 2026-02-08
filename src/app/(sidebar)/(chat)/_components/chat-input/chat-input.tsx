@@ -41,11 +41,7 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
     <form
       onSubmit={(e) => {
         e.preventDefault()
-        // Should shadcn-button default to type=button?
-        const submitter = (e.nativeEvent as SubmitEvent).submitter
-        if (submitter?.hasAttribute("data-submit")) {
-          handleSubmit()
-        }
+        handleSubmit()
       }}
       onClick={(e) => {
         // oxfmt-ignore
@@ -71,7 +67,7 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault()
-            handleSubmit()
+            e.currentTarget.form?.requestSubmit()
           }
         }}
       />
@@ -83,7 +79,7 @@ export function ChatInput({ className, sendMessage }: ChatInputProps) {
         </div>
         <div className="flex items-center gap-2">
           <TokenUsage />
-          <Button data-submit size="icon-sm" disabled={!(canSend || canStop)}>
+          <Button type="submit" size="icon-sm" disabled={!(canSend || canStop)}>
             {canStop ? <Square /> : <ArrowUp />}
           </Button>
         </div>
