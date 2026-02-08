@@ -1,9 +1,9 @@
 "server-only"
 
-import type { UIMessage } from "ai"
 import { and, eq, max } from "drizzle-orm"
 import { db } from "@/db"
-import { type Chat, chat, favoriteModel, message } from "@/db/schemas/chat"
+import { type Chat, chat, favoriteModel, message as messageTable } from "@/db/schemas/chat"
+import type { UIMessage } from "@/types/ui-message"
 import { requireAuth } from "./auth"
 
 // =============================================================================
@@ -59,12 +59,19 @@ export async function getChatWithMessages(chatId: string): Promise<(Chat & { mes
     with: {
       messages: {
         orderBy: (messages, { asc }) => asc(messages.createdAt),
-        columns: { id: true, role: true, parts: true },
+        columns: { chatId: false, createdAt: false },
       },
     },
   })
 
-  return result ?? null
+  if (!result) return null
+  return {
+    ...result,
+    messages: result.messages.map((m) => ({
+      ...m,
+      metadata: m.metadata ?? undefined,
+    })),
+  }
 }
 
 // =============================================================================
@@ -88,17 +95,7 @@ export async function createChat(chatId: string, modelId: string) {
  * Insert a message into a chat.
  * Verifies user owns the chat before inserting.
  */
-export async function insertMessage({
-  id,
-  chatId,
-  role,
-  parts,
-}: {
-  id: string
-  chatId: string
-  role: UIMessage["role"]
-  parts: UIMessage["parts"]
-}) {
+export async function insertMessage(chatId: string, message: UIMessage) {
   const user = await requireAuth()
 
   // Verify ownership
@@ -112,11 +109,9 @@ export async function insertMessage({
     throw new Error("Chat not found")
   }
 
-  await db.insert(message).values({
-    id,
+  await db.insert(messageTable).values({
     chatId,
-    role,
-    parts,
+    ...message,
   })
 }
 
@@ -124,14 +119,7 @@ export async function insertMessage({
  * Insert multiple messages into a chat (batch insert).
  * Useful for saving both user message and AI response together.
  */
-export async function insertMessages(
-  chatId: string,
-  messages: Array<{
-    id: string
-    role: UIMessage["role"]
-    parts: UIMessage["parts"]
-  }>,
-) {
+export async function insertMessages(chatId: string, messages: UIMessage[]) {
   const user = await requireAuth()
 
   // Verify ownership
@@ -145,7 +133,7 @@ export async function insertMessages(
     throw new Error("Chat not found")
   }
 
-  await db.insert(message).values(messages.map((m) => ({ ...m, chatId })))
+  await db.insert(messageTable).values(messages.map((m) => ({ ...m, chatId })))
 }
 
 /**

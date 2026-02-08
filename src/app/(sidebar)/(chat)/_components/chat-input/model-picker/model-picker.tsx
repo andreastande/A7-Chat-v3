@@ -9,7 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import { WithTooltip } from "@/components/ui/tooltip"
-import { allModels, type Creator, creatorIds, getCreatorName, getModelsByCreator } from "@/lib/models"
+import { allModels, creatorIds } from "@/lib/models/creators"
+import type { CreatorId } from "@/lib/models/types"
+import { getCreator, getModelsByCreator } from "@/lib/models/utils"
 import { cn } from "@/lib/utils"
 import { useSelectedModelStore } from "../../providers/selected-model-provider"
 import { CreatorLogo } from "./creator-logo"
@@ -23,7 +25,7 @@ export function ModelPicker() {
 
   const [input, setInput] = useState("")
   const [open, setOpen] = useState(false)
-  const [selectedFilter, setSelectedFilter] = useState<"favorites" | Creator>(() =>
+  const [selectedFilter, setSelectedFilter] = useState<"favorites" | CreatorId>(() =>
     session ? "favorites" : creatorIds[0],
   )
 
@@ -47,7 +49,7 @@ export function ModelPicker() {
       }}
     >
       <PopoverTrigger render={<Button variant="ghost" size="sm" className="font-normal" />}>
-        <CreatorLogo creator={selectedModelId.split("/")[0] as Creator} className="size-3" />
+        <CreatorLogo creator={selectedModelId.split("/")[0] as CreatorId} className="size-3" />
         {allModels.find((m) => m.id === selectedModelId)?.name}
         <ChevronDown className="ml-1.5 text-muted-foreground" />
       </PopoverTrigger>
@@ -69,7 +71,7 @@ export function ModelPicker() {
           {!input.trim() && (
             <div
               tabIndex={-1}
-              className="no-scrollbar flex w-10 flex-col items-center space-y-1 overflow-y-auto border-r p-1"
+              className="no-scrollbar flex w-10 flex-col items-center space-y-1 overflow-y-auto border-r bg-muted/35 p-1 dark:bg-background/20"
             >
               {favorites.length > 0 && (
                 <>
@@ -94,7 +96,7 @@ export function ModelPicker() {
               {creatorIds.map((id) => (
                 <WithTooltip
                   key={id}
-                  content={getCreatorName(id)}
+                  content={getCreator(id).name}
                   side="left"
                   delay={400}
                   render={

@@ -1,5 +1,5 @@
-import type { UIMessage } from "ai"
 import { index, integer, jsonb, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core"
+import type { UIMessage } from "@/types/ui-message"
 import { user } from "./auth"
 
 export const chat = pgTable(
@@ -32,6 +32,7 @@ export const message = pgTable(
       .references(() => chat.id, { onDelete: "cascade" }),
     role: text().$type<UIMessage["role"]>().notNull(),
     parts: jsonb().$type<UIMessage["parts"]>().notNull(),
+    metadata: jsonb().$type<UIMessage["metadata"]>(),
     createdAt: timestamp().defaultNow().notNull(),
   },
   (table) => [

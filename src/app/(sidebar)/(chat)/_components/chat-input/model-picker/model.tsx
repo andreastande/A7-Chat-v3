@@ -5,7 +5,7 @@ import { useFavoriteModelsStore } from "@/app/(sidebar)/(chat)/_components/provi
 import { useChatId } from "@/app/(sidebar)/_hooks/use-chat-id"
 import { useSession } from "@/components/providers/session-provider"
 import { Button } from "@/components/ui/button"
-import type { Creator, Model as TModel } from "@/lib/models"
+import type { CreatorId, Model as TModel } from "@/lib/models/types"
 import { cn } from "@/lib/utils"
 import { useSelectedModelStore } from "../../providers/selected-model-provider"
 import { CreatorLogo } from "./creator-logo"
@@ -39,7 +39,7 @@ export function Model({ model, showCreatorLogo, closeModelPicker }: ModelProps) 
           closeModelPicker()
         }}
       >
-        {showCreatorLogo && <CreatorLogo creator={model.id.split("/")[0] as Creator} className="size-3" />}
+        {showCreatorLogo && <CreatorLogo creator={model.id.split("/")[0] as CreatorId} className="size-3" />}
         <span className="truncate group-hover/model:pr-10 group-has-focus-visible/model:pr-10">{model.name}</span>
       </Button>
       {session && (

@@ -5,8 +5,8 @@ import { useChatStatus } from "@ai-sdk-tools/store"
 import { code } from "@streamdown/code"
 import { math } from "@streamdown/math"
 import { mermaid } from "@streamdown/mermaid"
-import type { UIMessage } from "ai"
 import { Streamdown } from "streamdown"
+import type { UIMessage } from "@/types/ui-message"
 
 function UserMessage({ message }: { message: UIMessage }) {
   const content = message.parts.find((part) => part.type === "text")?.text
@@ -20,6 +20,7 @@ function UserMessage({ message }: { message: UIMessage }) {
 
 function AssistantMessage({ message }: { message: UIMessage }) {
   const status = useChatStatus()
+
   return message.parts.map((part, i) => {
     switch (part.type) {
       case "text":
