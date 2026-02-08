@@ -248,7 +248,7 @@ const DEFAULT_FAVORITE_MODELS = [
   "anthropic/claude-sonnet-4.5",
   "google/gemini-3-flash",
   "zai/glm-4.7",
-  "moonshotai/kimi-k2",
+  "moonshotai/kimi-k2.5",
 ]
 
 /**

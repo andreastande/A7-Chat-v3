@@ -13,7 +13,8 @@
     "fmt:check": "oxfmt --check",
     "db:push": "drizzle-kit push",
     "clean": "rm -rf .next node_modules pnpm-lock.yaml && pnpm install",
-    "verify-models": "tsx scripts/verify-models.ts"
+    "verify-models": "tsx scripts/verify-models.ts",
+    "devtools": "ai-sdk-devtools"
   },
   "dependencies": {
     "@ai-sdk-tools/store": "2.0.0-beta.0",

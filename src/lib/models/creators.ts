@@ -96,14 +96,14 @@ export const creators = {
         },
       },
       {
-        id: "anthropic/claude-opus-4.5",
-        name: "Claude Opus 4.5",
-        maxContextTokens: 200000,
-        maxOutputTokens: 64000,
+        id: "anthropic/claude-opus-4.6",
+        name: "Claude Opus 4.6",
+        maxContextTokens: 1000000,
+        maxOutputTokens: 128000,
         pricing: {
-          input: 5,
-          inputCacheRead: 0.5,
-          output: 25,
+          input: [{ cost: 5, upTo: 200_000 }, { cost: 10 }],
+          inputCacheRead: [{ cost: 0.5, upTo: 200_000 }, { cost: 1 }],
+          output: [{ cost: 25, upTo: 200_000 }, { cost: 37.5 }],
         },
       },
     ],
@@ -202,6 +202,16 @@ export const creators = {
   moonshotai: {
     name: "Moonshot AI",
     models: [
+      {
+        id: "moonshotai/kimi-k2.5",
+        name: "Kimi K2.5",
+        maxContextTokens: 256000,
+        maxOutputTokens: 256000,
+        pricing: {
+          input: 0.5,
+          output: 2.8,
+        },
+      },
       {
         id: "moonshotai/kimi-k2",
         name: "Kimi K2",
