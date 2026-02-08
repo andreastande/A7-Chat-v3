@@ -11,8 +11,8 @@ export const creators = {
         maxOutputTokens: 128000,
         pricing: {
           input: 1.75,
-          inputCacheRead: 0.18,
           output: 14,
+          inputCacheRead: 0.18,
         },
       },
       {
@@ -22,8 +22,8 @@ export const creators = {
         maxOutputTokens: 128000,
         pricing: {
           input: 1.25,
-          inputCacheRead: 0.13,
           output: 10,
+          inputCacheRead: 0.13,
         },
       },
       {
@@ -33,8 +33,8 @@ export const creators = {
         maxOutputTokens: 128000,
         pricing: {
           input: 0.25,
-          inputCacheRead: 0.03,
           output: 2,
+          inputCacheRead: 0.03,
         },
       },
       {
@@ -44,8 +44,8 @@ export const creators = {
         maxOutputTokens: 16384,
         pricing: {
           input: 2.5,
-          inputCacheRead: 1.25,
           output: 10,
+          inputCacheRead: 1.25,
         },
       },
       {
@@ -80,8 +80,9 @@ export const creators = {
         maxOutputTokens: 64000,
         pricing: {
           input: [{ cost: 3, upTo: 200_000 }, { cost: 6 }],
-          inputCacheRead: [{ cost: 0.3, upTo: 200_000 }, { cost: 0.6 }],
           output: [{ cost: 15, upTo: 200_000 }, { cost: 22.5 }],
+          inputCacheRead: [{ cost: 0.3, upTo: 200_000 }, { cost: 0.6 }],
+          inputCacheWrite: [{ cost: 3.75, upTo: 200_000 }, { cost: 7.5 }],
         },
       },
       {
@@ -91,8 +92,9 @@ export const creators = {
         maxOutputTokens: 64000,
         pricing: {
           input: 1,
-          inputCacheRead: 0.1,
           output: 5,
+          inputCacheRead: 0.1,
+          inputCacheWrite: 1.25,
         },
       },
       {
@@ -102,8 +104,9 @@ export const creators = {
         maxOutputTokens: 128000,
         pricing: {
           input: [{ cost: 5, upTo: 200_000 }, { cost: 10 }],
-          inputCacheRead: [{ cost: 0.5, upTo: 200_000 }, { cost: 1 }],
           output: [{ cost: 25, upTo: 200_000 }, { cost: 37.5 }],
+          inputCacheRead: [{ cost: 0.5, upTo: 200_000 }, { cost: 1 }],
+          inputCacheWrite: [{ cost: 6.25, upTo: 200_000 }, { cost: 12.5 }],
         },
       },
     ],
@@ -118,8 +121,8 @@ export const creators = {
         maxOutputTokens: 64000,
         pricing: {
           input: 0.5,
-          inputCacheRead: 0.05,
           output: 3,
+          inputCacheRead: 0.05,
         },
       },
       {
@@ -129,8 +132,8 @@ export const creators = {
         maxOutputTokens: 64000,
         pricing: {
           input: [{ cost: 2, upTo: 200_000 }, { cost: 4 }],
-          inputCacheRead: [{ cost: 0.2, upTo: 200_000 }, { cost: 0.4 }],
           output: [{ cost: 12, upTo: 200_000 }, { cost: 18 }],
+          inputCacheRead: [{ cost: 0.2, upTo: 200_000 }, { cost: 0.4 }],
         },
       },
       {
@@ -155,8 +158,8 @@ export const creators = {
         maxOutputTokens: 30000,
         pricing: {
           input: [{ cost: 0.2, upTo: 128_000 }, { cost: 0.4 }],
-          inputCacheRead: 0.05,
           output: [{ cost: 0.5, upTo: 128_000 }, { cost: 1 }],
+          inputCacheRead: 0.05,
         },
       },
       {
@@ -166,8 +169,8 @@ export const creators = {
         maxOutputTokens: 30000,
         pricing: {
           input: [{ cost: 0.2, upTo: 128_000 }, { cost: 0.4 }],
-          inputCacheRead: 0.05,
           output: [{ cost: 0.5, upTo: 128_000 }, { cost: 1 }],
+          inputCacheRead: 0.05,
         },
       },
       {
@@ -177,8 +180,8 @@ export const creators = {
         maxOutputTokens: 256000,
         pricing: {
           input: 0.2,
-          inputCacheRead: 0.02,
           output: 1.5,
+          inputCacheRead: 0.02,
         },
       },
     ],
@@ -193,8 +196,8 @@ export const creators = {
         maxOutputTokens: 120000,
         pricing: {
           input: 0.43,
-          inputCacheRead: 0.08,
           output: 1.75,
+          inputCacheRead: 0.08,
         },
       },
     ],
@@ -239,8 +242,8 @@ export const creators = {
         maxOutputTokens: 216144,
         pricing: {
           input: 0.47,
-          inputCacheRead: 0.141,
           output: 2,
+          inputCacheRead: 0.141,
         },
       },
       {
@@ -250,8 +253,8 @@ export const creators = {
         maxOutputTokens: 262114,
         pricing: {
           input: 1.15,
-          inputCacheRead: 0.15,
           output: 8,
+          inputCacheRead: 0.15,
         },
       },
     ],
@@ -266,8 +269,8 @@ export const creators = {
         maxOutputTokens: 8000,
         pricing: {
           input: 0.27,
-          inputCacheRead: 0.216,
           output: 0.4,
+          inputCacheRead: 0.216,
         },
       },
       {
@@ -277,8 +280,8 @@ export const creators = {
         maxOutputTokens: 64000,
         pricing: {
           input: 0.28,
-          inputCacheRead: 0.028,
           output: 0.42,
+          inputCacheRead: 0.028,
         },
       },
       {
@@ -298,8 +301,8 @@ export const creators = {
         maxOutputTokens: 16384,
         pricing: {
           input: 0.5,
-          inputCacheRead: 0.4,
           output: 2.15,
+          inputCacheRead: 0.4,
         },
       },
     ],
@@ -364,8 +367,8 @@ export const creators = {
         maxOutputTokens: 131072,
         pricing: {
           input: 0.3,
-          inputCacheRead: 0.15,
           output: 1.2,
+          inputCacheRead: 0.15,
         },
       },
       {
@@ -375,8 +378,9 @@ export const creators = {
         maxOutputTokens: 131072,
         pricing: {
           input: 0.3,
-          inputCacheRead: 0.03,
           output: 2.4,
+          inputCacheRead: 0.03,
+          inputCacheWrite: 0.375,
         },
       },
     ],

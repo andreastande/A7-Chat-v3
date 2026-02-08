@@ -110,6 +110,21 @@ async function main() {
     } else if (api.pricing.input_cache_read) {
       err("pricing.inputCacheRead", `${toMTok(api.pricing.input_cache_read)} (from API)`, "missing locally")
     }
+
+    if (model.pricing.inputCacheWrite !== undefined) {
+      if (!api.pricing.input_cache_write) {
+        err("pricing.inputCacheWrite", "missing in API", JSON.stringify(model.pricing.inputCacheWrite))
+      } else {
+        comparePricing(
+          "pricing.inputCacheWrite",
+          model.pricing.inputCacheWrite,
+          api.pricing.input_cache_write,
+          api.pricing.input_cache_write_tiers,
+        )
+      }
+    } else if (api.pricing.input_cache_write) {
+      err("pricing.inputCacheWrite", `${toMTok(api.pricing.input_cache_write)} (from API)`, "missing locally")
+    }
   }
 
   if (errors > 0) {

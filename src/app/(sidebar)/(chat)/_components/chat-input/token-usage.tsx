@@ -110,14 +110,16 @@ export function TokenUsage() {
               <span className="text-foreground">{formatPrice(cumulative.reasoningCost)}</span>
             </p>
           </div>
-          <div className="flex justify-between">
-            <p>Cached read</p>
-            <p>
-              {formatTokenAmount(cumulative.cacheReadTokens)}
-              <span className="px-1.5">•</span>
-              <span className="text-foreground">{formatPrice(cumulative.cacheReadCost)}</span>
-            </p>
-          </div>
+          {cumulative.cacheTokens > 0 && (
+            <div className="flex justify-between">
+              <p>Cache</p>
+              <p>
+                {formatTokenAmount(cumulative.cacheTokens)}
+                <span className="px-1.5">•</span>
+                <span className="text-foreground">{formatPrice(cumulative.cacheCost)}</span>
+              </p>
+            </div>
+          )}
         </div>
         <div className="rounded-b-lg bg-muted/50">
           <div className="flex justify-between text-muted-foreground">

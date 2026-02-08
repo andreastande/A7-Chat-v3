@@ -10,8 +10,9 @@ export type Model = {
   maxOutputTokens: number
   pricing: {
     input: number | PriceTier[]
-    inputCacheRead?: number | PriceTier[]
     output: number | PriceTier[]
+    inputCacheRead?: number | PriceTier[]
+    inputCacheWrite?: number | PriceTier[]
   }
 }
 

@@ -24,11 +24,6 @@ export function getInputCost(model: Model, usage: LanguageModelUsage) {
   return ((usage.inputTokenDetails.noCacheTokens ?? 0) / 1_000_000) * rate
 }
 
-export function getCacheReadCost(model: Model, usage: LanguageModelUsage) {
-  const rate = resolvePricePerMTok(model.pricing.inputCacheRead ?? model.pricing.input, usage.inputTokens ?? 0)
-  return ((usage.inputTokenDetails.cacheReadTokens ?? 0) / 1_000_000) * rate
-}
-
 export function getOutputCost(model: Model, usage: LanguageModelUsage) {
   const rate = resolvePricePerMTok(model.pricing.output, usage.inputTokens ?? 0)
   return ((usage.outputTokenDetails.textTokens ?? usage.outputTokens ?? 0) / 1_000_000) * rate
@@ -39,12 +34,22 @@ export function getReasoningCost(model: Model, usage: LanguageModelUsage) {
   return ((usage.outputTokenDetails.reasoningTokens ?? 0) / 1_000_000) * rate
 }
 
+export function getCacheCost(model: Model, usage: LanguageModelUsage) {
+  const inputTokens = usage.inputTokens ?? 0
+  const readRate = resolvePricePerMTok(model.pricing.inputCacheRead ?? model.pricing.input, inputTokens)
+  const writeRate = resolvePricePerMTok(model.pricing.inputCacheWrite ?? model.pricing.input, inputTokens)
+  return (
+    ((usage.inputTokenDetails.cacheReadTokens ?? 0) / 1_000_000) * readRate +
+    ((usage.inputTokenDetails.cacheWriteTokens ?? 0) / 1_000_000) * writeRate
+  )
+}
+
 export function getTotalCost(model: Model, usage: LanguageModelUsage) {
   return (
     getInputCost(model, usage) +
-    getCacheReadCost(model, usage) +
     getOutputCost(model, usage) +
-    getReasoningCost(model, usage)
+    getReasoningCost(model, usage) +
+    getCacheCost(model, usage)
   )
 }
 
@@ -70,28 +75,28 @@ export function formatPrice(price: number, currency: string = "USD") {
 
 export type CumulativeUsage = {
   noCacheTokens: number
-  cacheReadTokens: number
+  cacheTokens: number
   textTokens: number
   reasoningTokens: number
   totalTokens: number
   inputCost: number
   outputCost: number
   reasoningCost: number
-  cacheReadCost: number
+  cacheCost: number
   totalCost: number
 }
 
 export function getCumulativeUsage(metadatas: MessageMetadata[]): CumulativeUsage {
   const result: CumulativeUsage = {
     noCacheTokens: 0,
-    cacheReadTokens: 0,
+    cacheTokens: 0,
     textTokens: 0,
     reasoningTokens: 0,
     totalTokens: 0,
     inputCost: 0,
     outputCost: 0,
     reasoningCost: 0,
-    cacheReadCost: 0,
+    cacheCost: 0,
     totalCost: 0,
   }
 
@@ -100,7 +105,8 @@ export function getCumulativeUsage(metadatas: MessageMetadata[]): CumulativeUsag
     if (!usage) continue
 
     result.noCacheTokens += usage.inputTokenDetails.noCacheTokens ?? 0
-    result.cacheReadTokens += usage.inputTokenDetails.cacheReadTokens ?? 0
+    result.cacheTokens +=
+      (usage.inputTokenDetails.cacheReadTokens ?? 0) + (usage.inputTokenDetails.cacheWriteTokens ?? 0)
     result.textTokens += usage.outputTokenDetails.textTokens ?? usage.outputTokens ?? 0
     result.reasoningTokens += usage.outputTokenDetails.reasoningTokens ?? 0
     result.totalTokens += usage.totalTokens ?? 0
@@ -110,10 +116,10 @@ export function getCumulativeUsage(metadatas: MessageMetadata[]): CumulativeUsag
       result.inputCost += getInputCost(model, usage)
       result.outputCost += getOutputCost(model, usage)
       result.reasoningCost += getReasoningCost(model, usage)
-      result.cacheReadCost += getCacheReadCost(model, usage)
+      result.cacheCost += getCacheCost(model, usage)
     }
   }
 
-  result.totalCost = result.inputCost + result.outputCost + result.reasoningCost + result.cacheReadCost
+  result.totalCost = result.inputCost + result.outputCost + result.reasoningCost + result.cacheCost
   return result
 }
