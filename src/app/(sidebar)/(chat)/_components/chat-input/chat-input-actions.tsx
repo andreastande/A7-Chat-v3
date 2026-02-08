@@ -30,7 +30,7 @@ export function ChatInputActions() {
       >
         <Plus />
       </WithTooltip>
-      <DropdownMenuContent className="w-52">
+      <DropdownMenuContent className="w-56">
         <DropdownMenuItem>
           <Paperclip />
           Add files or photos

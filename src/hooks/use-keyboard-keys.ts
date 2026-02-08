@@ -8,13 +8,13 @@ function isMac() {
 }
 
 export function useKeyboardKeys() {
-  const [keys, setKeys] = useState<{ mod: "⌘" | "Ctrl+"; shift: "⇧" | "Shift+" }>({
-    mod: "Ctrl+",
-    shift: "Shift+",
+  const [keys, setKeys] = useState<{ mod: "⌘" | "Ctrl + "; shift: "⇧" | "Shift + " }>({
+    mod: "Ctrl + ",
+    shift: "Shift + ",
   })
 
   useEffect(() => {
-    setKeys(isMac() ? { mod: "⌘", shift: "⇧" } : { mod: "Ctrl+", shift: "Shift+" })
+    setKeys(isMac() ? { mod: "⌘", shift: "⇧" } : { mod: "Ctrl + ", shift: "Shift + " })
   }, [])
 
   return keys

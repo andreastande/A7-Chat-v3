@@ -65,7 +65,7 @@ export function TokenUsage() {
           {isOverLimit && <span className="text-[8px] leading-none font-bold text-destructive">!</span>}
         </CircularProgressbarWithChildren>
       </HoverCardTrigger>
-      <HoverCardContent className="divide-y divide-border p-0 text-xs *:p-4">
+      <HoverCardContent className="divide-y divide-border p-0 text-xs *:p-3">
         <div>
           <Progress
             value={contextUsage}

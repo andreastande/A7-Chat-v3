@@ -565,7 +565,7 @@ function SidebarMenuShortcut({
       data-slot="sidebar-menu-shortcut"
       data-sidebar="menu-shortcut"
       className={cn(
-        "text-muted-foreground group-[:focus-visible,:hover]/menu-button:text-accent-foreground ml-auto text-xs tracking-widest",
+        "text-muted-foreground font-normal group-[:focus-visible,:hover]/menu-button:text-accent-foreground ml-auto text-xs",
         showOnFocus && "invisible group-[:focus-visible,:hover]/menu-button:visible group-[:focus-visible,:hover]/menu-button:text-muted-foreground!",
         className
       )}
