@@ -1,10 +1,49 @@
 "server-only"
 
 import { and, eq, max } from "drizzle-orm"
+import { parseCanonicalStorageUrl } from "@/lib/attachments"
 import { db } from "@/db"
 import { type Chat, chat, favoriteModel, message as messageTable } from "@/db/schemas/chat"
+import { supabaseServer } from "@/lib/supabase/server"
 import type { UIMessage } from "@/types/ui-message"
+import env from "~/env.config"
 import { requireAuth } from "./auth"
+
+async function hydrateFilePartUrl(part: UIMessage["parts"][number]) {
+  if (part.type !== "file") return part
+
+  const parsed = parseCanonicalStorageUrl(part.url)
+  if (!parsed) return part
+
+  const { data, error } = await supabaseServer.storage
+    .from(parsed.bucket)
+    .createSignedUrl(parsed.path, env.SUPABASE_SIGNED_URL_TTL_SECONDS)
+
+  if (error || !data?.signedUrl) {
+    console.error("Failed to create signed url for attachment", error)
+    return part
+  }
+
+  return {
+    ...part,
+    url: data.signedUrl,
+    providerMetadata: {
+      ...part.providerMetadata,
+      attachment: {
+        canonicalUrl: part.url,
+      },
+    },
+  }
+}
+
+async function hydrateMessageAttachmentUrls(messages: UIMessage[]) {
+  return Promise.all(
+    messages.map(async (message) => ({
+      ...message,
+      parts: await Promise.all(message.parts.map(hydrateFilePartUrl)),
+    })),
+  )
+}
 
 // =============================================================================
 // Queries
@@ -65,12 +104,16 @@ export async function getChatWithMessages(chatId: string): Promise<(Chat & { mes
   })
 
   if (!result) return null
-  return {
-    ...result,
-    messages: result.messages.map((m) => ({
+  const hydratedMessages = await hydrateMessageAttachmentUrls(
+    result.messages.map((m) => ({
       ...m,
       metadata: m.metadata ?? undefined,
     })),
+  )
+
+  return {
+    ...result,
+    messages: hydratedMessages,
   }
 }
 
