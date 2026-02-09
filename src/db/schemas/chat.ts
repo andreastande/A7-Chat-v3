@@ -1,4 +1,4 @@
-import { index, integer, jsonb, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core"
+import { bigint, index, integer, jsonb, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core"
 import type { UIMessage } from "@/types/ui-message"
 import { user } from "./auth"
 
@@ -65,7 +65,7 @@ export const attachmentUploadRateLimitWindow = pgTable(
     subject: text().notNull(),
     windowStart: timestamp().notNull(),
     uploadCount: integer().notNull().default(0),
-    totalBytes: integer().notNull().default(0),
+    totalBytes: bigint({ mode: "number" }).notNull().default(0),
     updatedAt: timestamp()
       .defaultNow()
       .$onUpdate(() => new Date())
