@@ -30,12 +30,7 @@ function AttachmentPreview({ attachment, onRemove }: { attachment: ChatAttachmen
   return attachment.isImage ? (
     <div className="relative size-18 overflow-hidden rounded-lg border border-input bg-muted/30">
       {/* oxlint-disable-next-line eslint-plugin-next/no-img-element */}
-      <img
-        src={attachment.previewUrl || attachment.signedUrl}
-        alt="Attachment"
-        className="size-full object-cover"
-        draggable={false}
-      />
+      <img src={attachment.previewUrl} alt="Attachment" className="size-full object-cover" draggable={false} />
       <Button
         type="button"
         size="icon-xs"

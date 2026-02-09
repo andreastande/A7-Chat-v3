@@ -45,6 +45,9 @@ If signed URLs were stored directly, messages would break after URL expiry. Pers
   - user-scoped draft path generation
 - `src/lib/attachments/rate-limit.ts`
   - DB-backed upload rate limiting used by the draft upload route
+- `src/lib/attachments/server.ts`
+  - shared canonical URL ownership validation for server routes
+  - shared batch hydration/signing of canonical file parts for model/read flows
 
 ### Supabase server client
 
@@ -55,7 +58,7 @@ If signed URLs were stored directly, messages would break after URL expiry. Pers
 ### Draft attachment API
 
 - `src/app/api/chat/attachments/draft/route.ts`
-  - `POST` uploads one file and returns canonical+signed metadata
+  - `POST` uploads one file and returns canonical metadata
   - `POST` enforces per-user upload rate limits (count + bytes) and returns `429` with `Retry-After` when exceeded
   - `DELETE` removes one canonical object (with ownership guard)
 
@@ -131,9 +134,8 @@ Server `POST` behavior:
 2. validate `chatId` and `file`
 3. validate attachment type/size
 4. enforce DB-backed upload rate limits (count + bytes)
-4. upload to private bucket under path:
+5. upload to private bucket under path:
    `users/<sanitized-user-id>/drafts/<sanitized-chat-id>/<uuid>-<sanitized-filename>`
-5. create signed URL
 6. return:
 
 ```json
@@ -141,12 +143,11 @@ Server `POST` behavior:
   "filename": "...",
   "mediaType": "...",
   "size": 123,
-  "canonicalUrl": "supabase://chat-attachments/users%2F...",
-  "signedUrl": "https://..."
+  "canonicalUrl": "supabase://chat-attachments/users%2F..."
 }
 ```
 
-Client stores both URLs. Signed URL is used for immediate preview/send; canonical URL is carried in metadata so server can persist stable references.
+Client stores canonical URL for authenticated attachments. Composer image previews use local blob URLs. At send-time, canonical URL is sent in the file part URL and also in `providerMetadata.attachment.canonicalUrl`.
 
 ### 2) Guest user adds files
 
@@ -173,13 +174,13 @@ In `chat.tsx`, send is blocked when uploads are still in progress. Once ready:
 
 - send payload may be text-only, files-only, or text+files
 - for files, the client sends AI SDK file parts with:
-  - `url`: current signed URL
+  - `url`: canonical storage URL
   - `providerMetadata.attachment.canonicalUrl`: stable storage URL
 
 `/api/chat/route.ts` then creates two message views:
 
 - **storage view** (`normalizeAndValidateAttachments`): file part URLs are validated and converted to canonical URLs before DB insert
-- **model view** (`hydrateMessageForModel`): file part URLs converted/signed for model invocation
+- **model view** (`hydrateMessageForModel`): canonical file part URLs are batch-hydrated to signed URLs for model invocation
 
 `normalizeAndValidateAttachments` performs additional server-side checks for authenticated users:
 
@@ -265,7 +266,6 @@ This is designed to work in multi-instance deployments (DB-backed, not in-memory
 
 - Attachments are still stored inside `message.parts` JSON (no attachment metadata table)
 - Guest API route (`/api/chat/guest`) logic unchanged, but now naturally accepts file parts through existing `messages` payload
-- Guest API route (`/api/chat/guest`) logic unchanged, but now naturally accepts file parts through existing `messages` payload
 - Message metadata type (`src/types/ui-message.ts`) unchanged
 
 ## Known Tradeoffs / Current Limitations
@@ -273,7 +273,7 @@ This is designed to work in multi-instance deployments (DB-backed, not in-memory
 1. Draft namespace is used for persisted objects. There is no move/rename to a “final” namespace after send.
 2. Cleanup is opportunistic (remove-on-delete), not lifecycle-managed. Abandoned uploads may remain until a future cleanup job is added.
 3. Server-side `POST /api/chat/attachments/draft` validates type/size per file, but aggregate constraints (count/total bytes across current unsent draft) are primarily enforced client-side.
-4. Image rendering intentionally uses `<img>` (with lint suppression) because previews include blob and signed URLs; this avoids unnecessary complexity with `next/image` for transient URLs.
+4. Image rendering intentionally uses `<img>` (with lint suppression) because previews/messages include blob and short-lived remote URLs; this avoids unnecessary complexity with `next/image` for transient URLs.
 5. Rate limiting uses a window table that can grow over time; it should be periodically pruned (e.g. keep a few days of rows).
 
 ## Operational Checklist
@@ -318,8 +318,7 @@ sequenceDiagram
   C->>C: Validate type/size/count/total
   C->>D: POST file + chatId
   D->>S: Upload private object
-  D->>S: Create signed URL
-  D-->>C: canonicalUrl + signedUrl
+  D-->>C: canonicalUrl
 
   U->>C: Send message
   C->>A: sendMessage(text/files)

@@ -3,7 +3,6 @@
 import { useChat } from "@ai-sdk-tools/store"
 import { DefaultChatTransport } from "ai"
 import { FileUp } from "lucide-react"
-import { type DragEvent, useRef, useState } from "react"
 import { toast } from "sonner"
 import { generateChatTitle } from "@/actions/chat"
 import { useApiKeysStore } from "@/app/(sidebar)/_components/providers/api-keys-provider"
@@ -14,6 +13,7 @@ import { cn } from "@/lib/utils"
 import type { UIMessage } from "@/types/ui-message"
 import { useChatAttachments } from "../_hooks/use-chat-attachments"
 import { useChatSession } from "../_hooks/use-chat-session"
+import { useFileDragDrop } from "../_hooks/use-file-drag-drop"
 import { useScrollOnMount } from "../_hooks/use-scroll-on-mount"
 import { useScrollOnSubmit } from "../_hooks/use-scroll-on-submit"
 import { ChatInput } from "./chat-input"
@@ -24,10 +24,6 @@ import { useSelectedModelStore } from "./providers/selected-model-provider"
 interface ChatProps {
   chatId?: string
   initialMessages?: UIMessage[]
-}
-
-function hasDraggedFiles(event: DragEvent<HTMLElement>) {
-  return Array.from(event.dataTransfer?.types ?? []).includes("Files")
 }
 
 function DropOverlay() {
@@ -63,9 +59,6 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
     chatId: id,
     isAuthenticated: Boolean(session),
   })
-
-  const [isDragActive, setIsDragActive] = useState(false)
-  const dragDepthRef = useRef(0)
 
   const { messages, status, error, sendMessage } = useChat<UIMessage>({
     id,
@@ -145,39 +138,6 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
     }
   }
 
-  function handleDragEnter(event: DragEvent<HTMLElement>) {
-    if (!hasDraggedFiles(event)) return
-    event.preventDefault()
-    dragDepthRef.current += 1
-    setIsDragActive(true)
-  }
-
-  function handleDragLeave(event: DragEvent<HTMLElement>) {
-    if (!hasDraggedFiles(event)) return
-    event.preventDefault()
-    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1)
-    if (dragDepthRef.current === 0) {
-      setIsDragActive(false)
-    }
-  }
-
-  function handleDragOver(event: DragEvent<HTMLElement>) {
-    if (!hasDraggedFiles(event)) return
-    event.preventDefault()
-    event.dataTransfer.dropEffect = "copy"
-  }
-
-  function handleDrop(event: DragEvent<HTMLElement>) {
-    if (!hasDraggedFiles(event)) return
-    event.preventDefault()
-
-    const files = Array.from(event.dataTransfer.files)
-    dragDepthRef.current = 0
-    setIsDragActive(false)
-
-    addFiles(files)
-  }
-
   const chatInputProps = {
     sendMessage: handleSendMessage,
     attachments,
@@ -187,12 +147,7 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
     hasBlockingUploads,
   }
 
-  const dragHandlers = {
-    onDragEnter: handleDragEnter,
-    onDragLeave: handleDragLeave,
-    onDragOver: handleDragOver,
-    onDrop: handleDrop,
-  }
+  const { isDragActive, dragHandlers } = useFileDragDrop({ onFilesDrop: addFiles })
 
   return isNewChat ? (
     <div className="relative flex h-fit w-full justify-center px-8 pt-56" {...dragHandlers}>

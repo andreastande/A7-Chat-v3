@@ -25,7 +25,6 @@ export type ChatAttachment = {
   error?: string
   file?: File
   canonicalUrl?: string
-  signedUrl?: string
 }
 
 interface UseChatAttachmentsOptions {
@@ -49,18 +48,13 @@ function revokePreviewUrl(url: string) {
 }
 
 function getUploadErrorMessage(xhr: XMLHttpRequest) {
-  const response = xhr.response
-  if (response && typeof response === "object" && "error" in response && typeof response.error === "string") {
-    return response.error
-  }
-
-  if (typeof xhr.responseText === "string" && xhr.responseText) {
-    try {
-      const parsed = JSON.parse(xhr.responseText)
-      if (parsed && typeof parsed.error === "string") return parsed.error
-    } catch {
-      // ignore parse errors
+  try {
+    const body = typeof xhr.response === "object" ? xhr.response : JSON.parse(xhr.responseText)
+    if (body && typeof body === "object" && "error" in body && typeof body.error === "string") {
+      return body.error
     }
+  } catch {
+    // ignore parse errors
   }
 
   return "Failed to upload attachment"
@@ -147,7 +141,6 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
         patchAttachment(id, {
           status: "ready",
           progress: 100,
-          signedUrl: payload.signedUrl,
           canonicalUrl: payload.canonicalUrl,
           error: undefined,
         })
@@ -183,7 +176,6 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
         const mediaType = file.type || "application/octet-stream"
         const validationError = validateAttachment(
           {
-            filename: file.name,
             mediaType,
             size: file.size,
           },
@@ -268,13 +260,13 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
       const parts: FileUIPart[] = []
 
       for (const attachment of readyAttachments) {
-        if (!attachment.signedUrl || !attachment.canonicalUrl) continue
+        if (!attachment.canonicalUrl) continue
 
         parts.push({
           type: "file",
           filename: attachment.filename,
           mediaType: attachment.mediaType,
-          url: attachment.signedUrl,
+          url: attachment.canonicalUrl,
           providerMetadata: {
             attachment: {
               canonicalUrl: attachment.canonicalUrl,

@@ -8,12 +8,9 @@ import {
   ALLOWED_ATTACHMENT_MEDIA_TYPE_SET,
   MAX_ATTACHMENTS_PER_MESSAGE,
   getAttachmentValidationMessage,
-  isCanonicalStorageUrl,
-  isUserOwnedAttachmentPath,
-  parseCanonicalStorageUrl,
   validateAttachment,
 } from "@/lib/attachments"
-import { signCanonicalAttachmentUrl } from "@/lib/attachments/server"
+import { hydrateCanonicalAttachmentUrls, validateOwnedCanonicalAttachmentUrl } from "@/lib/attachments/server"
 import { getSystemPrompt, isValidModelId } from "@/lib/models/utils"
 import { supabaseServer } from "@/lib/supabase/server"
 import type { UIMessage } from "@/types/ui-message"
@@ -41,10 +38,7 @@ function getCanonicalUrlFromProviderMetadata(part: UIMessage["parts"][number]) {
 async function normalizeAndValidateAttachments(message: UIMessage, userId: string): Promise<NormalizedMessageResult> {
   const normalizedParts: UIMessage["parts"] = []
   const pendingFiles: Array<{
-    canonicalUrl: string
     mediaType: string
-    filename: string | undefined
-    bucket: string
     path: string
   }> = []
 
@@ -64,24 +58,23 @@ async function normalizeAndValidateAttachments(message: UIMessage, userId: strin
     }
 
     const canonicalUrl = getCanonicalUrlFromProviderMetadata(part) ?? part.url
-    const parsed = parseCanonicalStorageUrl(canonicalUrl)
-
-    if (!parsed) {
+    const canonicalValidation = validateOwnedCanonicalAttachmentUrl(canonicalUrl, userId)
+    if (!canonicalValidation.ok && canonicalValidation.code === "invalid") {
       return { ok: false, error: "Invalid attachment reference", code: "ATTACHMENT_REFERENCE_INVALID" }
     }
-    if (parsed.bucket !== env.SUPABASE_STORAGE_BUCKET) {
+    if (!canonicalValidation.ok && canonicalValidation.code === "unexpected_bucket") {
       return { ok: false, error: "Unexpected attachment bucket", code: "ATTACHMENT_BUCKET_INVALID" }
     }
-    if (!isUserOwnedAttachmentPath(parsed.path, userId)) {
+    if (!canonicalValidation.ok && canonicalValidation.code === "forbidden") {
       return { ok: false, error: "Forbidden attachment reference", code: "ATTACHMENT_FORBIDDEN" }
+    }
+    if (!canonicalValidation.ok) {
+      return { ok: false, error: "Invalid attachment reference", code: "ATTACHMENT_REFERENCE_INVALID" }
     }
 
     pendingFiles.push({
-      canonicalUrl,
       mediaType: part.mediaType,
-      filename: part.filename,
-      bucket: parsed.bucket,
-      path: parsed.path,
+      path: canonicalValidation.path,
     })
 
     normalizedParts.push({ ...part, url: canonicalUrl })
@@ -93,7 +86,7 @@ async function normalizeAndValidateAttachments(message: UIMessage, userId: strin
 
   // Parallel fetch: verify all attachments exist and get actual metadata
   const infoResults = await Promise.all(
-    pendingFiles.map(({ bucket, path }) => supabaseServer.storage.from(bucket).info(path)),
+    pendingFiles.map(({ path }) => supabaseServer.storage.from(env.SUPABASE_STORAGE_BUCKET).info(path)),
   )
 
   let existingCount = 0
@@ -111,7 +104,7 @@ async function normalizeAndValidateAttachments(message: UIMessage, userId: strin
     const size = data.size ?? 0
 
     const validationError = validateAttachment(
-      { filename: pending.filename ?? data.name ?? "attachment", mediaType: actualMediaType, size },
+      { mediaType: actualMediaType, size },
       { existingCount, existingTotalBytes },
     )
 
@@ -131,20 +124,8 @@ async function normalizeAndValidateAttachments(message: UIMessage, userId: strin
 }
 
 async function hydrateMessageForModel(message: UIMessage, userId: string): Promise<UIMessage> {
-  return {
-    ...message,
-    parts: await Promise.all(
-      message.parts.map(async (part) => {
-        if (part.type !== "file") return part
-        if (!isCanonicalStorageUrl(part.url)) return part
-
-        const signedUrl = await signCanonicalAttachmentUrl(part.url, userId)
-        if (!signedUrl) return part
-
-        return { ...part, url: signedUrl }
-      }),
-    ),
-  }
+  const [hydratedMessage] = await hydrateCanonicalAttachmentUrls([message], { userId })
+  return hydratedMessage
 }
 
 export async function POST(req: Request) {

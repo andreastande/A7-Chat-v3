@@ -3,13 +3,12 @@ import { isChatAccessible } from "@/dal/chat"
 import {
   buildDraftAttachmentPath,
   getAttachmentValidationMessage,
-  isUserOwnedAttachmentPath,
-  parseCanonicalStorageUrl,
   toCanonicalStorageUrl,
   validateAttachment,
 } from "@/lib/attachments"
 import type { DraftUploadResponse } from "@/lib/attachments"
 import { enforceAttachmentUploadRateLimit } from "@/lib/attachments/rate-limit"
+import { validateOwnedCanonicalAttachmentUrl } from "@/lib/attachments/server"
 import { supabaseServer } from "@/lib/supabase/server"
 import env from "~/env.config"
 
@@ -36,7 +35,6 @@ export async function POST(req: Request) {
   const mediaType = file.type || "application/octet-stream"
   const validationError = validateAttachment(
     {
-      filename: file.name,
       mediaType,
       size: file.size,
     },
@@ -90,25 +88,11 @@ export async function POST(req: Request) {
     return new Response("Failed to upload file", { status: 500 })
   }
 
-  const { data: signedData, error: signedError } = await supabaseServer.storage
-    .from(env.SUPABASE_STORAGE_BUCKET)
-    .createSignedUrl(path, env.SUPABASE_SIGNED_URL_TTL_SECONDS)
-
-  if (signedError || !signedData?.signedUrl) {
-    console.error("Failed to sign draft attachment", signedError)
-    await supabaseServer.storage
-      .from(env.SUPABASE_STORAGE_BUCKET)
-      .remove([path])
-      .catch(() => {})
-    return new Response("Failed to sign file", { status: 500 })
-  }
-
   const response: DraftUploadResponse = {
     filename: file.name,
     mediaType,
     size: file.size,
     canonicalUrl: toCanonicalStorageUrl(env.SUPABASE_STORAGE_BUCKET, path),
-    signedUrl: signedData.signedUrl,
   }
 
   return Response.json(response)
@@ -125,20 +109,19 @@ export async function DELETE(req: Request) {
     return new Response("Invalid canonical url", { status: 400 })
   }
 
-  const parsed = parseCanonicalStorageUrl(canonicalUrl)
-  if (!parsed) {
+  const validation = validateOwnedCanonicalAttachmentUrl(canonicalUrl, user.id)
+  if (!validation.ok && validation.code === "invalid") {
     return new Response("Invalid canonical url", { status: 400 })
   }
-
-  if (parsed.bucket !== env.SUPABASE_STORAGE_BUCKET) {
+  if (!validation.ok && validation.code === "unexpected_bucket") {
     return new Response("Unexpected bucket", { status: 400 })
   }
-
-  if (!isUserOwnedAttachmentPath(parsed.path, user.id)) {
+  if (!validation.ok && validation.code === "forbidden") {
     return new Response("Forbidden", { status: 403 })
   }
+  if (!validation.ok) return new Response("Invalid canonical url", { status: 400 })
 
-  const { error } = await supabaseServer.storage.from(parsed.bucket).remove([parsed.path])
+  const { error } = await supabaseServer.storage.from(validation.bucket).remove([validation.path])
 
   if (error) {
     console.error("Failed to remove draft attachment", error)

@@ -15,6 +15,3 @@ export const ALLOWED_ATTACHMENT_MEDIA_TYPES = [
 ] as const
 
 export const ALLOWED_ATTACHMENT_MEDIA_TYPE_SET = new Set<string>(ALLOWED_ATTACHMENT_MEDIA_TYPES)
-
-export const DEFAULT_ATTACHMENT_BUCKET = "chat-attachments"
-export const DEFAULT_SIGNED_URL_TTL_SECONDS = 60 * 60

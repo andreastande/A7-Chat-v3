@@ -6,7 +6,6 @@ import {
 } from "./constants"
 
 export type AttachmentCandidate = {
-  filename: string
   mediaType: string
   size: number
 }

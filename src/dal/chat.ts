@@ -2,68 +2,9 @@ import "server-only"
 import { and, eq, max } from "drizzle-orm"
 import { db } from "@/db"
 import { type Chat, chat, favoriteModel, message as messageTable } from "@/db/schemas/chat"
-import { isCanonicalStorageUrl, isUserOwnedAttachmentPath, parseCanonicalStorageUrl } from "@/lib/attachments"
-import { supabaseServer } from "@/lib/supabase/server"
+import { hydrateCanonicalAttachmentUrls } from "@/lib/attachments/server"
 import type { UIMessage } from "@/types/ui-message"
-import env from "~/env.config"
 import { requireAuth } from "./auth"
-
-async function hydrateMessageAttachmentUrls(messages: UIMessage[], userId: string) {
-  const targets: Array<{ msgIdx: number; partIdx: number; canonicalUrl: string; path: string }> = []
-
-  for (let mi = 0; mi < messages.length; mi++) {
-    const parts = messages[mi].parts
-    for (let pi = 0; pi < parts.length; pi++) {
-      const part = parts[pi]
-      if (part.type !== "file" || !isCanonicalStorageUrl(part.url)) continue
-
-      const parsed = parseCanonicalStorageUrl(part.url)
-      if (!parsed || parsed.bucket !== env.SUPABASE_STORAGE_BUCKET || !isUserOwnedAttachmentPath(parsed.path, userId)) {
-        continue
-      }
-
-      targets.push({ msgIdx: mi, partIdx: pi, canonicalUrl: part.url, path: parsed.path })
-    }
-  }
-
-  if (targets.length === 0) return messages
-
-  const { data, error } = await supabaseServer.storage.from(env.SUPABASE_STORAGE_BUCKET).createSignedUrls(
-    targets.map((t) => t.path),
-    env.SUPABASE_SIGNED_URL_TTL_SECONDS,
-  )
-
-  if (error || !data) {
-    console.error("Failed to batch sign attachment URLs", error)
-    return messages
-  }
-
-  const signedUrlMap = new Map<string, string>()
-  for (let i = 0; i < targets.length; i++) {
-    const item = data[i]
-    if (item?.error || !item?.signedUrl) continue
-    signedUrlMap.set(`${targets[i].msgIdx}:${targets[i].partIdx}`, item.signedUrl)
-  }
-
-  return messages.map((message, mi) => ({
-    ...message,
-    parts: message.parts.map((part, pi) => {
-      if (part.type !== "file") return part
-
-      const signedUrl = signedUrlMap.get(`${mi}:${pi}`)
-      if (!signedUrl) return part
-
-      return {
-        ...part,
-        url: signedUrl,
-        providerMetadata: {
-          ...part.providerMetadata,
-          attachment: { canonicalUrl: part.url },
-        },
-      }
-    }),
-  }))
-}
 
 // =============================================================================
 // Queries
@@ -137,12 +78,12 @@ export async function getChatWithMessages(chatId: string): Promise<(Chat & { mes
   })
 
   if (!result) return null
-  const hydratedMessages = await hydrateMessageAttachmentUrls(
+  const hydratedMessages = await hydrateCanonicalAttachmentUrls(
     result.messages.map((m) => ({
       ...m,
       metadata: m.metadata ?? undefined,
     })),
-    user.id,
+    { userId: user.id },
   )
 
   return {
