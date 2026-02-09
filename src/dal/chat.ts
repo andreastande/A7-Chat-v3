@@ -1,39 +1,68 @@
 import "server-only"
-
 import { and, eq, max } from "drizzle-orm"
-import { isCanonicalStorageUrl } from "@/lib/attachments"
-import { signCanonicalAttachmentUrl } from "@/lib/attachments/server"
 import { db } from "@/db"
 import { type Chat, chat, favoriteModel, message as messageTable } from "@/db/schemas/chat"
+import { isCanonicalStorageUrl, isUserOwnedAttachmentPath, parseCanonicalStorageUrl } from "@/lib/attachments"
+import { supabaseServer } from "@/lib/supabase/server"
 import type { UIMessage } from "@/types/ui-message"
+import env from "~/env.config"
 import { requireAuth } from "./auth"
 
-async function hydrateFilePartUrl(part: UIMessage["parts"][number], userId: string) {
-  if (part.type !== "file") return part
-  if (!isCanonicalStorageUrl(part.url)) return part
-
-  const signedUrl = await signCanonicalAttachmentUrl(part.url, userId)
-  if (!signedUrl) return part
-
-  return {
-    ...part,
-    url: signedUrl,
-    providerMetadata: {
-      ...part.providerMetadata,
-      attachment: {
-        canonicalUrl: part.url,
-      },
-    },
-  }
-}
-
 async function hydrateMessageAttachmentUrls(messages: UIMessage[], userId: string) {
-  return Promise.all(
-    messages.map(async (message) => ({
-      ...message,
-      parts: await Promise.all(message.parts.map((part) => hydrateFilePartUrl(part, userId))),
-    })),
+  const targets: Array<{ msgIdx: number; partIdx: number; canonicalUrl: string; path: string }> = []
+
+  for (let mi = 0; mi < messages.length; mi++) {
+    const parts = messages[mi].parts
+    for (let pi = 0; pi < parts.length; pi++) {
+      const part = parts[pi]
+      if (part.type !== "file" || !isCanonicalStorageUrl(part.url)) continue
+
+      const parsed = parseCanonicalStorageUrl(part.url)
+      if (!parsed || parsed.bucket !== env.SUPABASE_STORAGE_BUCKET || !isUserOwnedAttachmentPath(parsed.path, userId)) {
+        continue
+      }
+
+      targets.push({ msgIdx: mi, partIdx: pi, canonicalUrl: part.url, path: parsed.path })
+    }
+  }
+
+  if (targets.length === 0) return messages
+
+  const { data, error } = await supabaseServer.storage.from(env.SUPABASE_STORAGE_BUCKET).createSignedUrls(
+    targets.map((t) => t.path),
+    env.SUPABASE_SIGNED_URL_TTL_SECONDS,
   )
+
+  if (error || !data) {
+    console.error("Failed to batch sign attachment URLs", error)
+    return messages
+  }
+
+  const signedUrlMap = new Map<string, string>()
+  for (let i = 0; i < targets.length; i++) {
+    const item = data[i]
+    if (item?.error || !item?.signedUrl) continue
+    signedUrlMap.set(`${targets[i].msgIdx}:${targets[i].partIdx}`, item.signedUrl)
+  }
+
+  return messages.map((message, mi) => ({
+    ...message,
+    parts: message.parts.map((part, pi) => {
+      if (part.type !== "file") return part
+
+      const signedUrl = signedUrlMap.get(`${mi}:${pi}`)
+      if (!signedUrl) return part
+
+      return {
+        ...part,
+        url: signedUrl,
+        providerMetadata: {
+          ...part.providerMetadata,
+          attachment: { canonicalUrl: part.url },
+        },
+      }
+    }),
+  }))
 }
 
 // =============================================================================
@@ -66,6 +95,19 @@ export async function getChat(chatId: string): Promise<Chat | null> {
   })
 
   return result ?? null
+}
+
+/**
+ * Check if a chat is accessible to the current user.
+ * Returns true if the chat doesn't exist (e.g., new chat not yet created) or belongs to the user.
+ * Returns false only if the chat exists and belongs to another user.
+ */
+export async function isChatAccessible(chatId: string): Promise<boolean> {
+  const user = await requireAuth()
+
+  const [existing] = await db.select({ userId: chat.userId }).from(chat).where(eq(chat.id, chatId)).limit(1)
+
+  return !existing || existing.userId === user.id
 }
 
 /**

@@ -3,6 +3,7 @@ import { createOpenRouter } from "@openrouter/ai-sdk-provider"
 import { convertToModelMessages, generateId, streamText, createGateway, wrapLanguageModel } from "ai"
 import { getCurrentUser } from "@/dal/auth"
 import { getChatWithMessages, insertMessage } from "@/dal/chat"
+import type { ApiKeyPayload } from "@/lib/api-keys/types"
 import {
   ALLOWED_ATTACHMENT_MEDIA_TYPE_SET,
   MAX_ATTACHMENTS_PER_MESSAGE,
@@ -13,7 +14,6 @@ import {
   validateAttachment,
 } from "@/lib/attachments"
 import { signCanonicalAttachmentUrl } from "@/lib/attachments/server"
-import type { ApiKeyPayload } from "@/lib/api-keys/types"
 import { getSystemPrompt, isValidModelId } from "@/lib/models/utils"
 import { supabaseServer } from "@/lib/supabase/server"
 import type { UIMessage } from "@/types/ui-message"
@@ -26,9 +26,7 @@ interface RequestBody {
   apiKey: ApiKeyPayload | null
 }
 
-type NormalizedMessageResult =
-  | { ok: true; message: UIMessage }
-  | { ok: false; error: string; code: string }
+type NormalizedMessageResult = { ok: true; message: UIMessage } | { ok: false; error: string; code: string }
 
 function getCanonicalUrlFromProviderMetadata(part: UIMessage["parts"][number]) {
   if (!("providerMetadata" in part) || !part.providerMetadata || typeof part.providerMetadata !== "object") return null
@@ -43,7 +41,6 @@ function getCanonicalUrlFromProviderMetadata(part: UIMessage["parts"][number]) {
 async function normalizeAndValidateAttachments(message: UIMessage, userId: string): Promise<NormalizedMessageResult> {
   const normalizedParts: UIMessage["parts"] = []
   const pendingFiles: Array<{
-    partIndex: number
     canonicalUrl: string
     mediaType: string
     filename: string | undefined
@@ -80,7 +77,6 @@ async function normalizeAndValidateAttachments(message: UIMessage, userId: strin
     }
 
     pendingFiles.push({
-      partIndex: normalizedParts.length,
       canonicalUrl,
       mediaType: part.mediaType,
       filename: part.filename,

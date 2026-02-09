@@ -51,7 +51,7 @@ function AttachmentPreview({ attachment, onRemove }: { attachment: ChatAttachmen
         </div>
       )}
       {attachment.status === "error" && (
-        <div className="absolute inset-x-1 bottom-1 rounded-sm bg-destructive/85 px-1 py-0.5 text-[10px] font-medium text-destructive-foreground">
+        <div className="text-destructive-foreground absolute inset-x-1 bottom-1 rounded-sm bg-destructive/85 px-1 py-0.5 text-[10px] font-medium">
           Upload failed
         </div>
       )}

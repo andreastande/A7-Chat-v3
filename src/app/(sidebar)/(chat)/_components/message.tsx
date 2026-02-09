@@ -24,7 +24,10 @@ function UserMessage({ message }: { message: UIMessage }) {
           {fileParts.map((part, index) => {
             if (part.mediaType.startsWith("image/")) {
               return (
-                <div key={`${message.id}-file-${index}`} className="size-24 overflow-hidden rounded-lg border border-input bg-muted/30">
+                <div
+                  key={`${message.id}-file-${index}`}
+                  className="size-24 overflow-hidden rounded-lg border border-input bg-muted/30"
+                >
                   {/* oxlint-disable-next-line eslint-plugin-next/no-img-element */}
                   <img src={part.url} alt="Attachment" className="size-full object-cover" />
                 </div>

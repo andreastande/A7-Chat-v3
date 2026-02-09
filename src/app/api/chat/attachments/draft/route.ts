@@ -1,4 +1,5 @@
 import { getCurrentUser } from "@/dal/auth"
+import { isChatAccessible } from "@/dal/chat"
 import {
   buildDraftAttachmentPath,
   getAttachmentValidationMessage,
@@ -24,6 +25,10 @@ export async function POST(req: Request) {
     return new Response("Invalid chat id", { status: 400 })
   }
 
+  if (!(await isChatAccessible(chatId.trim()))) {
+    return new Response("Forbidden", { status: 403 })
+  }
+
   if (!(file instanceof File)) {
     return new Response("File is required", { status: 400 })
   }
@@ -42,7 +47,10 @@ export async function POST(req: Request) {
   )
 
   if (validationError) {
-    return Response.json({ error: getAttachmentValidationMessage(validationError), code: validationError }, { status: 400 })
+    return Response.json(
+      { error: getAttachmentValidationMessage(validationError), code: validationError },
+      { status: 400 },
+    )
   }
 
   const path = buildDraftAttachmentPath({
@@ -68,7 +76,10 @@ export async function POST(req: Request) {
 
   if (signedError || !signedData?.signedUrl) {
     console.error("Failed to sign draft attachment", signedError)
-    await supabaseServer.storage.from(env.SUPABASE_STORAGE_BUCKET).remove([path]).catch(() => {})
+    await supabaseServer.storage
+      .from(env.SUPABASE_STORAGE_BUCKET)
+      .remove([path])
+      .catch(() => {})
     return new Response("Failed to sign file", { status: 500 })
   }
 

@@ -31,6 +31,7 @@
     "@streamdown/code": "^1.0.1",
     "@streamdown/math": "^1.0.1",
     "@streamdown/mermaid": "^1.0.1",
+    "@supabase/supabase-js": "^2.49.8",
     "ai": "^6.0.68",
     "better-auth": "^1.4.18",
     "class-variance-authority": "^0.7.1",
@@ -56,7 +57,6 @@
     "shadcn": "^3.8.2",
     "sonner": "^2.0.7",
     "streamdown": "2.1.0",
-    "@supabase/supabase-js": "^2.49.8",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.6",
     "zustand": "^5.0.11"

@@ -30,6 +30,17 @@ function hasDraggedFiles(event: DragEvent<HTMLElement>) {
   return Array.from(event.dataTransfer?.types ?? []).includes("Files")
 }
 
+function DropOverlay() {
+  return (
+    <div className="pointer-events-none absolute inset-8 z-50 grid place-items-center rounded-2xl border-2 border-dashed border-primary/50 bg-primary/10 backdrop-blur-[1px]">
+      <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm shadow-sm">
+        <FileUp className="size-4 text-primary" />
+        Drop files to attach
+      </div>
+    </div>
+  )
+}
+
 export function Chat({ chatId, initialMessages = [] }: ChatProps) {
   const session = useSession()
   const { id, navigateToChat } = useChatSession(chatId)
@@ -176,36 +187,24 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
     hasBlockingUploads,
   }
 
+  const dragHandlers = {
+    onDragEnter: handleDragEnter,
+    onDragLeave: handleDragLeave,
+    onDragOver: handleDragOver,
+    onDrop: handleDrop,
+  }
+
   return isNewChat ? (
-    <div
-      className="relative flex h-fit w-full justify-center px-8 pt-56"
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-    >
+    <div className="relative flex h-fit w-full justify-center px-8 pt-56" {...dragHandlers}>
       <div className="w-full max-w-2xl">
         <h1 className="text-center text-2xl">What's on your mind today?</h1>
         <ChatInput {...chatInputProps} className="mt-10" />
       </div>
 
-      {isDragActive && (
-        <div className="pointer-events-none absolute inset-8 z-50 grid place-items-center rounded-2xl border-2 border-dashed border-primary/50 bg-primary/10 backdrop-blur-[1px]">
-          <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm shadow-sm">
-            <FileUp className="size-4 text-primary" />
-            Drop files to attach
-          </div>
-        </div>
-      )}
+      {isDragActive && <DropOverlay />}
     </div>
   ) : (
-    <div
-      className="relative flex w-full justify-center px-8"
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-    >
+    <div className="relative flex w-full justify-center px-8" {...dragHandlers}>
       <div className="flex w-full max-w-3xl flex-col">
         <div className="flex-1 space-y-14 pt-8 pb-30">
           {earlierMessages.map((msg) => (
@@ -224,14 +223,7 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
         </div>
       </div>
 
-      {isDragActive && (
-        <div className="pointer-events-none absolute inset-8 z-50 grid place-items-center rounded-2xl border-2 border-dashed border-primary/50 bg-primary/10 backdrop-blur-[1px]">
-          <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm shadow-sm">
-            <FileUp className="size-4 text-primary" />
-            Drop files to attach
-          </div>
-        </div>
-      )}
+      {isDragActive && <DropOverlay />}
     </div>
   )
 }

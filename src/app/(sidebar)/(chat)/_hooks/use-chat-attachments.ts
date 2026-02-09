@@ -96,7 +96,9 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
   }, [])
 
   function patchAttachment(id: string, patch: Partial<ChatAttachment>) {
-    setAttachments((prev) => prev.map((attachment) => (attachment.id === id ? { ...attachment, ...patch } : attachment)))
+    setAttachments((prev) =>
+      prev.map((attachment) => (attachment.id === id ? { ...attachment, ...patch } : attachment)),
+    )
   }
 
   async function removeRemoteDraft(canonicalUrl: string) {
