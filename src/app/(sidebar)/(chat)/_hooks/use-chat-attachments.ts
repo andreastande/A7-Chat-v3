@@ -32,6 +32,46 @@ interface UseChatAttachmentsOptions {
   isAuthenticated: boolean
 }
 
+function getFileExtensionFromMediaType(mediaType: string) {
+  const normalized = mediaType.toLowerCase()
+
+  switch (normalized) {
+    case "image/jpeg":
+      return "jpg"
+    case "image/png":
+      return "png"
+    case "image/webp":
+      return "webp"
+    case "image/gif":
+      return "gif"
+    case "application/pdf":
+      return "pdf"
+    case "text/plain":
+      return "txt"
+    case "text/markdown":
+      return "md"
+    case "text/csv":
+      return "csv"
+    case "application/json":
+      return "json"
+    default:
+      return null
+  }
+}
+
+function ensureFilename(file: File) {
+  const trimmedName = file.name.trim()
+  if (trimmedName) return file
+
+  const extension = getFileExtensionFromMediaType(file.type)
+  const generatedName = extension ? `pasted-${crypto.randomUUID()}.${extension}` : `pasted-${crypto.randomUUID()}`
+
+  return new File([file], generatedName, {
+    type: file.type,
+    lastModified: file.lastModified || Date.now(),
+  })
+}
+
 function readFileAsDataUrl(file: File) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
@@ -172,7 +212,8 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
       let existingCount = next.length
       let existingTotalBytes = next.reduce((sum, attachment) => sum + attachment.size, 0)
 
-      for (const file of files) {
+      for (const rawFile of files) {
+        const file = ensureFilename(rawFile)
         const mediaType = file.type || "application/octet-stream"
         const validationError = validateAttachment(
           {

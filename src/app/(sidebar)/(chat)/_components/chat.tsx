@@ -2,7 +2,6 @@
 
 import { useChat } from "@ai-sdk-tools/store"
 import { DefaultChatTransport } from "ai"
-import { FileUp } from "lucide-react"
 import { toast } from "sonner"
 import { generateChatTitle } from "@/actions/chat"
 import { useApiKeysStore } from "@/app/(sidebar)/_components/providers/api-keys-provider"
@@ -18,23 +17,13 @@ import { useScrollOnMount } from "../_hooks/use-scroll-on-mount"
 import { useScrollOnSubmit } from "../_hooks/use-scroll-on-submit"
 import { ChatInput } from "./chat-input"
 import { ErrorMessage } from "./error-message"
+import { FileDropOverlay } from "./file-drop-overlay"
 import { Message } from "./message"
 import { useSelectedModelStore } from "./providers/selected-model-provider"
 
 interface ChatProps {
   chatId?: string
   initialMessages?: UIMessage[]
-}
-
-function DropOverlay() {
-  return (
-    <div className="pointer-events-none absolute inset-8 z-50 grid place-items-center rounded-2xl border-2 border-dashed border-primary/50 bg-primary/10 backdrop-blur-[1px]">
-      <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm shadow-sm">
-        <FileUp className="size-4 text-primary" />
-        Drop files to attach
-      </div>
-    </div>
-  )
 }
 
 export function Chat({ chatId, initialMessages = [] }: ChatProps) {
@@ -156,7 +145,7 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
         <ChatInput {...chatInputProps} className="mt-10" />
       </div>
 
-      {isDragActive && <DropOverlay />}
+      {isDragActive && <FileDropOverlay />}
     </div>
   ) : (
     <div className="relative flex w-full justify-center px-8" {...dragHandlers}>
@@ -178,7 +167,7 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
         </div>
       </div>
 
-      {isDragActive && <DropOverlay />}
+      {isDragActive && <FileDropOverlay />}
     </div>
   )
 }
