@@ -73,6 +73,7 @@ export const attachmentUploadRateLimitWindow = pgTable(
   },
   (table) => [
     primaryKey({
+      name: "att_upload_rl_window_pk",
       columns: [table.scope, table.subject, table.windowStart],
     }),
     index("attachment_upload_rate_limit_window_scope_subject_idx").on(table.scope, table.subject),
