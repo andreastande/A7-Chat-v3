@@ -13,8 +13,9 @@ This implementation adds message attachments across the full chat lifecycle:
 - persistence for authenticated users using private Supabase Storage
 - temporary (non-persistent) behavior for guests
 - rendering file attachments above user message text
+- server-side protection against attachment upload abuse (DB-backed rate limiting)
 
-The design intentionally avoids DB schema migrations by storing attachments inside existing `message.parts` JSON and introducing a canonical URL scheme for storage references.
+Attachments themselves are stored inside existing `message.parts` JSON and use a canonical URL scheme for durable storage references. A small additional DB table is used for upload rate limiting.
 
 ## High-Level Design
 
@@ -42,6 +43,8 @@ If signed URLs were stored directly, messages would break after URL expiry. Pers
   - filename sanitization
   - canonical URL encode/decode helpers
   - user-scoped draft path generation
+- `src/lib/attachments/rate-limit.ts`
+  - DB-backed upload rate limiting used by the draft upload route
 
 ### Supabase server client
 
@@ -53,6 +56,7 @@ If signed URLs were stored directly, messages would break after URL expiry. Pers
 
 - `src/app/api/chat/attachments/draft/route.ts`
   - `POST` uploads one file and returns canonical+signed metadata
+  - `POST` enforces per-user upload rate limits (count + bytes) and returns `429` with `Retry-After` when exceeded
   - `DELETE` removes one canonical object (with ownership guard)
 
 ### Chat UI + orchestration
@@ -76,10 +80,11 @@ If signed URLs were stored directly, messages would break after URL expiry. Pers
 ### Message persistence and runtime hydration
 
 - `src/app/api/chat/route.ts`
-  - authenticated send normalization (persist canonical URLs)
+  - authenticated send normalization + validation (persist canonical URLs)
   - model-time re-signing for canonical file parts
 - `src/dal/chat.ts`
   - load-time re-signing for canonical file parts in stored messages
+  - uses Supabase batch signing (`createSignedUrls`) to reduce signing round-trips
   - injects canonical URL in `providerMetadata.attachment.canonicalUrl` for traceability
 
 ### Rendering
@@ -88,6 +93,11 @@ If signed URLs were stored directly, messages would break after URL expiry. Pers
   - user messages render file parts above text
   - image files render thumbnail only
   - non-images render extension badge + filename
+
+### DB schema
+
+- `src/db/schemas/chat.ts`
+  - adds `attachment_upload_rate_limit_window`, a small table used to rate limit draft uploads
 
 ### Env and deps
 
@@ -120,6 +130,7 @@ Server `POST` behavior:
 1. authenticate user
 2. validate `chatId` and `file`
 3. validate attachment type/size
+4. enforce DB-backed upload rate limits (count + bytes)
 4. upload to private bucket under path:
    `users/<sanitized-user-id>/drafts/<sanitized-chat-id>/<uuid>-<sanitized-filename>`
 5. create signed URL
@@ -167,17 +178,25 @@ In `chat.tsx`, send is blocked when uploads are still in progress. Once ready:
 
 `/api/chat/route.ts` then creates two message views:
 
-- **storage view** (`normalizeMessageForStorage`): file part URLs converted to canonical URLs before DB insert
+- **storage view** (`normalizeAndValidateAttachments`): file part URLs are validated and converted to canonical URLs before DB insert
 - **model view** (`hydrateMessageForModel`): file part URLs converted/signed for model invocation
 
-The user message is inserted first (existing behavior retained), then model call continues.
+`normalizeAndValidateAttachments` performs additional server-side checks for authenticated users:
+
+- enforces max attachment count (server-side)
+- validates allowed media types (server-side)
+- validates canonical URL shape/bucket/ownership
+- verifies objects exist in Storage and re-checks size/limits using authoritative Storage metadata
+- rejects mismatched metadata (e.g. `part.mediaType` not matching Storage `contentType`)
+
+The user message is inserted first (existing behavior retained), then the model call continues.
 
 ### 5) Reading persisted messages
 
 `getChatWithMessages` in `src/dal/chat.ts` rehydrates file parts on read:
 
 - parse canonical URL from `part.url`
-- generate signed URL
+- generate signed URL (batched via `createSignedUrls`)
 - replace `part.url` with signed URL
 - preserve canonical URL inside `providerMetadata.attachment.canonicalUrl`
 
@@ -228,13 +247,24 @@ Toasts are emitted for:
 - storage operations are server-side only with service role key
 - delete endpoint requires auth and enforces user-owned prefix
 - signed URLs are short-lived (TTL env controlled)
+- draft upload endpoint is rate limited per authenticated user (count + bytes)
 
 This keeps object access constrained while still allowing model and UI consumption.
 
+## Rate Limiting
+
+To prevent authenticated users from using draft uploads as an unbounded storage sink, the draft upload route enforces per-user rate limits.
+
+- Implementation: `src/lib/attachments/rate-limit.ts`
+- Storage: `attachment_upload_rate_limit_window` table in `src/db/schemas/chat.ts`
+- Strategy: fixed windows (minute/hour/day) with counters for `uploadCount` and `totalBytes` (stored as `BIGINT` in Postgres)
+
+This is designed to work in multi-instance deployments (DB-backed, not in-memory).
+
 ## What Did Not Change
 
-- No new DB tables or columns
-- No migration files
+- Attachments are still stored inside `message.parts` JSON (no attachment metadata table)
+- Guest API route (`/api/chat/guest`) logic unchanged, but now naturally accepts file parts through existing `messages` payload
 - Guest API route (`/api/chat/guest`) logic unchanged, but now naturally accepts file parts through existing `messages` payload
 - Message metadata type (`src/types/ui-message.ts`) unchanged
 
@@ -244,6 +274,7 @@ This keeps object access constrained while still allowing model and UI consumpti
 2. Cleanup is opportunistic (remove-on-delete), not lifecycle-managed. Abandoned uploads may remain until a future cleanup job is added.
 3. Server-side `POST /api/chat/attachments/draft` validates type/size per file, but aggregate constraints (count/total bytes across current unsent draft) are primarily enforced client-side.
 4. Image rendering intentionally uses `<img>` (with lint suppression) because previews include blob and signed URLs; this avoids unnecessary complexity with `next/image` for transient URLs.
+5. Rate limiting uses a window table that can grow over time; it should be periodically pruned (e.g. keep a few days of rows).
 
 ## Operational Checklist
 
@@ -252,7 +283,9 @@ For local/prod correctness:
 1. set env values in `.env`
 2. ensure bucket exists and is private
 3. verify service role key is server-only
-4. run:
+4. apply DB schema changes:
+   - `pnpm db:push`
+5. run:
    - `pnpm lint`
    - `pnpm -s tsc --noEmit`
    - `pnpm build`
