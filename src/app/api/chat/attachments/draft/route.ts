@@ -9,10 +9,10 @@ import {
   validateAttachment,
 } from "@/lib/attachments"
 import type { DraftUploadResponse } from "@/lib/attachments"
+import { enforceAttachmentUploadRateLimit } from "@/lib/attachments/rate-limit"
 import { supabaseServer } from "@/lib/supabase/server"
 import env from "~/env.config"
 
-// TODO: Add rate limiting to prevent storage abuse by authenticated users
 export async function POST(req: Request) {
   const user = await getCurrentUser()
   if (!user) return new Response("Unauthorized", { status: 401 })
@@ -50,6 +50,26 @@ export async function POST(req: Request) {
     return Response.json(
       { error: getAttachmentValidationMessage(validationError), code: validationError },
       { status: 400 },
+    )
+  }
+
+  const rateLimitResult = await enforceAttachmentUploadRateLimit({
+    userId: user.id,
+    fileSizeBytes: file.size,
+  })
+
+  if (!rateLimitResult.ok) {
+    return Response.json(
+      {
+        error: "Too many attachment uploads. Please try again soon.",
+        code: "RATE_LIMITED",
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(rateLimitResult.retryAfterSeconds),
+        },
+      },
     )
   }
 

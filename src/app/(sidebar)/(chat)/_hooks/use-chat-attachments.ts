@@ -68,6 +68,7 @@ function getUploadErrorMessage(xhr: XMLHttpRequest) {
 
 export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmentsOptions) {
   const [attachments, setAttachments] = useState<ChatAttachment[]>([])
+  const attachmentsRef = useRef<ChatAttachment[]>([])
   const activeUploadsRef = useRef(new Map<string, XMLHttpRequest>())
   const previewUrlsRef = useRef(new Set<string>())
 
@@ -94,6 +95,10 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
       previewUrls.clear()
     }
   }, [])
+
+  useEffect(() => {
+    attachmentsRef.current = attachments
+  }, [attachments])
 
   function patchAttachment(id: string, patch: Partial<ChatAttachment>) {
     setAttachments((prev) =>
@@ -223,21 +228,11 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
   }
 
   function removeAttachment(id: string) {
-    let removedAttachment: ChatAttachment | undefined
-
-    setAttachments((prev) => {
-      const next = prev.filter((attachment) => {
-        if (attachment.id === id) {
-          removedAttachment = attachment
-          return false
-        }
-        return true
-      })
-
-      return next
-    })
-
+    const removedAttachment = attachmentsRef.current.find((attachment) => attachment.id === id)
     if (!removedAttachment) return
+
+    setAttachments((prev) => prev.filter((attachment) => attachment.id !== id))
+    attachmentsRef.current = attachmentsRef.current.filter((attachment) => attachment.id !== id)
 
     const xhr = activeUploadsRef.current.get(id)
     if (xhr) {

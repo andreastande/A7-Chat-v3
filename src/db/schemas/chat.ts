@@ -58,5 +58,26 @@ export const favoriteModel = pgTable(
   ],
 )
 
+export const attachmentUploadRateLimitWindow = pgTable(
+  "attachment_upload_rate_limit_window",
+  {
+    scope: text().notNull(),
+    subject: text().notNull(),
+    windowStart: timestamp().notNull(),
+    uploadCount: integer().notNull().default(0),
+    totalBytes: integer().notNull().default(0),
+    updatedAt: timestamp()
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.scope, table.subject, table.windowStart],
+    }),
+    index("attachment_upload_rate_limit_window_scope_subject_idx").on(table.scope, table.subject),
+  ],
+)
+
 export type Chat = Omit<typeof chat.$inferSelect, "userId">
 export type Message = typeof message.$inferSelect
