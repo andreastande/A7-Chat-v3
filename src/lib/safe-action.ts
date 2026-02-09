@@ -1,4 +1,4 @@
-"server-only"
+import "server-only"
 
 import { createSafeActionClient } from "next-safe-action"
 import { headers } from "next/headers"

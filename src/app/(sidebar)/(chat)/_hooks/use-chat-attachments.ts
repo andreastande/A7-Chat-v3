@@ -1,13 +1,14 @@
 "use client"
 
 import type { FileUIPart } from "ai"
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import {
   getAttachmentValidationMessage,
   isImageMediaType,
   validateAttachment,
   type AttachmentValidationErrorCode,
+  type DraftUploadResponse,
 } from "@/lib/attachments"
 
 type UploadStatus = "uploading" | "ready" | "error"
@@ -25,14 +26,6 @@ export type ChatAttachment = {
   file?: File
   canonicalUrl?: string
   signedUrl?: string
-}
-
-type DraftUploadResponse = {
-  filename: string
-  mediaType: string
-  size: number
-  canonicalUrl: string
-  signedUrl: string
 }
 
 interface UseChatAttachmentsOptions {
@@ -76,6 +69,31 @@ function getUploadErrorMessage(xhr: XMLHttpRequest) {
 export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmentsOptions) {
   const [attachments, setAttachments] = useState<ChatAttachment[]>([])
   const activeUploadsRef = useRef(new Map<string, XMLHttpRequest>())
+  const previewUrlsRef = useRef(new Set<string>())
+
+  function trackPreviewUrl(url: string) {
+    if (url.startsWith("blob:")) {
+      previewUrlsRef.current.add(url)
+    }
+  }
+
+  function revokeTrackedPreviewUrl(url: string) {
+    revokePreviewUrl(url)
+    previewUrlsRef.current.delete(url)
+  }
+
+  useEffect(() => {
+    const activeUploads = activeUploadsRef.current
+    const previewUrls = previewUrlsRef.current
+
+    return () => {
+      activeUploads.forEach((xhr) => xhr.abort())
+      activeUploads.clear()
+
+      previewUrls.forEach((url) => revokePreviewUrl(url))
+      previewUrls.clear()
+    }
+  }, [])
 
   function patchAttachment(id: string, patch: Partial<ChatAttachment>) {
     setAttachments((prev) => prev.map((attachment) => (attachment.id === id ? { ...attachment, ...patch } : attachment)))
@@ -173,6 +191,7 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
         const id = crypto.randomUUID()
         const isImage = isImageMediaType(mediaType)
         const previewUrl = isImage ? URL.createObjectURL(file) : ""
+        trackPreviewUrl(previewUrl)
 
         next.push({
           id,
@@ -224,7 +243,7 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
       activeUploadsRef.current.delete(id)
     }
 
-    revokePreviewUrl(removedAttachment.previewUrl)
+    revokeTrackedPreviewUrl(removedAttachment.previewUrl)
 
     if (isAuthenticated && removedAttachment.canonicalUrl) {
       void removeRemoteDraft(removedAttachment.canonicalUrl).catch((error) => {
@@ -236,7 +255,7 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
 
   function clearAfterSend() {
     setAttachments((prev) => {
-      prev.forEach((attachment) => revokePreviewUrl(attachment.previewUrl))
+      prev.forEach((attachment) => revokeTrackedPreviewUrl(attachment.previewUrl))
       return []
     })
   }
@@ -283,15 +302,8 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
     )
   }
 
-  const hasBlockingUploads = useMemo(
-    () => attachments.some((attachment) => attachment.status === "uploading"),
-    [attachments],
-  )
-
-  const hasReadyAttachments = useMemo(
-    () => attachments.some((attachment) => attachment.status === "ready"),
-    [attachments],
-  )
+  const hasBlockingUploads = attachments.some((attachment) => attachment.status === "uploading")
+  const hasReadyAttachments = attachments.some((attachment) => attachment.status === "ready")
 
   return {
     attachments,

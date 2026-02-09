@@ -6,6 +6,7 @@ import { useRef, useState } from "react"
 import TextareaAutosize from "react-textarea-autosize"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { ALLOWED_ATTACHMENT_MEDIA_TYPES } from "@/lib/attachments"
 import { cn } from "@/lib/utils"
 import type { ChatAttachment } from "../../_hooks/use-chat-attachments"
 import { useFocusOnType } from "../../_hooks/use-focus-on-type"
@@ -47,6 +48,11 @@ function AttachmentPreview({ attachment, onRemove }: { attachment: ChatAttachmen
       {attachment.status === "uploading" && (
         <div className="absolute inset-x-1 bottom-1 h-1 rounded-full bg-black/30">
           <div className="h-full rounded-full bg-white" style={{ width: `${attachment.progress}%` }} />
+        </div>
+      )}
+      {attachment.status === "error" && (
+        <div className="absolute inset-x-1 bottom-1 rounded-sm bg-destructive/85 px-1 py-0.5 text-[10px] font-medium text-destructive-foreground">
+          Upload failed
         </div>
       )}
     </div>
@@ -133,6 +139,7 @@ export function ChatInput({
         ref={fileInputRef}
         type="file"
         multiple
+        accept={ALLOWED_ATTACHMENT_MEDIA_TYPES.join(",")}
         className="hidden"
         onChange={(event) => {
           const files = event.target.files ? Array.from(event.target.files) : []

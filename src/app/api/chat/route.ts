@@ -3,7 +3,16 @@ import { createOpenRouter } from "@openrouter/ai-sdk-provider"
 import { convertToModelMessages, generateId, streamText, createGateway, wrapLanguageModel } from "ai"
 import { getCurrentUser } from "@/dal/auth"
 import { getChatWithMessages, insertMessage } from "@/dal/chat"
-import { isUserOwnedAttachmentPath, parseCanonicalStorageUrl } from "@/lib/attachments"
+import {
+  ALLOWED_ATTACHMENT_MEDIA_TYPE_SET,
+  MAX_ATTACHMENTS_PER_MESSAGE,
+  getAttachmentValidationMessage,
+  isCanonicalStorageUrl,
+  isUserOwnedAttachmentPath,
+  parseCanonicalStorageUrl,
+  validateAttachment,
+} from "@/lib/attachments"
+import { signCanonicalAttachmentUrl } from "@/lib/attachments/server"
 import type { ApiKeyPayload } from "@/lib/api-keys/types"
 import { getSystemPrompt, isValidModelId } from "@/lib/models/utils"
 import { supabaseServer } from "@/lib/supabase/server"
@@ -17,6 +26,10 @@ interface RequestBody {
   apiKey: ApiKeyPayload | null
 }
 
+type NormalizedMessageResult =
+  | { ok: true; message: UIMessage }
+  | { ok: false; error: string; code: string }
+
 function getCanonicalUrlFromProviderMetadata(part: UIMessage["parts"][number]) {
   if (!("providerMetadata" in part) || !part.providerMetadata || typeof part.providerMetadata !== "object") return null
 
@@ -27,25 +40,98 @@ function getCanonicalUrlFromProviderMetadata(part: UIMessage["parts"][number]) {
   return typeof canonicalUrl === "string" ? canonicalUrl : null
 }
 
-function normalizeMessageForStorage(message: UIMessage, userId: string): UIMessage {
-  return {
-    ...message,
-    parts: message.parts.map((part) => {
-      if (part.type !== "file") return part
+async function normalizeAndValidateAttachments(message: UIMessage, userId: string): Promise<NormalizedMessageResult> {
+  const normalizedParts: UIMessage["parts"] = []
+  const pendingFiles: Array<{
+    partIndex: number
+    canonicalUrl: string
+    mediaType: string
+    filename: string | undefined
+    bucket: string
+    path: string
+  }> = []
 
-      const canonicalUrl = getCanonicalUrlFromProviderMetadata(part) ?? part.url
-      const parsed = parseCanonicalStorageUrl(canonicalUrl)
+  // First pass: extract canonical URLs, validate shape/bucket/ownership, fast-fail on type/count
+  for (const part of message.parts) {
+    if (part.type !== "file") {
+      normalizedParts.push(part)
+      continue
+    }
 
-      if (!parsed) return part
-      if (parsed.bucket !== env.SUPABASE_STORAGE_BUCKET) return part
-      if (!isUserOwnedAttachmentPath(parsed.path, userId)) return part
+    if (pendingFiles.length + 1 > MAX_ATTACHMENTS_PER_MESSAGE) {
+      return { ok: false, error: getAttachmentValidationMessage("too_many_files"), code: "too_many_files" }
+    }
 
-      return {
-        ...part,
-        url: canonicalUrl,
-      }
-    }),
+    if (!ALLOWED_ATTACHMENT_MEDIA_TYPE_SET.has(part.mediaType)) {
+      return { ok: false, error: getAttachmentValidationMessage("unsupported_type"), code: "unsupported_type" }
+    }
+
+    const canonicalUrl = getCanonicalUrlFromProviderMetadata(part) ?? part.url
+    const parsed = parseCanonicalStorageUrl(canonicalUrl)
+
+    if (!parsed) {
+      return { ok: false, error: "Invalid attachment reference", code: "ATTACHMENT_REFERENCE_INVALID" }
+    }
+    if (parsed.bucket !== env.SUPABASE_STORAGE_BUCKET) {
+      return { ok: false, error: "Unexpected attachment bucket", code: "ATTACHMENT_BUCKET_INVALID" }
+    }
+    if (!isUserOwnedAttachmentPath(parsed.path, userId)) {
+      return { ok: false, error: "Forbidden attachment reference", code: "ATTACHMENT_FORBIDDEN" }
+    }
+
+    pendingFiles.push({
+      partIndex: normalizedParts.length,
+      canonicalUrl,
+      mediaType: part.mediaType,
+      filename: part.filename,
+      bucket: parsed.bucket,
+      path: parsed.path,
+    })
+
+    normalizedParts.push({ ...part, url: canonicalUrl })
   }
+
+  if (pendingFiles.length === 0) {
+    return { ok: true, message: { ...message, parts: normalizedParts } }
+  }
+
+  // Parallel fetch: verify all attachments exist and get actual metadata
+  const infoResults = await Promise.all(
+    pendingFiles.map(({ bucket, path }) => supabaseServer.storage.from(bucket).info(path)),
+  )
+
+  let existingCount = 0
+  let existingTotalBytes = 0
+
+  for (let i = 0; i < pendingFiles.length; i++) {
+    const pending = pendingFiles[i]
+    const { data, error } = infoResults[i]
+
+    if (error || !data) {
+      return { ok: false, error: "Attachment not found", code: "ATTACHMENT_NOT_FOUND" }
+    }
+
+    const actualMediaType = data.contentType ?? pending.mediaType
+    const size = data.size ?? 0
+
+    const validationError = validateAttachment(
+      { filename: pending.filename ?? data.name ?? "attachment", mediaType: actualMediaType, size },
+      { existingCount, existingTotalBytes },
+    )
+
+    if (validationError) {
+      return { ok: false, error: getAttachmentValidationMessage(validationError), code: validationError }
+    }
+
+    if (pending.mediaType !== actualMediaType) {
+      return { ok: false, error: "Attachment metadata mismatch", code: "ATTACHMENT_METADATA_MISMATCH" }
+    }
+
+    existingCount += 1
+    existingTotalBytes += size
+  }
+
+  return { ok: true, message: { ...message, parts: normalizedParts } }
 }
 
 async function hydrateMessageForModel(message: UIMessage, userId: string): Promise<UIMessage> {
@@ -54,25 +140,12 @@ async function hydrateMessageForModel(message: UIMessage, userId: string): Promi
     parts: await Promise.all(
       message.parts.map(async (part) => {
         if (part.type !== "file") return part
+        if (!isCanonicalStorageUrl(part.url)) return part
 
-        const parsed = parseCanonicalStorageUrl(part.url)
-        if (!parsed) return part
-        if (parsed.bucket !== env.SUPABASE_STORAGE_BUCKET) return part
-        if (!isUserOwnedAttachmentPath(parsed.path, userId)) return part
+        const signedUrl = await signCanonicalAttachmentUrl(part.url, userId)
+        if (!signedUrl) return part
 
-        const { data, error } = await supabaseServer.storage
-          .from(parsed.bucket)
-          .createSignedUrl(parsed.path, env.SUPABASE_SIGNED_URL_TTL_SECONDS)
-
-        if (error || !data?.signedUrl) {
-          console.error("Failed to sign attachment for model", error)
-          return part
-        }
-
-        return {
-          ...part,
-          url: data.signedUrl,
-        }
+        return { ...part, url: signedUrl }
       }),
     ),
   }
@@ -86,9 +159,14 @@ export async function POST(req: Request) {
   if (!user) return new Response("Unauthorized", { status: 401 })
   if (!chat) return new Response("Chat not found", { status: 404 })
 
-  // Save user message before validation so it persists even if API key/model is invalid
-  const messageForStorage = normalizeMessageForStorage(message, user.id)
-  const messageForModel = await hydrateMessageForModel(message, user.id)
+  const normalized = await normalizeAndValidateAttachments(message, user.id)
+  if (!normalized.ok) {
+    return Response.json({ error: normalized.error, code: normalized.code }, { status: 400 })
+  }
+
+  // Save user message before API key/model validation so it persists even if API key/model is invalid
+  const messageForStorage = normalized.message
+  const messageForModel = await hydrateMessageForModel(messageForStorage, user.id)
   const messages = [...chat.messages, messageForModel]
   await insertMessage(chatId, messageForStorage)
 

@@ -7,17 +7,11 @@ import {
   toCanonicalStorageUrl,
   validateAttachment,
 } from "@/lib/attachments"
+import type { DraftUploadResponse } from "@/lib/attachments"
 import { supabaseServer } from "@/lib/supabase/server"
 import env from "~/env.config"
 
-type DraftUploadResponse = {
-  filename: string
-  mediaType: string
-  size: number
-  canonicalUrl: string
-  signedUrl: string
-}
-
+// TODO: Add rate limiting to prevent storage abuse by authenticated users
 export async function POST(req: Request) {
   const user = await getCurrentUser()
   if (!user) return new Response("Unauthorized", { status: 401 })

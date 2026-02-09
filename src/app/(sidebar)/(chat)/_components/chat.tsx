@@ -11,7 +11,7 @@ import { useChatHistoryStore } from "@/app/(sidebar)/_components/providers/chat-
 import { useSession } from "@/components/providers/session-provider"
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
-import type { UIMessage } from "../../../../types/ui-message"
+import type { UIMessage } from "@/types/ui-message"
 import { useChatAttachments } from "../_hooks/use-chat-attachments"
 import { useChatSession } from "../_hooks/use-chat-session"
 import { useScrollOnMount } from "../_hooks/use-scroll-on-mount"
@@ -85,6 +85,11 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
       return
     }
 
+    const errorCount = attachments.filter((a) => a.status === "error").length
+    if (errorCount > 0) {
+      toast.warning(`${errorCount} attachment(s) failed to upload and won't be included`)
+    }
+
     let files
     try {
       files = await getSendableFileParts()
@@ -101,13 +106,12 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
     }
 
     const apiKey = getActiveKeyPayload()
+    const requestOptions = { body: { modelId: selectedModelId, apiKey } }
 
-    if (trimmedText && files.length > 0) {
-      void sendMessage({ text: trimmedText, files }, { body: { modelId: selectedModelId, apiKey } })
-    } else if (trimmedText) {
-      void sendMessage({ text: trimmedText }, { body: { modelId: selectedModelId, apiKey } })
+    if (trimmedText) {
+      void sendMessage({ text: trimmedText, ...(files.length > 0 ? { files } : {}) }, requestOptions)
     } else {
-      void sendMessage({ files }, { body: { modelId: selectedModelId, apiKey } })
+      void sendMessage({ files }, requestOptions)
     }
 
     clearAfterSend()

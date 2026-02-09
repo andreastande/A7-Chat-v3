@@ -1,32 +1,23 @@
-"server-only"
+import "server-only"
 
 import { and, eq, max } from "drizzle-orm"
-import { parseCanonicalStorageUrl } from "@/lib/attachments"
+import { isCanonicalStorageUrl } from "@/lib/attachments"
+import { signCanonicalAttachmentUrl } from "@/lib/attachments/server"
 import { db } from "@/db"
 import { type Chat, chat, favoriteModel, message as messageTable } from "@/db/schemas/chat"
-import { supabaseServer } from "@/lib/supabase/server"
 import type { UIMessage } from "@/types/ui-message"
-import env from "~/env.config"
 import { requireAuth } from "./auth"
 
-async function hydrateFilePartUrl(part: UIMessage["parts"][number]) {
+async function hydrateFilePartUrl(part: UIMessage["parts"][number], userId: string) {
   if (part.type !== "file") return part
+  if (!isCanonicalStorageUrl(part.url)) return part
 
-  const parsed = parseCanonicalStorageUrl(part.url)
-  if (!parsed) return part
-
-  const { data, error } = await supabaseServer.storage
-    .from(parsed.bucket)
-    .createSignedUrl(parsed.path, env.SUPABASE_SIGNED_URL_TTL_SECONDS)
-
-  if (error || !data?.signedUrl) {
-    console.error("Failed to create signed url for attachment", error)
-    return part
-  }
+  const signedUrl = await signCanonicalAttachmentUrl(part.url, userId)
+  if (!signedUrl) return part
 
   return {
     ...part,
-    url: data.signedUrl,
+    url: signedUrl,
     providerMetadata: {
       ...part.providerMetadata,
       attachment: {
@@ -36,11 +27,11 @@ async function hydrateFilePartUrl(part: UIMessage["parts"][number]) {
   }
 }
 
-async function hydrateMessageAttachmentUrls(messages: UIMessage[]) {
+async function hydrateMessageAttachmentUrls(messages: UIMessage[], userId: string) {
   return Promise.all(
     messages.map(async (message) => ({
       ...message,
-      parts: await Promise.all(message.parts.map(hydrateFilePartUrl)),
+      parts: await Promise.all(message.parts.map((part) => hydrateFilePartUrl(part, userId))),
     })),
   )
 }
@@ -109,6 +100,7 @@ export async function getChatWithMessages(chatId: string): Promise<(Chat & { mes
       ...m,
       metadata: m.metadata ?? undefined,
     })),
+    user.id,
   )
 
   return {
