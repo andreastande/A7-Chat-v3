@@ -59,8 +59,9 @@ If signed URLs were stored directly, messages would break after URL expiry. Pers
 
 - `src/app/api/chat/attachments/draft/route.ts`
   - `POST` uploads one file and returns canonical metadata
+  - `POST` pre-validates request envelope (`multipart/form-data`, valid `Content-Length`, size cap) before form parsing
   - `POST` enforces per-user upload rate limits (count + bytes) and returns `429` with `Retry-After` when exceeded
-  - `DELETE` removes one canonical object (with ownership guard)
+  - `DELETE` removes one canonical object (with ownership guard) only when not referenced by any sent message
 
 ### Chat UI + orchestration
 
@@ -73,7 +74,7 @@ If signed URLs were stored directly, messages would break after URL expiry. Pers
   - previews above textarea
   - remove buttons
   - upload progress bars
-  - hidden file input + keyboard shortcut (`Ctrl/Cmd + D`)
+  - hidden file input + keyboard shortcut (`Mod + U`)
 - `src/app/(sidebar)/(chat)/_components/chat-input/chat-input-actions.tsx`
   - wires menu action to file picker callback
 - `src/app/(sidebar)/(chat)/_components/chat.tsx`
@@ -131,12 +132,13 @@ Accepted files enter local state with `uploading` status and are uploaded one-by
 Server `POST` behavior:
 
 1. authenticate user
-2. validate `chatId` and `file`
-3. validate attachment type/size
-4. enforce DB-backed upload rate limits (count + bytes)
-5. upload to private bucket under path:
+2. validate request envelope (`multipart/form-data`, valid `Content-Length`, max request size)
+3. parse form data and validate `chatId` and `file`
+4. validate attachment type/size
+5. enforce DB-backed upload rate limits (count + bytes)
+6. upload to private bucket under path:
    `users/<sanitized-user-id>/drafts/<sanitized-chat-id>/<uuid>-<sanitized-filename>`
-6. return:
+7. return:
 
 ```json
 {
@@ -164,9 +166,10 @@ If authenticated and a canonical URL exists, client calls `DELETE /api/chat/atta
 - validates canonical URL shape
 - enforces expected bucket
 - enforces user ownership by required `users/<userId>/` prefix
+- rejects deletion when the canonical URL is already referenced in any sent message (`409`)
 - removes object from storage
 
-This is **opportunistic cleanup**. There is no scheduled stale draft sweeper yet.
+This is **opportunistic cleanup** for unsent drafts. There is no scheduled stale draft sweeper yet.
 
 ### 4) Sending an authenticated message
 
@@ -202,6 +205,16 @@ The user message is inserted first (existing behavior retained), then the model 
 - preserve canonical URL inside `providerMetadata.attachment.canonicalUrl`
 
 This makes the UI and model pipeline consume valid URLs while DB remains canonical.
+
+### 6) Deleting a chat
+
+When an authenticated chat is deleted (`deleteChat` in `src/dal/chat.ts`):
+
+- backend collects owned canonical attachment targets referenced by that chat
+- chat row is deleted (message rows cascade)
+- storage cleanup runs server-side and deletes only attachment objects that are no longer referenced by any remaining message for that user
+
+This prevents both orphan accumulation from chat deletion and accidental deletion of files still used in other chats.
 
 ## AI SDK Integration
 
@@ -271,7 +284,10 @@ This is designed to work in multi-instance deployments (DB-backed, not in-memory
 ## Known Tradeoffs / Current Limitations
 
 1. Draft namespace is used for persisted objects. There is no move/rename to a “final” namespace after send.
-2. Cleanup is opportunistic (remove-on-delete), not lifecycle-managed. Abandoned uploads may remain until a future cleanup job is added.
+2. Cleanup is partially lifecycle-managed:
+   - chat deletion triggers backend storage cleanup for unreferenced files
+   - remove-before-send triggers opportunistic draft cleanup
+   - abandoned uploads without chat deletion still require a future sweeper
 3. Server-side `POST /api/chat/attachments/draft` validates type/size per file, but aggregate constraints (count/total bytes across current unsent draft) are primarily enforced client-side.
 4. Image rendering intentionally uses `<img>` (with lint suppression) because previews/messages include blob and short-lived remote URLs; this avoids unnecessary complexity with `next/image` for transient URLs.
 5. Rate limiting uses a window table that can grow over time; it should be periodically pruned (e.g. keep a few days of rows).
@@ -335,4 +351,4 @@ sequenceDiagram
 
 ---
 
-If future work is prioritized, the first recommended follow-up is introducing a draft attachment lifecycle sweeper and/or move-to-final-path on successful send.
+If future work is prioritized, the first recommended follow-up is introducing a scheduled stale-draft sweeper and/or move-to-final-path on successful send.

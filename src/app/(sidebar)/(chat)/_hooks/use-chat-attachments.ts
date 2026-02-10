@@ -301,7 +301,9 @@ export function useChatAttachments({ chatId, isAuthenticated }: UseChatAttachmen
       const parts: FileUIPart[] = []
 
       for (const attachment of readyAttachments) {
-        if (!attachment.canonicalUrl) continue
+        if (!attachment.canonicalUrl) {
+          throw new Error("An attachment is missing its upload reference. Remove it and add it again.")
+        }
 
         parts.push({
           type: "file",

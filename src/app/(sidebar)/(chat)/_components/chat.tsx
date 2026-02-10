@@ -86,8 +86,8 @@ export function Chat({ chatId, initialMessages = [] }: ChatProps) {
     let files
     try {
       files = await getSendableFileParts()
-    } catch {
-      toast.error("Failed to prepare attachments")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to prepare attachments")
       return
     }
 

@@ -38,7 +38,7 @@ export function ChatInputActions({ onAddFiles }: ChatInputActionsProps) {
         <DropdownMenuItem onClick={onAddFiles}>
           <Paperclip />
           Add files or photos
-          <DropdownMenuShortcut showOnFocus>{mod}D</DropdownMenuShortcut>
+          <DropdownMenuShortcut showOnFocus>{mod}U</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>

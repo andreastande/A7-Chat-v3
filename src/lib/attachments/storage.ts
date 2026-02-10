@@ -10,6 +10,8 @@ export function sanitizeFilename(filename: string): string {
 }
 
 function sanitizePathSegment(value: string): string {
+  // NOTE: This normalization is lossy and assumes IDs are already safe (UUID-style).
+  // If ID formats broaden, switch to a reversible encoding to avoid segment collisions.
   return value.replace(/[^a-zA-Z0-9_-]/g, "_")
 }
 

@@ -3,6 +3,7 @@
 import { useChatActions, useChatStatus } from "@ai-sdk-tools/store"
 import { ArrowUp, Square } from "lucide-react"
 import { useRef, useState } from "react"
+import { useHotkeys } from "react-hotkeys-hook"
 import TextareaAutosize from "react-textarea-autosize"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -41,6 +42,12 @@ export function ChatInput({
 
   const status = useChatStatus()
   const { stop } = useChatActions()
+  const openFilePicker = () => fileInputRef.current?.click()
+
+  useHotkeys("mod+u", openFilePicker, {
+    preventDefault: true,
+    enableOnFormTags: true,
+  })
 
   const canSend = status === "ready" && !hasBlockingUploads && Boolean(input.trim() || hasReadyAttachments)
   const canStop = status === "submitted" || status === "streaming"
@@ -122,7 +129,7 @@ export function ChatInput({
       />
       <div className="mt-2 flex justify-between">
         <div className="flex items-center gap-2">
-          <ChatInputActions onAddFiles={() => fileInputRef.current?.click()} />
+          <ChatInputActions onAddFiles={openFilePicker} />
           <Separator orientation="vertical" className="h-4 self-center!" />
           <ModelPicker />
         </div>
