@@ -13,7 +13,11 @@ import {
 import { WithTooltip } from "@/components/ui/tooltip"
 import { useKeyboardKeys } from "@/hooks/use-keyboard-keys"
 
-export function ChatInputActions() {
+interface ChatInputActionsProps {
+  onAddFiles: () => void
+}
+
+export function ChatInputActions({ onAddFiles }: ChatInputActionsProps) {
   const { mod } = useKeyboardKeys()
 
   return (
@@ -31,10 +35,10 @@ export function ChatInputActions() {
         <Plus />
       </WithTooltip>
       <DropdownMenuContent className="w-56">
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={onAddFiles}>
           <Paperclip />
           Add files or photos
-          <DropdownMenuShortcut showOnFocus>{mod}D</DropdownMenuShortcut>
+          <DropdownMenuShortcut showOnFocus>{mod}U</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>

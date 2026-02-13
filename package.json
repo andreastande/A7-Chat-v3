@@ -31,6 +31,7 @@
     "@streamdown/code": "^1.0.1",
     "@streamdown/math": "^1.0.1",
     "@streamdown/mermaid": "^1.0.1",
+    "@supabase/supabase-js": "^2.49.8",
     "ai": "^6.0.68",
     "better-auth": "^1.4.18",
     "class-variance-authority": "^0.7.1",

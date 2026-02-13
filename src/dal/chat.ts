@@ -1,10 +1,121 @@
-"server-only"
-
-import { and, eq, max } from "drizzle-orm"
+import "server-only"
+import { and, eq, max, sql } from "drizzle-orm"
 import { db } from "@/db"
 import { type Chat, chat, favoriteModel, message as messageTable } from "@/db/schemas/chat"
+import { hydrateCanonicalAttachmentUrls, validateOwnedCanonicalAttachmentUrl } from "@/lib/attachments/server"
+import { toCanonicalStorageUrl } from "@/lib/attachments/storage"
+import { supabaseServer } from "@/lib/supabase/server"
 import type { UIMessage } from "@/types/ui-message"
 import { requireAuth } from "./auth"
+
+const STORAGE_DELETE_BATCH_SIZE = 100
+
+type AttachmentStorageTarget = {
+  bucket: string
+  path: string
+}
+
+function getCanonicalUrlFromProviderMetadata(part: UIMessage["parts"][number]) {
+  if (!("providerMetadata" in part) || !part.providerMetadata || typeof part.providerMetadata !== "object") return null
+
+  const attachment = (part.providerMetadata as Record<string, unknown>).attachment
+  if (!attachment || typeof attachment !== "object") return null
+
+  const canonicalUrl = (attachment as Record<string, unknown>).canonicalUrl
+  return typeof canonicalUrl === "string" ? canonicalUrl : null
+}
+
+function collectOwnedAttachmentTargets(
+  messages: Array<Pick<typeof messageTable.$inferSelect, "parts">>,
+  userId: string,
+): AttachmentStorageTarget[] {
+  const byKey = new Map<string, AttachmentStorageTarget>()
+
+  for (const message of messages) {
+    for (const part of message.parts) {
+      if (part.type !== "file") continue
+
+      const candidateUrls = [part.url, getCanonicalUrlFromProviderMetadata(part)]
+      for (const url of candidateUrls) {
+        if (!url) continue
+
+        const validation = validateOwnedCanonicalAttachmentUrl(url, userId)
+        if (!validation.ok) continue
+
+        byKey.set(`${validation.bucket}:${validation.path}`, {
+          bucket: validation.bucket,
+          path: validation.path,
+        })
+      }
+    }
+  }
+
+  return Array.from(byKey.values())
+}
+
+async function isAttachmentReferencedByUser({ canonicalUrl, userId }: { canonicalUrl: string; userId: string }) {
+  const [referencedMessage] = await db
+    .select({ id: messageTable.id })
+    .from(messageTable)
+    .innerJoin(chat, eq(chat.id, messageTable.chatId))
+    .where(
+      and(
+        eq(chat.userId, userId),
+        sql`exists (
+          select 1
+          from jsonb_array_elements(${messageTable.parts}) as part
+          where part->>'type' = 'file'
+            and (
+              part->>'url' = ${canonicalUrl}
+              or part->'providerMetadata'->'attachment'->>'canonicalUrl' = ${canonicalUrl}
+            )
+        )`,
+      ),
+    )
+    .limit(1)
+
+  return Boolean(referencedMessage)
+}
+
+async function cleanupAttachmentTargets({ targets, userId }: { targets: AttachmentStorageTarget[]; userId: string }) {
+  if (targets.length === 0) return
+
+  const deletableTargets: AttachmentStorageTarget[] = []
+  for (const target of targets) {
+    const canonicalUrl = toCanonicalStorageUrl(target.bucket, target.path)
+    const isReferenced = await isAttachmentReferencedByUser({ canonicalUrl, userId })
+    if (!isReferenced) {
+      deletableTargets.push(target)
+    }
+  }
+
+  if (deletableTargets.length === 0) return
+
+  const byBucket = new Map<string, string[]>()
+  for (const target of deletableTargets) {
+    const existing = byBucket.get(target.bucket)
+    if (existing) {
+      existing.push(target.path)
+    } else {
+      byBucket.set(target.bucket, [target.path])
+    }
+  }
+
+  for (const [bucket, paths] of byBucket) {
+    for (let i = 0; i < paths.length; i += STORAGE_DELETE_BATCH_SIZE) {
+      const chunk = paths.slice(i, i + STORAGE_DELETE_BATCH_SIZE)
+      const { error } = await supabaseServer.storage.from(bucket).remove(chunk)
+
+      if (error) {
+        console.error("Failed to cleanup chat attachment objects after chat delete", {
+          bucket,
+          batchSize: chunk.length,
+          error,
+        })
+      }
+    }
+  }
+}
 
 // =============================================================================
 // Queries
@@ -39,6 +150,19 @@ export async function getChat(chatId: string): Promise<Chat | null> {
 }
 
 /**
+ * Check if a chat is accessible to the current user.
+ * Returns true if the chat doesn't exist (e.g., new chat not yet created) or belongs to the user.
+ * Returns false only if the chat exists and belongs to another user.
+ */
+export async function isChatAccessible(chatId: string): Promise<boolean> {
+  const user = await requireAuth()
+
+  const [existing] = await db.select({ userId: chat.userId }).from(chat).where(eq(chat.id, chatId)).limit(1)
+
+  return !existing || existing.userId === user.id
+}
+
+/**
  * Get all messages for a chat, ordered chronologically.
  * Verifies user owns the chat before returning messages.
  */
@@ -65,12 +189,17 @@ export async function getChatWithMessages(chatId: string): Promise<(Chat & { mes
   })
 
   if (!result) return null
-  return {
-    ...result,
-    messages: result.messages.map((m) => ({
+  const hydratedMessages = await hydrateCanonicalAttachmentUrls(
+    result.messages.map((m) => ({
       ...m,
       metadata: m.metadata ?? undefined,
     })),
+    { userId: user.id },
+  )
+
+  return {
+    ...result,
+    messages: hydratedMessages,
   }
 }
 
@@ -177,8 +306,22 @@ export async function updateChatModel(chatId: string, modelId: string) {
  */
 export async function deleteChat(chatId: string) {
   const user = await requireAuth()
+  const chatWithMessages = await db.query.chat.findFirst({
+    where: and(eq(chat.id, chatId), eq(chat.userId, user.id)),
+    columns: { id: true },
+    with: {
+      messages: {
+        columns: { parts: true },
+      },
+    },
+  })
+
+  if (!chatWithMessages) return
+
+  const attachmentTargets = collectOwnedAttachmentTargets(chatWithMessages.messages, user.id)
 
   await db.delete(chat).where(and(eq(chat.id, chatId), eq(chat.userId, user.id)))
+  await cleanupAttachmentTargets({ targets: attachmentTargets, userId: user.id })
 }
 
 // =============================================================================
